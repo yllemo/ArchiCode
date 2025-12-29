@@ -15,8 +15,9 @@ An autonomous JavaScript library for rendering ArchiMate 3.2 diagrams from text,
 <html>
 <head>
     <title>ArchiCode Example</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.css">
-    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.js"></script>
+    <!-- Use specific commit for stability (update hash for latest version) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.css">
+    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.js"></script>
 </head>
 <body>
     <div id="diagram"></div>

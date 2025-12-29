@@ -55,8 +55,9 @@ ArchiCode.render(code, '#diagram');
 
 **Alternativ 1: jsDelivr (Fungerar direkt från GitHub)**
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.css">
-<script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.js"></script>
+<!-- Använd specifik commit för stabilitet (uppdatera hash för senaste version) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.css">
+<script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.js"></script>
 <script>
     ArchiCode.render(myCode, '#diagram');
 </script>

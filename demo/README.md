@@ -9,12 +9,16 @@ This directory contains the interactive demo application for ArchiCode.js.
 
 ## ⚠️ Important Note
 
-This demo uses the **local version** of ArchiCode.js from the parent directory to ensure you always have the latest features and bug fixes.
+This demo uses the **CDN version** of ArchiCode.js from jsDelivr with a specific commit hash to ensure stability and avoid cache issues.
 
-**If you experience errors:**
-1. Hard refresh: `Ctrl+Shift+R` (Windows/Linux) or `Cmd+Shift+R` (Mac)
-2. Clear browser cache
+**If you want to use the latest development version:**
+1. Uncomment the local file links in `index.html`
+2. Comment out the CDN links
 3. Ensure `../archicode.js` and `../archicode.css` exist
+
+**CDN vs Local:**
+- **CDN** (default): Reliable, works online without downloading files
+- **Local**: Latest features, works offline, best for development
 
 ## Running the Demo
 
