@@ -17,38 +17,34 @@
 [<application:data> Data Store]
 [<technology:node> Server]
 
-// Association - simple relationship
+// Association - simple relationship (solid line, no arrow)
 [Source Actor] --- [Target Actor]
 
-// Serving - one serves another
-[Service A] --> [Process A]
-[Component A] --> [Service A]
+// Serving - one serves another (solid line, open arrow)
+[Service A] -> [Process A]
+[Component A] -> [Service A]
 
-// Realization - realizes/implements
-[Component A] --:> [Service A]
-[Process A] --:> [Service B]
+// Flow - information/data flow (dashed line, open arrow)
+[Process A] --> [Process B]
 
-// Triggering - triggers/activates
-[Process A] -|> [Process B]
+// Realization - realizes/implements (dashed line, empty triangle)
+[Component A] --:> [Service B]
 
-// Assignment - assigned to
+// Triggering - triggers/activates (solid line, open arrow)
+[Process B] -|> [Process A]
+
+// Assignment - assigned to (solid line, filled circle)
 [Manager Role] .-- [Source Actor]
 [Employee Role] .-- [Target Actor]
 
-// Composition - is part of (strong ownership)
-[Component A] +- [Data Store]
+// Composition - is part of (solid line, filled diamond)
 [Server] +- [Component B]
 
-// Aggregation - is part of (weak ownership)  
+// Aggregation - is part of (solid line, empty diamond)
 [Service A] o- [Component A]
-[Process A] o- [Service A]
 
-// Specialization - is a specialized form of
+// Specialization - is a specialized form of (solid line, empty triangle)
 [Manager Role] -:> [Employee Role]
 
-// Access - accesses (bidirectional)
-[Component A] <-> [Data Store]
+// Access - accesses (dashed line, bidirectional open arrows)
 [Component B] <-> [Data Store]
-
-// Flow - information/data flow
-[Process A] --> [Process B]

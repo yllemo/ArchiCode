@@ -147,27 +147,31 @@ ArchiCode.js follows the official ArchiMate 3.2 standard with the official color
 
 Supported relationship types:
 
-| Syntax | Relationship | Description |
-|--------|-------------|-------------|
-| `-->` | Serving | Element serves another |
-| `--:>` | Realization | Element realizes another |
-| `-|>` | Triggering | Element triggers another |
-| `.--.` | Assignment | Element assigned to another |
-| `+-` | Composition | Element composed of another |
-| `o-` | Aggregation | Element aggregates another |
-| `-:>` | Specialization | Element specializes another |
-| `---` | Association | Elements are associated |
-| `<->` | Access | Bidirectional access |
+| Syntax | Relationship | Description | Line Style | Arrow |
+|--------|-------------|-------------|-----------|-------|
+| `->` / `<-` | Serving | Element serves another | Solid | Open |
+| `-->` / `<--` | Flow | Flow between elements | Dashed | Open |
+| `--:>` / `<:--` | Realization | Element realizes another | Dashed | Empty triangle |
+| `-|>` / `<\|-` | Triggering | Element triggers another | Solid | Open |
+| `.--` / `--.` | Assignment | Element assigned to another | Solid | Filled circle |
+| `+-` / `-+` | Composition | Element composed of another | Solid | Filled diamond |
+| `o-` / `-o` | Aggregation | Element aggregates another | Solid | Empty diamond |
+| `-:>` / `<:-` | Specialization | Element specializes another | Solid | Empty triangle |
+| `---` | Association | Elements are associated | Solid | None |
+| `<->` | Access | Bidirectional access | Dashed | Open (both) |
 
 **Examples:**
 ```
-[Customer] --> [Sales Process]          # Serving
+[Customer] -> [Sales Process]           # Serving
+[Process A] --> [Process B]             # Flow
 [Web Portal] --:> [Customer Service]    # Realization
 [Order Event] -|> [Fulfillment]         # Triggering
 [Manager] .-- [Project Team]            # Assignment
 [System] +- [Database]                  # Composition
 [Department] o- [Employee]              # Aggregation
 [Premium Customer] -:> [Customer]       # Specialization
+[Component] <-> [Database]              # Access
+[Object A] --- [Object B]               # Association
 ```
 
 ### Complete Example

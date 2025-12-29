@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ArchiCode Syntax Test</title>
+    <link rel="stylesheet" href="archicode.css">
+    <script src="archicode.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .code-block {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            white-space: pre;
+        }
+        .diagram {
+            background: #fafafa;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+            min-height: 200px;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>🧪 ArchiCode Syntax Test</h1>
+    <p>Test av alla ArchiMate relationstyper och deras syntaxer</p>
+
+    <div class="test-section">
+        <h2>1. Serving (Solid line, open arrow)</h2>
+        <div class="code-block">[<business:actor> Actor] -> [<business:service> Service]
+[<business:service> Service] <- [<business:actor> Actor]</div>
+        <div class="diagram" id="test1"></div>
+        <div class="result" id="result1"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Flow (Dashed line, open arrow)</h2>
+        <div class="code-block">[<business:process> Process A] --> [<business:process> Process B]
+[<business:process> Process B] <-- [<business:process> Process A]</div>
+        <div class="diagram" id="test2"></div>
+        <div class="result" id="result2"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Triggering (Solid line, open arrow)</h2>
+        <div class="code-block">[<business:event> Event] -|> [<business:process> Process]
+[<business:process> Process] <|- [<business:event> Event]</div>
+        <div class="diagram" id="test3"></div>
+        <div class="result" id="result3"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Access (Dashed line, bidirectional)</h2>
+        <div class="code-block">[<application:component> Component] <-> [<application:data> Database]</div>
+        <div class="diagram" id="test4"></div>
+        <div class="result" id="result4"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Realization (Dashed line, empty triangle)</h2>
+        <div class="code-block">[<application:component> Component] --:> [<application:service> Service]
+[<application:service> Service] <:-- [<application:component> Component]</div>
+        <div class="diagram" id="test5"></div>
+        <div class="result" id="result5"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Specialization (Solid line, empty triangle)</h2>
+        <div class="code-block">[<business:role> Manager] -:> [<business:role> Employee]
+[<business:role> Employee] <:- [<business:role> Manager]</div>
+        <div class="diagram" id="test6"></div>
+        <div class="result" id="result6"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Assignment (Solid line, filled circle)</h2>
+        <div class="code-block">[<business:actor> Actor] .-- [<business:process> Process]
+[<business:process> Process] --. [<business:actor> Actor]</div>
+        <div class="diagram" id="test7"></div>
+        <div class="result" id="result7"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>8. Composition (Solid line, filled diamond)</h2>
+        <div class="code-block">[<application:component> Parent] +- [<application:component> Child]
+[<application:component> Child] -+ [<application:component> Parent]</div>
+        <div class="diagram" id="test8"></div>
+        <div class="result" id="result8"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>9. Aggregation (Solid line, empty diamond)</h2>
+        <div class="code-block">[<business:service> Service] o- [<business:process> Process]
+[<business:process> Process] -o [<business:service> Service]</div>
+        <div class="diagram" id="test9"></div>
+        <div class="result" id="result9"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>10. Association (Solid line, no arrow)</h2>
+        <div class="code-block">[<business:object> Object A] --- [<business:object> Object B]</div>
+        <div class="diagram" id="test10"></div>
+        <div class="result" id="result10"></div>
+    </div>
+
+    <script>
+        const tests = [
+            { id: 1, code: `[<business:actor> Actor] -> [<business:service> Service]\n[<business:service> Service2] <- [<business:actor> Actor2]` },
+            { id: 2, code: `[<business:process> Process A] --> [<business:process> Process B]\n[<business:process> Process D] <-- [<business:process> Process C]` },
+            { id: 3, code: `[<business:event> Event] -|> [<business:process> Process]\n[<business:process> Process2] <|- [<business:event> Event2]` },
+            { id: 4, code: `[<application:component> Component] <-> [<application:data> Database]` },
+            { id: 5, code: `[<application:component> Component] --:> [<application:service> Service]\n[<application:service> Service2] <:-- [<application:component> Component2]` },
+            { id: 6, code: `[<business:role> Manager] -:> [<business:role> Employee]\n[<business:role> Employee2] <:- [<business:role> Manager2]` },
+            { id: 7, code: `[<business:actor> Actor] .-- [<business:process> Process]\n[<business:process> Process2] --. [<business:actor> Actor2]` },
+            { id: 8, code: `[<application:component> Parent] +- [<application:component> Child]\n[<application:component> Child2] -+ [<application:component> Parent2]` },
+            { id: 9, code: `[<business:service> Service] o- [<business:process> Process]\n[<business:process> Process2] -o [<business:service> Service2]` },
+            { id: 10, code: `[<business:object> Object A] --- [<business:object> Object B]` }
+        ];
+
+        tests.forEach(test => {
+            try {
+                const parseResult = ArchiCode.parse(test.code);
+                ArchiCode.render(test.code, `#test${test.id}`);
+
+                const resultDiv = document.getElementById(`result${test.id}`);
+                if (parseResult.hasErrors) {
+                    resultDiv.className = 'result warning';
+                    resultDiv.innerHTML = `⚠️ Varningar: ${parseResult.parseErrors.length}`;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ OK - ${parseResult.elements.length} element, ${parseResult.relations.length} relationer`;
+                }
+            } catch (error) {
+                const resultDiv = document.getElementById(`result${test.id}`);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Fel: ${error.message}`;
+                console.error(`Test ${test.id} failed:`, error);
+            }
+        });
+    </script>
+</body>
+</html>

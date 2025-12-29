@@ -324,29 +324,31 @@ ArchiCode.js använder de officiella formerna:
 
 Stödda relationstyper enligt [Architext.dev syntax](https://architext.dev/guide/relationships.html):
 
-| Syntax | Relation | Beskrivning | Pil-typ |
-|--------|----------|-------------|---------|
-| `-:>` eller `<:-` | Specialization | Specialisering/arv | Tom triangel |
-| `+-` eller `-+` | Composition | Komposition | Fylld diamant |
-| `o-` eller `-o` | Aggregation | Aggregering | Tom diamant |
-| `.--.` eller `.->` eller `.-|>` eller `.--|>` | Assignment | Tilldelning | Fylld cirkel |
-| `--:>` | Realization | Realisering | Tom triangel |
-| `-|>` eller `<|-` | Triggering | Triggande | Öppen pil |
-| `->` eller `<-` | Serving | Tjänar | Öppen pil |
-| `-->` eller `<--` | Flow | Flöde | Öppen pil (streckad linje) |
-| `<->` | Access | Åtkomst | Öppen pil (streckad linje) |
-| `---` eller `<--` | Association | Association | Ingen pil |
+| Syntax | Relation | Beskrivning | Linjestil | Pil-typ |
+|--------|----------|-------------|-----------|---------|
+| `->` / `<-` | Serving | Tjänar | Heldragen | Öppen pil |
+| `-->` / `<--` | Flow | Flöde | Streckad | Öppen pil |
+| `--:>` / `<:--` | Realization | Realisering | Streckad | Tom triangel |
+| `-|>` / `<\|-` | Triggering | Triggande | Heldragen | Öppen pil |
+| `.--` / `--.` | Assignment | Tilldelning | Heldragen | Fylld cirkel |
+| `+-` / `-+` | Composition | Komposition | Heldragen | Fylld diamant |
+| `o-` / `-o` | Aggregation | Aggregering | Heldragen | Tom diamant |
+| `-:>` / `<:-` | Specialization | Specialisering | Heldragen | Tom triangel |
+| `---` | Association | Association | Heldragen | Ingen pil |
+| `<->` | Access | Åtkomst | Streckad | Öppen pil (båda håll) |
 
 **Exempel:**
 ```
-[Customer] --- [Sales Manager]                    # Association
-[Order Process] -> [Online Shopping]              # Serving
-[Process] -|> [Event]                              # Triggering
+[Customer] -> [Order Process]                     # Serving
+[Process A] --> [Process B]                       # Flow
 [Component] --:> [Service]                        # Realization
-[Business Actor] .-> [Customer]                    # Assignment
-[Manager] -:> [Employee]                           # Specialization
-[System] +- [Component]                            # Composition
+[Event] -|> [Process]                             # Triggering
+[Actor] .-- [Business Process]                    # Assignment
+[System] +- [Component]                           # Composition
 [Team] o- [Member]                                # Aggregation
+[Manager] -:> [Employee]                          # Specialization
+[Component] <-> [Database]                        # Access
+[Object A] --- [Object B]                         # Association
 ```
 
 **Labels på relationer:**

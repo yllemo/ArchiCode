@@ -200,22 +200,21 @@
     // Map Architext.dev syntax to relationship types
     // Based on official Architext.dev documentation: https://architext.dev/guide/relationships.html
     const SYNTAX_TO_RELATIONSHIP = {
-        // Specialization: -:> or <-: or <:--
+        // Specialization: -:> or <:-
         '-:>': 'specialization',
         '<:-': 'specialization',
-        '<:--': 'specialization',
         // Composition: +- or -+
         '+-': 'composition',
         '-+': 'composition',
         // Aggregation: o- or -o
         'o-': 'aggregation',
         '-o': 'aggregation',
-        // Assignments: .--. or .-> or .-|> or .--|> or <-. or <-|.
-        '.--.': 'assignment',
+        // Assignment: .-- or --. or .-> or <-. (solid line, filled circle)
+        '.--': 'assignment',
+        '--.': 'assignment',
         '.->': 'assignment',
-        '.-|>': 'assignment',
-        '.--|>': 'assignment',
         '<-.': 'assignment',
+        '.-|>': 'assignment',
         '<-|.': 'assignment',
         // Realization: --:> or <:--
         '--:>': 'realization',
@@ -229,11 +228,10 @@
         // Flow: --> or <--
         '-->': 'flow',
         '<--': 'flow',
-        // Access: <->
+        // Access: <-> (bidirectional)
         '<->': 'access',
-        // Association: --- or <--
-        '---': 'association',
-        '<--': 'association'
+        // Association: --- (no direction, no arrow)
+        '---': 'association'
     };
 
     /**
@@ -332,22 +330,6 @@
                 }
             }
 
-            // Check for common misspellings of relationship arrows
-            const commonMistakes = {
-                '-->': 'Korrekt (serving)',
-                '->': 'Korrekt (serving)',
-                '<--': 'Använd <-- eller <- för omvänd riktning',
-                '<-': 'Korrekt (omvänd serving)',
-                '--:>': 'Korrekt (realization)',
-                '<:--': 'Använd --:> för realization (inte <:--)',
-                '+-': 'Korrekt (composition)',
-                '-+': 'Använd +- för composition (inte -+)',
-                'o-': 'Korrekt (aggregation)',
-                '-o': 'Använd o- för aggregation (inte -o)',
-                '.-': 'Korrekt start för assignment',
-                '-.': 'Använd .- för assignment (inte -.)'
-            };
-
             // Suggest relationship if brackets exist but no valid relationship found
             if (line.includes('[') && line.includes(']')) {
                 const hasRelation = /\[([^\]]+)\]\s*([^\[]+)\s*\[([^\]]+)\]/.test(line);
@@ -355,10 +337,13 @@
                     const middlePart = line.match(/\]\s*([^\[]+)\s*\[/);
                     if (middlePart) {
                         const relSyntax = middlePart[1].trim();
+                        // All valid relationship syntaxes (updated to match SYNTAX_TO_RELATIONSHIP)
+                        const validSyntaxes = /^(-:>|<:-|\+-|-\+|o-|-o|\.--|--\.|\.->|<-\.|\.-\|>|<-\|\.|\--:>|<:--|-\|>|<\|-->|<-|-->|<--|<->|---)$/;
+
                         // Check if it looks like an attempt at a relationship but with wrong syntax
-                        if (relSyntax.length > 0 && !relSyntax.match(/^(-:>|<-:|<:--|\+\-|\-\+|o-|-o|\.--\.|\.->|\.-\|>|\.--\|>|<-\||<-\|\.|--:>|-\|>|<\|-|->|<-|-->|<--|<->|---)$/)) {
+                        if (relSyntax.length > 0 && !validSyntaxes.test(relSyntax)) {
                             errors.push(`Rad ${lineNum + 1}: Ogiltig relations-syntax "${relSyntax}"`);
-                            suggestions.push(`Använd någon av: --> (serving), --:> (realization), +- (composition), o- (aggregation), .- (assignment), <-> (access), -|> (triggering), --- (association)`);
+                            suggestions.push(`Giltiga syntaxer:\n  -> (serving), --> (flow), --:> (realization)\n  +- (composition), o- (aggregation), .-- (assignment)\n  <-> (access), -|> (triggering), --- (association)\n  -:> (specialization)`);
                         }
                     }
                 }

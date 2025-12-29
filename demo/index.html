@@ -371,11 +371,11 @@ Exempel:
 [<business:object> Beställning]
 
 // Relationer
-[Kund] --> [Försäljningsprocess]
-[Säljare] --> [Försäljningsprocess]
-[Försäljningsprocess] --> [Kundtjänst]
-[Försäljningsprocess] --> [Beställning]
-[Beställning] --> [Leveransprocess]
+[Kund] -> [Försäljningsprocess]
+[Säljare] -> [Försäljningsprocess]
+[Försäljningsprocess] -> [Kundtjänst]
+[Försäljningsprocess] -> [Beställning]
+[Beställning] -> [Leveransprocess]
 [Projektledare] .-- [Kund]`,
 
             'ecommerce': `#spacing: 100
@@ -395,13 +395,13 @@ Exempel:
 [<technology:node> Applikationsserver]
 
 // Relationer
-[Kund] --> [Webbutik]
-[Webbutik] --> [REST API]
-[REST API] --> [Orderservice]
+[Kund] -> [Webbutik]
+[Webbutik] -> [REST API]
+[REST API] -> [Orderservice]
 [Orderservice] <-> [Produktdatabas]
 [Webbfrontend] --:> [Webbutik]
-[Webbfrontend] --> [Lastbalanserare]
-[Lastbalanserare] --> [Applikationsserver]`,
+[Webbfrontend] -> [Lastbalanserare]
+[Lastbalanserare] -> [Applikationsserver]`,
 
             'relationships': `#spacing: 70
 #fontSize: 13
@@ -418,31 +418,34 @@ Exempel:
 [<application:component> System B]
 [<application:data> Databas]
 
-// Association - enkel koppling
+// Association - enkel koppling (solid, no arrow)
 [Källa] --- [Mål]
 
-// Serving - tjänar
-[Tjänst A] --> [Process A]
+// Serving - tjänar (solid, open arrow)
+[Tjänst A] -> [Process A]
 
-// Realization - realiserar
+// Flow - flöde (dashed, open arrow)
+[Process A] --> [Process B]
+
+// Realization - realiserar (dashed, empty triangle)
 [System A] --:> [Tjänst A]
 
-// Triggering - utlöser
-[Process A] -|> [Process B]
+// Triggering - utlöser (solid, open arrow)
+[Process B] -|> [Process A]
 
-// Assignment - tilldelning
+// Assignment - tilldelning (solid, filled circle)
 [Chef] .-- [Process A]
 
-// Composition - består av (stark ägande)
+// Composition - består av (solid, filled diamond)
 [System A] +- [Databas]
 
-// Aggregation - består av (svag ägande)
+// Aggregation - består av (solid, empty diamond)
 [Tjänst A] o- [System A]
 
-// Specialization - specialisering
+// Specialization - specialisering (solid, empty triangle)
 [Chef] -:> [Anställd]
 
-// Access - åtkomst
+// Access - åtkomst (dashed, bidirectional)
 [System B] <-> [Databas]`
         };
 
