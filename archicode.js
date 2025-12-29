@@ -6,7 +6,7 @@
  * Compatible with Architext.dev syntax
  *
  * @author Henrik Yllemo
- * @copyright 2026 Henrik Yllemo
+ * @copyright 2025 Henrik Yllemo
  * @license MIT
  *
  * Usage:
@@ -902,9 +902,11 @@
             );
 
             // Final coordinates for arrow
+            const x1 = sourcePoint.x;
+            const y1 = sourcePoint.y;
             const x2 = targetPoint.x;
             const y2 = targetPoint.y;
-            
+
             if (relStyle.arrow === 'open') {
                 // Open arrow (for serving, access, triggering, flow)
                 const arrowPoints = [
@@ -1070,6 +1072,66 @@
         }
 
         /**
+         * Export diagram as SVG string
+         * Creates an in-memory SVG without rendering to the DOM
+         */
+        exportSVG(code) {
+            // Parse code
+            const { elements, relations, config } = this.parse(code);
+
+            if (elements.length === 0) {
+                throw new Error('No elements found in code');
+            }
+
+            // Calculate layout
+            const layoutElements = this.calculateLayout(elements, relations, config);
+
+            // Create elements map
+            const elementsMap = new Map();
+            layoutElements.forEach(el => elementsMap.set(el.id, el));
+
+            // Calculate SVG size
+            const maxX = Math.max(...layoutElements.map(e => e.x + e.width));
+            const maxY = Math.max(...layoutElements.map(e => e.y + e.height));
+            const width = maxX + config.spacing;
+            const height = maxY + config.spacing;
+
+            // Create SVG
+            const svg = this.createSvgElement('svg', {
+                class: 'archicode-diagram',
+                width: width,
+                height: height,
+                xmlns: 'http://www.w3.org/2000/svg',
+                style: 'background: transparent; border-radius: 8px;'
+            });
+
+            // Render relations first (so they appear under elements)
+            relations.forEach(rel => {
+                const relEl = this.renderRelation(rel, elementsMap, config);
+                if (relEl) svg.appendChild(relEl);
+            });
+
+            // Render elements
+            layoutElements.forEach(element => {
+                const elementSvg = this.renderElement(element, config);
+                svg.appendChild(elementSvg);
+            });
+
+            // Convert to string
+            const serializer = new XMLSerializer();
+            return serializer.serializeToString(svg);
+        }
+
+        /**
+         * Export diagram to draw.io (diagrams.net) XML format
+         * Returns a string that can be imported into draw.io
+         * Alias for toDrawIo()
+         */
+        exportDrawIO(code) {
+            return this.toDrawIo(code);
+        }
+
+        /**
          * Export diagram to draw.io (diagrams.net) XML format
          * Returns a string that can be imported into draw.io
          */
@@ -1163,16 +1225,17 @@
                 );
             });
 
-            // Enkel mxGraphModel-XML som draw.io/diagrams.net kan importera som "ren XML".
-            // (Ingen base64, ingen komprimering – enklast och mest robust.)
+            // Simple mxGraphModel XML that draw.io/diagrams.net can import as "plain XML"
+            // (No base64, no compression - simplest and most robust)
             const innerXml =
 `<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
   <root>
-    ${cells.join('\\n    ')}
+    ${cells.join('\n    ')}
   </root>
 </mxGraphModel>`;
 
-            return `<?xml version="1.0" encoding="UTF-8"?>\\n${innerXml}`;
+            return `<?xml version="1.0" encoding="UTF-8"?>
+${innerXml}`;
         }
     }
 

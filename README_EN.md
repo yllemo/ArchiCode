@@ -88,7 +88,19 @@ Define ArchiMate elements with the following syntax:
 
 ### ArchiMate 3.2 Layers and Colors
 
-ArchiCode.js follows the official ArchiMate 3.2 standard:
+ArchiCode.js follows the official ArchiMate 3.2 standard with the official color palette:
+
+| Layer | Fill Color | Stroke Color | Description |
+|-------|-----------|--------------|-------------|
+| **Motivation** | `#FFCCDD` | `#CC0066` | Pink/Magenta - Stakeholders, goals, requirements |
+| **Strategy** | `#FFE0B2` | `#FF6F00` | Orange - Capabilities, resources, courses of action |
+| **Business** | `#FFF9C4` | `#F9A825` | Yellow - Business actors, processes, services |
+| **Application** | `#B3E5FC` | `#0277BD` | Light Blue - Software components, services, data |
+| **Technology** | `#C8E6C9` | `#388E3C` | Green - Hardware, networks, system software |
+| **Physical** | `#E1BEE7` | `#7B1FA2` | Light Purple - Physical equipment and facilities |
+| **Implementation** | `#F8BBD0` | `#C2185B` | Pink - Work packages, deliverables, migration |
+
+**Layer Examples:**
 
 #### 🔴 Motivation Layer (Pink/Magenta)
 ```
@@ -191,34 +203,86 @@ Supported relationship types:
 
 ### `ArchiCode.render(code, container)`
 
-Renders an ArchiMate diagram from textual code.
+Renders an ArchiMate diagram from textual code to a DOM element.
 
 **Parameters:**
 - `code` (string) - ArchiMate code in Architext syntax
 - `container` (string | HTMLElement) - CSS selector or DOM element
 
 **Returns:**
-- SVG element
+- SVGElement - The created SVG element
+
+**Example:**
+```javascript
+const code = `
+  [<business:actor> Customer]
+  [<business:process> Order Process]
+  [Customer] --> [Order Process]
+`;
+ArchiCode.render(code, '#diagram');
+```
+
+---
 
 ### `ArchiCode.exportSVG(code)`
 
-Exports diagram as SVG string.
+Exports diagram as an SVG string (without rendering to DOM).
 
 **Parameters:**
 - `code` (string) - ArchiMate code in Architext syntax
 
 **Returns:**
-- SVG string
+- string - SVG markup as a string
+
+**Example:**
+```javascript
+const svgString = ArchiCode.exportSVG(code);
+// Use the SVG string for download, storage, or embedding
+const blob = new Blob([svgString], { type: 'image/svg+xml' });
+const url = URL.createObjectURL(blob);
+```
+
+---
 
 ### `ArchiCode.exportDrawIO(code)`
 
-Exports diagram as draw.io XML format.
+Exports diagram as draw.io/diagrams.net XML format for import.
 
 **Parameters:**
 - `code` (string) - ArchiMate code in Architext syntax
 
 **Returns:**
-- XML string compatible with draw.io
+- string - XML string compatible with draw.io
+
+**Example:**
+```javascript
+const drawIoXml = ArchiCode.exportDrawIO(code);
+// Download as .drawio file
+const blob = new Blob([drawIoXml], { type: 'application/xml' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'diagram.drawio';
+a.click();
+```
+
+---
+
+### `ArchiCode.parse(code)`
+
+Parses ArchiMate code into an internal structure (advanced usage).
+
+**Parameters:**
+- `code` (string) - ArchiMate code in Architext syntax
+
+**Returns:**
+- object - `{ elements, relations, config }`
+
+**Example:**
+```javascript
+const { elements, relations, config } = ArchiCode.parse(code);
+console.log('Found', elements.length, 'elements and', relations.length, 'relations');
+```
 
 ## 🤖 AI Integration
 

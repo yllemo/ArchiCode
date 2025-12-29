@@ -11,10 +11,7 @@ En webbaserad applikation för att skapa ArchiMate 3.2-diagram från textbaserad
 
 ## 📋 Översikt
 
-Detta projekt består av två huvudkomponenter:
-
-1. **ArchiCode.js** - Ett autonomt JavaScript-bibliotek för rendering av ArchiMate-diagram (liknande mermaid.js)
-2. **Architext Playground** - En webbaserad editor som använder ArchiCode.js
+ArchiCode.js är ett autonomt JavaScript-bibliotek för rendering av ArchiMate-diagram (liknande mermaid.js). Projektet inkluderar också en interaktiv demo för att testa biblioteket.
 
 ### ✨ Funktioner
 
@@ -87,17 +84,22 @@ ArchiCode.render(code, '#diagram');
    npm install
    ```
 
-3. **Starta webbservern**
+3. **Öppna demon i webbläsaren**
+
+   Öppna filen `demo/index.html` direkt i webbläsaren, eller starta en lokal webbserver:
+
    ```bash
+   # Med Python
+   python -m http.server 8000
+
+   # Med Node.js (om http-server är installerat)
    npm run dev
-   # eller
+
+   # Med PHP
    php -S localhost:8000
    ```
 
-4. **Öppna i webbläsaren**
-   ```
-   http://localhost:8000/demo/
-   ```
+   Gå sedan till: `http://localhost:8000/demo/`
 
 ## 📚 ArchiCode.js - Autonomt Bibliotek
 
@@ -135,14 +137,14 @@ ArchiCode.js kan användas i vilken webbapplikation som helst, precis som mermai
 
 #### `ArchiCode.render(code, container)`
 
-Renderar ett ArchiMate-diagram från textbaserad kod.
+Renderar ett ArchiMate-diagram från textbaserad kod till ett DOM-element.
 
 **Parameters:**
 - `code` (string) - ArchiMate-kod i Architext-syntax
 - `container` (string | HTMLElement) - CSS-selector eller DOM-element där diagrammet ska renderas
 
 **Returns:**
-- SVG-element
+- SVGElement - Det skapade SVG-elementet
 
 **Exempel:**
 ```javascript
@@ -152,6 +154,62 @@ ArchiCode.render(myCode, '#myDiagram');
 // Med DOM-element
 const container = document.getElementById('myDiagram');
 ArchiCode.render(myCode, container);
+```
+
+#### `ArchiCode.exportSVG(code)`
+
+Exporterar diagram som en SVG-sträng (utan rendering till DOM).
+
+**Parameters:**
+- `code` (string) - ArchiMate-kod i Architext-syntax
+
+**Returns:**
+- string - SVG-markup som sträng
+
+**Exempel:**
+```javascript
+const svgString = ArchiCode.exportSVG(code);
+// Använd SVG-strängen för nedladdning, lagring eller inbäddning
+const blob = new Blob([svgString], { type: 'image/svg+xml' });
+const url = URL.createObjectURL(blob);
+```
+
+#### `ArchiCode.exportDrawIO(code)`
+
+Exporterar diagram som draw.io/diagrams.net XML-format för import.
+
+**Parameters:**
+- `code` (string) - ArchiMate-kod i Architext-syntax
+
+**Returns:**
+- string - XML-sträng kompatibel med draw.io
+
+**Exempel:**
+```javascript
+const drawIoXml = ArchiCode.exportDrawIO(code);
+// Ladda ner som .drawio-fil
+const blob = new Blob([drawIoXml], { type: 'application/xml' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'diagram.drawio';
+a.click();
+```
+
+#### `ArchiCode.parse(code)`
+
+Parsar ArchiMate-kod till en intern struktur (avancerad användning).
+
+**Parameters:**
+- `code` (string) - ArchiMate-kod i Architext-syntax
+
+**Returns:**
+- object - `{ elements, relations, config }`
+
+**Exempel:**
+```javascript
+const { elements, relations, config } = ArchiCode.parse(code);
+console.log('Hittade', elements.length, 'element och', relations.length, 'relationer');
 ```
 
 ## 📖 Syntax
@@ -374,13 +432,15 @@ Anpassa diagrammets utseende:
 
 ArchiCode.js använder de officiella färgerna från ArchiMate 3.2-specifikationen:
 
-- **Motivation** - #FFCCDD (Rosa/Magenta)
-- **Strategy** - #FFE0B2 (Orange)
-- **Business** - #FFF9C4 (Gul)
-- **Application** - #B3E5FC (Ljusblå)
-- **Technology** - #C8E6C9 (Grön)
-- **Physical** - #E1BEE7 (Lila)
-- **Implementation** - #F8BBD0 (Rosa)
+| Lager | Fyllnadsfärg | Kantfärg | Beskrivning |
+|-------|-------------|----------|-------------|
+| **Motivation** | `#FFCCDD` | `#CC0066` | Rosa/Magenta - Intressenter, mål, krav |
+| **Strategy** | `#FFE0B2` | `#FF6F00` | Orange - Kapabiliteter, resurser, handlingsplaner |
+| **Business** | `#FFF9C4` | `#F9A825` | Gul - Affärsaktörer, processer, tjänster |
+| **Application** | `#B3E5FC` | `#0277BD` | Ljusblå - Mjukvarukomponenter, tjänster, data |
+| **Technology** | `#C8E6C9` | `#388E3C` | Grön - Hårdvara, nätverk, systemmjukvara |
+| **Physical** | `#E1BEE7` | `#7B1FA2` | Lila - Fysisk utrustning och anläggningar |
+| **Implementation** | `#F8BBD0` | `#C2185B` | Rosa - Arbetspaket, leveranser, migration |
 
 Varje element har också en lager-badge (M, S, B, A, T, P, I) i det övre vänstra hörnet.
 
@@ -505,21 +565,25 @@ Technology Layer:
 Använd ArchiMate 3.2-syntax, lägg till relationer.
 ```
 
-**Output från AI → Klistra in i ArchiCode Playground!**
+**Output från AI → Klistra in i demo-editorn och testa!**
 
 ## 🗂️ Filstruktur
 
 ```
-architext-playground/
-├── index.php           # Webbapplikation (HTML)
+ArchiCode/
 ├── archicode.js        # ArchiCode-biblioteket (autonomt)
-├── script.js           # Applikations-logik
-├── style.css           # Dark mode styling
-├── demo.html           # Fristående demo
-├── README.md           # Huvuddokumentation
-├── FEATURES.md         # Funktionsguide (zoom, pan, fullskärm)
+├── archicode.css       # Stilar och ikoner för ArchiMate-element
+├── archicode.d.ts      # TypeScript-definitioner
+├── demo/               # Interaktiv demo/playground
+│   └── index.html      # Demo-applikation
+├── examples/           # Exempeldiagram
+├── README.md           # Huvuddokumentation (Svenska)
+├── README_EN.md        # Huvuddokumentation (English)
 ├── AI.md               # AI-integration guide
-└── PROMPT.md           # AI promptmallar
+├── PROMPT.md           # AI promptmallar
+├── CHANGELOG.md        # Versionshistorik
+├── CONTRIBUTING.md     # Bidragsguide
+└── LICENSE             # MIT-licens
 ```
 
 ## ⌨️ Tangentbordsgenvägar
@@ -587,7 +651,7 @@ try {
 
 ### Diagrammet renderas inte
 - Kontrollera att syntaxen är korrekt (`<layer:type>` format)
-- Se till att ArchiCode.js laddas före script.js
+- Se till att ArchiCode.js är korrekt inkluderad i din HTML
 - Öppna webbläsarens konsol (F12) för felmeddelanden
 
 ### Element har fel färg
@@ -667,4 +731,5 @@ Förbättringsförslag välkomnas! Idéer för framtida utveckling:
 
 **Author:** Henrik Yllemo
 **Version:** 1.0.0
-**Year:** 2026
+**Year:** 2025
+**License:** MIT
