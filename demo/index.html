@@ -99,6 +99,29 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        select {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 180px;
+            outline: none;
+        }
+
+        select:hover {
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        select option {
+            background: white;
+            color: #333;
+            padding: 8px 12px;
+        }
+
         button:active {
             transform: translateY(0);
         }
@@ -257,7 +280,17 @@
             <div class="editor-section">
                 <div class="section-header">
                     <span>📝 Architext Kod</span>
-                    <button onclick="loadExample()">Ladda exempel</button>
+                    <div class="button-group">
+                        <select id="exampleSelect" onchange="loadSelectedExample()">
+                            <option value="">Välj exempel...</option>
+                            <option value="business-process">Affärsprocess</option>
+                            <option value="ecommerce">E-handel</option>
+                            <option value="banking">Banksystem</option>
+                            <option value="healthcare">Vårdsystem</option>
+                            <option value="enterprise">Företagsarkitektur</option>
+                            <option value="relationships">Relationstyper</option>
+                        </select>
+                    </div>
                 </div>
                 <textarea id="codeInput" placeholder="Klistra in din Architext-kod här...
 
@@ -875,43 +908,264 @@ Exempel:
             }
         }
 
-        function loadExample() {
-            const example = `// Personec P - Systemlandskap
-// Försystem
-[<application:component> Benify]
-[<application:component> Treserva]
-[<application:component> IFS]
+        const examples = {
+            'business-process': `#spacing: 80
+#fontSize: 14
+#showBadges: true
 
-// HR-system
-[<application:component> Adato]
-[<application:component> WinLas]
-[<application:component> Stella]
+// Affärsprocessexempel
+[<business:actor> Kund]
+[<business:actor> Säljare]
+[<business:role> Projektledare]
+[<business:process> Försäljningsprocess]
+[<business:process> Leveransprocess]
+[<business:service> Kundtjänst]
+[<business:object> Beställning]
+[<business:product> Mjukvarulicens]
 
-// Huvudsystem
-[<application:component> Personec P]
+// Relationer
+[Kund] --> [Försäljningsprocess]
+[Säljare] --> [Försäljningsprocess]
+[Försäljningsprocess] --> [Kundtjänst]
+[Försäljningsprocess] --> [Beställning]
+[Beställning] --> [Leveransprocess]
+[Leveransprocess] --> [Mjukvarulicens]
+[Projektledare] .-- [Kund]`,
 
-// Nedströms
-[<application:component> Personec Förhandling]
-[<application:service> Kompass]
+            'ecommerce': `#spacing: 100
+#direction: down
+
+// E-handelsplattform
+// Affärslager
+[<business:actor> Kund]
+[<business:actor> Handlare]
+[<business:process> Orderhantering]
+[<business:process> Betalning]
+[<business:service> Webbutik]
+[<business:object> Produktkatalog]
+[<business:object> Varukorg]
+
+// Applikationslager
+[<application:component> Webbfrontend]
+[<application:component> Orderservice]
+[<application:component> Betalservice]
+[<application:component> Lagerservice]
+[<application:service> REST API]
+[<application:data> Produktdatabas]
+[<application:data> Användardatabas]
+
+// Tekniklager
+[<technology:node> Lastbalanserare]
+[<technology:node> Applikationsserver]
+[<technology:node> Databasserver]
+[<technology:device> CDN]
+
+// Relationer
+[Kund] --> [Webbutik]
+[Handlare] --> [Orderhantering]
+[Webbutik] --> [REST API]
+[REST API] --> [Orderservice]
+[Orderservice] --> [Betalservice]
+[Orderservice] <-> [Produktdatabas]
+[Webbfrontend] --:> [Webbutik]
+[Webbfrontend] --> [Lastbalanserare]
+[Lastbalanserare] --> [Applikationsserver]
+[Applikationsserver] --> [Databasserver]`,
+
+            'banking': `#spacing: 90
+#fontSize: 13
+
+// Banksystemarkitektur
+// Affärslager
+[<business:actor> Bankkund]
+[<business:actor> Bankpersonal]
+[<business:process> Kontounderhåll]
+[<business:process> Kreditbedömning]
+[<business:process> Transaktionshantering]
+[<business:service> Internetbank]
+[<business:service> Mobilbank]
+[<business:object> Konto]
+[<business:object> Transaktion]
+
+// Applikationslager
+[<application:component> Internetbanksystem]
+[<application:component> Mobilapp]
+[<application:component> Kärnbanksystem]
+[<application:component> Kreditmotor]
+[<application:component> Antibedrägeri]
+[<application:data> Kunddatabas]
+[<application:data> Transaktionsregister]
+
+// Tekniklager
+[<technology:node> Säkerhetsgateway]
+[<technology:node> Applikationskluster]
+[<technology:device> HSM (Hardware Security Module)]
+[<technology:network> Privat nätverk]
+
+// Externa aktörer
+[<business:actor> Riksbank]
+[<business:actor> Andra banker]
+
+// Relationer
+[Bankkund] --> [Internetbank]
+[Bankkund] --> [Mobilbank]
+[Bankpersonal] --> [Kontounderhåll]
+[Internetbanksystem] --:> [Internetbank]
+[Mobilapp] --:> [Mobilbank]
+[Internetbanksystem] --> [Kärnbanksystem]
+[Kärnbanksystem] --> [Kreditmotor]
+[Kärnbanksystem] --> [Antibedrägeri]
+[Kärnbanksystem] <-> [Kunddatabas]
+[Transaktionshantering] <-> [Transaktionsregister]
+[Kärnbanksystem] --> [Riksbank]
+[Kärnbanksystem] <-> [Andra banker]`,
+
+            'healthcare': `#spacing: 85
+#fontSize: 12
+
+// Vårdsystemarkitektur
+// Affärslager
+[<business:actor> Patient]
+[<business:actor> Läkare]
+[<business:actor> Sjuksköterska]
+[<business:process> Patientmottagning]
+[<business:process> Diagnos]
+[<business:process> Behandling]
+[<business:service> Journalsystem]
+[<business:service> Bokningssystem]
+[<business:object> Patientjournal]
+[<business:object> Recepter]
+
+// Applikationslager
+[<application:component> Elektronisk journal]
+[<application:component> Bokningssystem]
+[<application:component> Medicinregister]
+[<application:component> Bildarkiv (PACS)]
+[<application:service> Patientportal]
+[<application:data> Patientdatabas]
+[<application:data> Medicindatabas]
+
+// Tekniklager
+[<technology:node> Sjukhusserver]
+[<technology:device> Medicinsk utrustning]
+[<technology:network> Sjukhusnätverk]
 
 // Externa
-[<business:actor> Försäkringskassan]
-[<business:actor> Skatteverket]
+[<business:actor> Apotek]
+[<business:actor> Socialstyrelsen]
 
-// Integrationer
-[Benify] -> [Personec P]
-[Treserva] -> [Personec P]
-[IFS] -> [Personec P]
-[Adato] -> [Personec P]
-[WinLas] -> [Personec P]
-[Stella] -> [Personec P]
-[Personec P] -> [Personec Förhandling]
-[Personec P] -> [Kompass]
-[Personec Förhandling] -> [Försäkringskassan]
-[Personec Förhandling] -> [Skatteverket]`;
+// Relationer
+[Patient] --> [Bokningssystem]
+[Läkare] --> [Patientmottagning]
+[Sjuksköterska] --> [Behandling]
+[Elektronisk journal] --:> [Journalsystem]
+[Bokningssystem] --:> [Bokningssystem]
+[Elektronisk journal] <-> [Patientdatabas]
+[Medicinregister] <-> [Medicindatabas]
+[Läkare] --> [Diagnos]
+[Diagnos] --> [Recepter]
+[Recepter] --> [Apotek]
+[Patientjournal] --> [Socialstyrelsen]`,
 
-            document.getElementById('codeInput').value = example;
-            renderDiagram();
+            'enterprise': `#spacing: 70
+#fontSize: 13
+
+// Fullständig företagsarkitektur
+// Motivationslager
+[<motivation:stakeholder> Styrelse]
+[<motivation:goal> Ökad lönsamhet]
+[<motivation:requirement> Förbättrad kundupplevelse]
+
+// Strategilager  
+[<strategy:capability> Digital transformation]
+[<strategy:resource> IT-avdelning]
+
+// Affärslager
+[<business:actor> Kunder]
+[<business:process> Säljprocess]
+[<business:service> Webbtjänster]
+
+// Applikationslager
+[<application:component> CRM-system]
+[<application:component> ERP-system]
+[<application:service> API Gateway]
+
+// Tekniklager
+[<technology:node> Molnplattform]
+[<technology:device> Enheter]
+
+// Implementeringslager
+[<implementation:workpackage> Digitalisering]
+[<implementation:deliverable> Ny webbplats]
+
+// Relationer
+[Styrelse] --> [Ökad lönsamhet]
+[Ökad lönsamhet] --> [Förbättrad kundupplevelse]
+[Förbättrad kundupplevelse] --> [Digital transformation]
+[Digital transformation] --> [IT-avdelning]
+[Säljprocess] --> [Webbtjänster]
+[CRM-system] --:> [Webbtjänster]
+[API Gateway] --> [CRM-system]
+[Molnplattform] --> [API Gateway]
+[Digitalisering] --> [Ny webbplats]`,
+
+            'relationships': `#spacing: 70
+#fontSize: 13
+
+// Demonstration av alla relationstyper
+[<business:actor> Källa]
+[<business:actor> Mål]
+[<business:role> Chef]
+[<business:role> Anställd]
+[<business:process> Process A]
+[<business:process> Process B]
+[<business:service> Tjänst A]
+[<application:component> System A]
+[<application:component> System B]
+[<application:data> Databas]
+
+// Association - enkel koppling
+[Källa] --- [Mål]
+
+// Serving - tjänar
+[Tjänst A] --> [Process A]
+
+// Realization - realiserar
+[System A] --:> [Tjänst A]
+
+// Triggering - utlöser
+[Process A] -|> [Process B]
+
+// Assignment - tilldelning
+[Chef] .-- [Process A]
+
+// Composition - består av (stark ägande)
+[System A] +- [Databas]
+
+// Aggregation - består av (svag ägande)
+[Tjänst A] o- [System A]
+
+// Specialization - specialisering
+[Chef] -:> [Anställd]
+
+// Access - åtkomst
+[System B] <-> [Databas]`
+        };
+
+        function loadSelectedExample() {
+            const select = document.getElementById('exampleSelect');
+            const selectedValue = select.value;
+            
+            if (selectedValue && examples[selectedValue]) {
+                document.getElementById('codeInput').value = examples[selectedValue];
+                renderDiagram();
+            }
+        }
+
+        // Bakåtkompatibilitet för gamla loadExample()
+        function loadExample() {
+            document.getElementById('exampleSelect').value = 'business-process';
+            loadSelectedExample();
         }
 
         // Auto-render on page load if there's code
