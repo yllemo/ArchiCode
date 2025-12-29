@@ -37,9 +37,9 @@
   },
   "homepage": "https://github.com/yllemo/ArchiCode#readme",
   "devDependencies": {
-    "eslint": "^8.0.0",
-    "http-server": "^14.0.0",
-    "prettier": "^3.0.0"
+    "eslint": "^8.56.0",
+    "http-server": "^14.1.1",
+    "prettier": "^3.1.1"
   },
   "files": [
     "archicode.js",
