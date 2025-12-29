@@ -20,9 +20,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: false
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-package-lock
 
       - name: Run ESLint
         run: npm run lint
@@ -41,9 +42,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: false
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-package-lock
 
       - name: Run tests
         run: npm test
@@ -59,6 +61,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: false
 
       - name: Test example parsing
         run: |
@@ -141,8 +144,9 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
+          cache: false
 
       - name: Publish to NPM
-        run: npm install && npm publish --access public
+        run: npm install --no-package-lock && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

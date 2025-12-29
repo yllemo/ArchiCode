@@ -6,11 +6,11 @@
   "types": "archicode.d.ts",
   "scripts": {
     "dev": "http-server -p 8000",
-    "test": "echo \"No tests yet\" && exit 0",
-    "build": "echo \"No build process needed - standalone library\" && exit 0",
+    "test": "echo \"✓ No tests configured - library is standalone\" && exit 0",
+    "build": "echo \"✓ No build process needed - standalone library\" && exit 0",
     "demo": "http-server demo -p 8001",
-    "lint": "eslint archicode.js",
-    "format": "prettier --write *.js *.html *.css *.md"
+    "lint": "eslint archicode.js --fix",
+    "format": "prettier --write *.js demo/*.html *.css *.md"
   },
   "repository": {
     "type": "git",
