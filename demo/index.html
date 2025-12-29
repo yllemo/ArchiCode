@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architext Viewer</title>
+    <title>ArchiCode Playground</title>
     <style>
         * {
             margin: 0;
@@ -269,7 +269,7 @@
         </div>
 
         <div class="instructions">
-            <strong>Instruktioner:</strong> Klistra in din Architext-kod i vänster fält och klicka på "Rita diagram". 
+            <strong>Instruktioner:</strong> Klistra in din ArchiMate-kod i vänster fält och klicka på "Rita diagram". 
             Använd syntax som <code>[&lt;application:component&gt; System Name]</code> och <code>[System A] -> [System B]</code> för kopplingar.
         </div>
 
@@ -279,7 +279,7 @@
         <div class="content">
             <div class="editor-section">
                 <div class="section-header">
-                    <span>📝 Architext Kod</span>
+                    <span>📝 ArchiCode</span>
                     <div class="button-group">
                         <select id="exampleSelect" onchange="loadSelectedExample()">
                             <option value="">Välj exempel...</option>
@@ -292,7 +292,7 @@
                         </select>
                     </div>
                 </div>
-                <textarea id="codeInput" placeholder="Klistra in din Architext-kod här...
+                <textarea id="codeInput" placeholder="Klistra in din ArchiMate-kod här...
 
 Exempel:
 [<application:component> System A]
@@ -341,7 +341,7 @@ Exempel:
             setTimeout(() => successDiv.classList.remove('show'), 3000);
         }
 
-        function parseArchitextCode(code) {
+        function parseArchiCode(code) {
             nodes = [];
             connections = [];
             const lines = code.split('\n');
@@ -642,7 +642,7 @@ Exempel:
             const ctx = canvas.getContext('2d');
 
             if (nodes.length === 0) {
-                showError('Inga noder hittades. Kontrollera din Architext-kod.');
+                showError('Inga noder hittades. Kontrollera din ArchiMate-kod.');
                 return;
             }
 
@@ -776,12 +776,12 @@ Exempel:
         function renderDiagram() {
             const code = document.getElementById('codeInput').value;
             if (!code.trim()) {
-                showError('Vänligen ange Architext-kod först.');
+                showError('Vänligen ange ArchiMate-kod först.');
                 return;
             }
 
             try {
-                parseArchitextCode(code);
+                parseArchiCode(code);
                 drawDiagram('canvas');
                 drawDiagram('fullscreenCanvas');
                 showSuccess(`Diagram renderat! ${nodes.length} noder och ${connections.length} kopplingar.`);
@@ -805,7 +805,7 @@ Exempel:
 
             try {
                 const link = document.createElement('a');
-                link.download = 'architext-diagram.png';
+                link.download = 'archicode-diagram.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 showSuccess('PNG-fil nedladdad!');
@@ -831,8 +831,8 @@ Exempel:
             try {
                 // Create draw.io XML format
                 let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-                xml += '<mxfile host="app.diagrams.net" modified="' + new Date().toISOString() + '" agent="Architext Viewer" version="21.0.0" etag="' + Math.random().toString(36).substring(7) + '" type="device">\n';
-                xml += '  <diagram name="Architext Diagram" id="' + Math.random().toString(36).substring(7) + '">\n';
+                xml += '<mxfile host="app.diagrams.net" modified="' + new Date().toISOString() + '" agent="ArchiCode Playground" version="21.0.0" etag="' + Math.random().toString(36).substring(7) + '" type="device">\n';
+                xml += '  <diagram name="ArchiCode Diagram" id="' + Math.random().toString(36).substring(7) + '">\n';
                 xml += '    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">\n';
                 xml += '      <root>\n';
                 xml += '        <mxCell id="0" />\n';
@@ -897,7 +897,7 @@ Exempel:
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'architext-diagram.drawio';
+                link.download = 'archicode-diagram.drawio';
                 link.click();
                 URL.revokeObjectURL(url);
                 
