@@ -7,6 +7,15 @@ This directory contains the interactive demo application for ArchiCode.js.
 - `index.html` - Interactive playground for testing ArchiCode.js
 - The demo uses the main library files (`archicode.js` and `archicode.css`) from the project root
 
+## ⚠️ Important Note
+
+This demo uses the **local version** of ArchiCode.js from the parent directory to ensure you always have the latest features and bug fixes.
+
+**If you experience errors:**
+1. Hard refresh: `Ctrl+Shift+R` (Windows/Linux) or `Cmd+Shift+R` (Mac)
+2. Clear browser cache
+3. Ensure `../archicode.js` and `../archicode.css` exist
+
 ## Running the Demo
 
 ### Option 1: Local Web Server (Recommended)
