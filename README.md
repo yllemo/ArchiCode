@@ -56,6 +56,16 @@ ArchiCode.render(code, '#diagram');
 
 ### CDN Usage
 
+**Alternativ 1: jsDelivr (Fungerar direkt från GitHub)**
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.css">
+<script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.js"></script>
+<script>
+    ArchiCode.render(myCode, '#diagram');
+</script>
+```
+
+**Alternativ 2: unpkg (Efter NPM-publicering)**
 ```html
 <link rel="stylesheet" href="https://unpkg.com/@yllemo/archicode@1.0.0/archicode.css">
 <script src="https://unpkg.com/@yllemo/archicode@1.0.0/archicode.js"></script>
