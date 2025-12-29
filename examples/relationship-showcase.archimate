@@ -1,0 +1,54 @@
+#spacing: 70
+#fontSize: 13
+
+// Demonstration of all ArchiMate relationship types
+
+// Elements for testing relationships
+[<business:actor> Source Actor]
+[<business:actor> Target Actor]
+[<business:role> Manager Role]
+[<business:role> Employee Role]
+[<business:process> Process A]
+[<business:process> Process B]
+[<business:service> Service A]
+[<business:service> Service B]
+[<application:component> Component A]
+[<application:component> Component B]
+[<application:data> Data Store]
+[<technology:node> Server]
+
+// Association - simple relationship
+[Source Actor] --- [Target Actor]
+
+// Serving - one serves another
+[Service A] --> [Process A]
+[Component A] --> [Service A]
+
+// Realization - realizes/implements
+[Component A] --:> [Service A]
+[Process A] --:> [Service B]
+
+// Triggering - triggers/activates
+[Process A] -|> [Process B]
+
+// Assignment - assigned to
+[Manager Role] .-- [Source Actor]
+[Employee Role] .-- [Target Actor]
+
+// Composition - is part of (strong ownership)
+[Component A] +- [Data Store]
+[Server] +- [Component B]
+
+// Aggregation - is part of (weak ownership)  
+[Service A] o- [Component A]
+[Process A] o- [Service A]
+
+// Specialization - is a specialized form of
+[Manager Role] -:> [Employee Role]
+
+// Access - accesses (bidirectional)
+[Component A] <-> [Data Store]
+[Component B] <-> [Data Store]
+
+// Flow - information/data flow
+[Process A] --> [Process B]

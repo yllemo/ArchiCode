@@ -1,0 +1,20 @@
+#spacing: 80
+#fontSize: 14
+#showBadges: true
+
+// Simple business layer diagram
+[<business:actor> Customer]
+[<business:actor> Sales Manager]
+[<business:role> Account Manager]
+[<business:process> Sales Process]
+[<business:service> Customer Service]
+[<business:object> Sales Order]
+[<business:product> Software License]
+
+// Relationships
+[Customer] --> [Sales Process]
+[Sales Manager] --> [Sales Process]  
+[Sales Process] --> [Customer Service]
+[Sales Process] --> [Sales Order]
+[Sales Order] --> [Software License]
+[Account Manager] .-- [Customer]

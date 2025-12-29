@@ -1,0 +1,86 @@
+name: Feature Request
+description: Suggest a new feature for ArchiCode.js
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature for ArchiCode.js!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe alternatives you've considered
+      placeholder: A clear and concise description of any alternative solutions or features you've considered.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What category does this feature belong to?
+      options:
+        - Rendering/Visualization
+        - Syntax/Parser
+        - Export/Import
+        - Performance
+        - Documentation
+        - API/Integration
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: archimate-compliance
+    attributes:
+      label: ArchiMate Compliance
+      description: Does this feature relate to ArchiMate standard compliance?
+      options:
+        - label: This feature is required by ArchiMate 3.2 standard
+        - label: This feature enhances ArchiMate diagram quality
+        - label: This feature is not related to ArchiMate standard
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or Mockups
+      description: Add any examples, mockups, or code snippets that illustrate the feature
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low (nice to have)
+        - Medium (would be helpful)
+        - High (needed for my use case)
+        - Critical (blocking my work)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context or information about the feature request here

@@ -1,0 +1,59 @@
+{
+  "name": "@yllemo/archicode",
+  "version": "1.0.0",
+  "description": "Autonomous ArchiMate 3.2 diagram renderer. A standalone JavaScript library for creating ArchiMate diagrams from text, compatible with Architext.dev syntax.",
+  "main": "archicode.js",
+  "types": "archicode.d.ts",
+  "scripts": {
+    "dev": "http-server -p 8000",
+    "test": "echo \"No tests yet\" && exit 0",
+    "build": "echo \"No build process needed - standalone library\" && exit 0",
+    "demo": "http-server demo -p 8001",
+    "lint": "eslint archicode.js",
+    "format": "prettier --write *.js *.html *.css *.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yllemo/ArchiCode.git"
+  },
+  "keywords": [
+    "archimate",
+    "architecture",
+    "diagram",
+    "enterprise",
+    "modeling",
+    "visualization",
+    "svg",
+    "standalone",
+    "javascript",
+    "library",
+    "renderer",
+    "architext"
+  ],
+  "author": "Henrik Yllemo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yllemo/ArchiCode/issues"
+  },
+  "homepage": "https://github.com/yllemo/ArchiCode#readme",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "http-server": "^14.0.0",
+    "prettier": "^3.0.0"
+  },
+  "files": [
+    "archicode.js",
+    "archicode.css",
+    "archicode.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

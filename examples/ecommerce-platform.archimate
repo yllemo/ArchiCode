@@ -1,0 +1,69 @@
+#spacing: 100
+#fontSize: 12
+#direction: down
+
+// E-commerce platform architecture
+
+// Business Layer
+[<business:actor> Customer]
+[<business:actor> Merchant]
+[<business:process> Order Management]
+[<business:process> Payment Processing]
+[<business:process> Inventory Management]
+[<business:service> Online Shopping]
+[<business:service> Payment Gateway]
+[<business:object> Product Catalog]
+[<business:object> Shopping Cart]
+[<business:object> Order]
+
+// Application Layer
+[<application:component> Web Frontend]
+[<application:component> Mobile App]
+[<application:component> Order Service]
+[<application:component> Payment Service]
+[<application:component> Inventory Service]
+[<application:component> User Management]
+[<application:service> REST API]
+[<application:service> Notification Service]
+[<application:data> Product Database]
+[<application:data> User Database]
+[<application:data> Order Database]
+
+// Technology Layer
+[<technology:node> Load Balancer]
+[<technology:node> Application Server]
+[<technology:node> Database Server]
+[<technology:node> Cache Server]
+[<technology:device> CDN]
+[<technology:service> Cloud Storage]
+
+// Business Relationships
+[Customer] --> [Online Shopping]
+[Merchant] --> [Inventory Management]
+[Online Shopping] --> [Order Management]
+[Order Management] --> [Payment Processing]
+[Payment Processing] --> [Payment Gateway]
+
+// Application Relationships
+[Web Frontend] --:> [Online Shopping]
+[Mobile App] --:> [Online Shopping]
+[Online Shopping] --> [REST API]
+[REST API] --> [Order Service]
+[REST API] --> [Payment Service]
+[REST API] --> [Inventory Service]
+[Order Service] --> [User Management]
+[Payment Service] --> [Notification Service]
+
+// Data Relationships
+[Order Service] <-> [Order Database]
+[Inventory Service] <-> [Product Database]
+[User Management] <-> [User Database]
+
+// Technology Relationships
+[Web Frontend] --> [Load Balancer]
+[Mobile App] --> [Load Balancer]
+[Load Balancer] --> [Application Server]
+[Application Server] --> [Database Server]
+[Application Server] --> [Cache Server]
+[Web Frontend] --> [CDN]
+[Order Service] --> [Cloud Storage]
