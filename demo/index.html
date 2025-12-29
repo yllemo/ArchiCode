@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArchiCode Playground</title>
+
+    <!-- ArchiCode Library från CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.css">
+    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -145,24 +150,25 @@
             line-height: 1.6;
         }
 
-        .canvas-container {
+        .diagram-container {
             flex: 1;
             padding: 20px;
             overflow: auto;
             background: #fafafa;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-start;
+            justify-content: flex-start;
             position: relative;
         }
 
-        canvas {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: white;
+        #diagram {
+            min-width: 100%;
+            min-height: 400px;
+        }
+
+        #diagram svg {
             max-width: 100%;
             height: auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .fullscreen-overlay {
@@ -264,7 +270,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏗️ Architext Viewer</h1>
+            <h1>🏗️ ArchiCode Playground</h1>
             <p>Visualisera ditt systemlandskap med ArchiMate-stöd</p>
         </div>
 
@@ -305,27 +311,16 @@ Exempel:
                     <span>🎨 Diagram</span>
                     <div class="button-group">
                         <button onclick="renderDiagram()">🔄 Rita diagram</button>
-                        <button class="secondary" onclick="toggleFullscreen()">🖥️ Fullskärm</button>
-                        <button class="secondary" onclick="downloadPNG()">💾 Ladda ner PNG</button>
                         <button class="secondary" onclick="downloadSVG()">📄 Ladda ner SVG</button>
                         <button class="secondary" onclick="exportToDrawIO()">📊 Exportera till Draw.io</button>
                     </div>
                 </div>
-                <div class="canvas-container">
-                    <canvas id="canvas"></canvas>
+                <div class="diagram-container">
+                    <div id="diagram"></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="fullscreen-overlay" id="fullscreenOverlay" onclick="toggleFullscreen()">
-        <button class="close-fullscreen" onclick="toggleFullscreen(); event.stopPropagation();">✕ Stäng fullskärm</button>
-        <canvas id="fullscreenCanvas"></canvas>
-    </div>
-
-    <script>
-        let nodes = [];
-        let connections = [];
 
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
@@ -341,438 +336,6 @@ Exempel:
             setTimeout(() => successDiv.classList.remove('show'), 3000);
         }
 
-        function parseArchiCode(code) {
-            nodes = [];
-            connections = [];
-            const lines = code.split('\n');
-
-            for (let line of lines) {
-                line = line.trim();
-                if (!line || line.startsWith('//') || line.startsWith('#')) continue;
-
-                // Parse node with ArchiMate type: [<type:subtype> Name]
-                const archiMateNodeMatch = line.match(/\[<([^:>]+):([^>]+)>\s*([^\]]+)\]/);
-                if (archiMateNodeMatch) {
-                    const category = archiMateNodeMatch[1];
-                    const subtype = archiMateNodeMatch[2];
-                    const name = archiMateNodeMatch[3].trim();
-                    const type = `${category}:${subtype}`;
-                    
-                    if (!nodes.find(n => n.name === name)) {
-                        nodes.push({ name, type, category, subtype });
-                    }
-                    continue;
-                }
-
-                // Parse simple node: [Name]
-                const simpleNodeMatch = line.match(/^\[([^\]]+)\]$/);
-                if (simpleNodeMatch) {
-                    const name = simpleNodeMatch[1].trim();
-                    if (!nodes.find(n => n.name === name)) {
-                        nodes.push({ name, type: 'component', category: 'application', subtype: 'component' });
-                    }
-                    continue;
-                }
-
-                // Parse connections with various arrow types
-                const connMatch = line.match(/\[([^\]]+)\]\s*(<?-+>?|\.<?-+>?)\s*\[([^\]]+)\]/);
-                if (connMatch) {
-                    const from = connMatch[1].trim();
-                    const arrow = connMatch[2].trim();
-                    const to = connMatch[3].trim();
-                    
-                    // Add nodes if they don't exist
-                    if (!nodes.find(n => n.name === from)) {
-                        nodes.push({ name: from, type: 'component', category: 'application', subtype: 'component' });
-                    }
-                    if (!nodes.find(n => n.name === to)) {
-                        nodes.push({ name: to, type: 'component', category: 'application', subtype: 'component' });
-                    }
-                    
-                    connections.push({ from, to, arrow });
-                }
-            }
-        }
-
-        function getArchiMateColor(category, subtype) {
-            const colors = {
-                'application': {
-                    'component': '#A8D8EA',
-                    'service': '#7FC8E7',
-                    'interface': '#5BB4DD',
-                    'function': '#3A9FD4',
-                    'data': '#FFF4A3'
-                },
-                'business': {
-                    'actor': '#FFEB99',
-                    'role': '#FFE066',
-                    'process': '#FFD633',
-                    'function': '#FFCC00',
-                    'service': '#FFB700',
-                    'event': '#FFA500',
-                    'object': '#FF9500'
-                },
-                'technology': {
-                    'node': '#C1E1C1',
-                    'device': '#A7D7A7',
-                    'system_software': '#8CCD8C',
-                    'communication_network': '#72C372',
-                    'artifact': '#58B958',
-                    'service': '#3EAF3E'
-                },
-                'motivation': {
-                    'stakeholder': '#E6B3E6',
-                    'driver': '#D999D9',
-                    'goal': '#CC7FCC',
-                    'requirement': '#BF66BF'
-                },
-                'strategy': {
-                    'resource': '#FFB3BA',
-                    'capability': '#FF9AA2',
-                    'course_of_action': '#FF8089'
-                }
-            };
-
-            if (colors[category] && colors[category][subtype]) {
-                return colors[category][subtype];
-            }
-            return '#A8D8EA'; // default
-        }
-
-        function drawArchiMateIcon(ctx, x, y, size, type, subtype) {
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 1.5;
-            ctx.fillStyle = 'transparent';
-            
-            // Icon in top-right corner INSIDE the box
-            const iconX = x - size - 8;
-            const iconY = y + 8;
-            
-            // Draw different icons based on ArchiMate type
-            if (type === 'application') {
-                if (subtype === 'component') {
-                    // Square with inner squares (component icon)
-                    ctx.strokeRect(iconX, iconY, size, size);
-                    ctx.strokeRect(iconX + 4, iconY + 4, size - 8, size - 8);
-                } else if (subtype === 'service') {
-                    // Rounded rectangle with notches (service icon)
-                    const notchSize = size / 5;
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + notchSize, iconY);
-                    ctx.lineTo(iconX + size - notchSize, iconY);
-                    ctx.lineTo(iconX + size, iconY + notchSize);
-                    ctx.lineTo(iconX + size, iconY + size - notchSize);
-                    ctx.lineTo(iconX + size - notchSize, iconY + size);
-                    ctx.lineTo(iconX + notchSize, iconY + size);
-                    ctx.lineTo(iconX, iconY + size - notchSize);
-                    ctx.lineTo(iconX, iconY + notchSize);
-                    ctx.closePath();
-                    ctx.stroke();
-                } else if (subtype === 'interface') {
-                    // Circle (interface icon)
-                    ctx.beginPath();
-                    ctx.arc(iconX + size/2, iconY + size/2, size/2, 0, Math.PI * 2);
-                    ctx.stroke();
-                } else if (subtype === 'function') {
-                    // Rounded rectangle (function icon)
-                    const radius = size / 4;
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + radius, iconY);
-                    ctx.lineTo(iconX + size - radius, iconY);
-                    ctx.quadraticCurveTo(iconX + size, iconY, iconX + size, iconY + radius);
-                    ctx.lineTo(iconX + size, iconY + size - radius);
-                    ctx.quadraticCurveTo(iconX + size, iconY + size, iconX + size - radius, iconY + size);
-                    ctx.lineTo(iconX + radius, iconY + size);
-                    ctx.quadraticCurveTo(iconX, iconY + size, iconX, iconY + size - radius);
-                    ctx.lineTo(iconX, iconY + radius);
-                    ctx.quadraticCurveTo(iconX, iconY, iconX + radius, iconY);
-                    ctx.stroke();
-                } else if (subtype === 'data') {
-                    // Folder/document icon (data object)
-                    ctx.beginPath();
-                    ctx.moveTo(iconX, iconY + size * 0.2);
-                    ctx.lineTo(iconX, iconY + size);
-                    ctx.lineTo(iconX + size, iconY + size);
-                    ctx.lineTo(iconX + size, iconY);
-                    ctx.lineTo(iconX + size * 0.3, iconY);
-                    ctx.lineTo(iconX + size * 0.2, iconY + size * 0.2);
-                    ctx.closePath();
-                    ctx.stroke();
-                }
-            } else if (type === 'business') {
-                if (subtype === 'actor') {
-                    // Stick figure
-                    ctx.beginPath();
-                    ctx.arc(iconX + size/2, iconY + size/4, size/5, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + size/2, iconY + size/4 + size/5);
-                    ctx.lineTo(iconX + size/2, iconY + size * 0.65);
-                    ctx.moveTo(iconX + size * 0.2, iconY + size * 0.45);
-                    ctx.lineTo(iconX + size * 0.8, iconY + size * 0.45);
-                    ctx.moveTo(iconX + size/2, iconY + size * 0.65);
-                    ctx.lineTo(iconX + size * 0.2, iconY + size * 0.95);
-                    ctx.moveTo(iconX + size/2, iconY + size * 0.65);
-                    ctx.lineTo(iconX + size * 0.8, iconY + size * 0.95);
-                    ctx.stroke();
-                } else if (subtype === 'role') {
-                    // Rounded square (role icon)
-                    const radius = size / 3;
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + radius, iconY);
-                    ctx.lineTo(iconX + size - radius, iconY);
-                    ctx.quadraticCurveTo(iconX + size, iconY, iconX + size, iconY + radius);
-                    ctx.lineTo(iconX + size, iconY + size - radius);
-                    ctx.quadraticCurveTo(iconX + size, iconY + size, iconX + size - radius, iconY + size);
-                    ctx.lineTo(iconX + radius, iconY + size);
-                    ctx.quadraticCurveTo(iconX, iconY + size, iconX, iconY + size - radius);
-                    ctx.lineTo(iconX, iconY + radius);
-                    ctx.quadraticCurveTo(iconX, iconY, iconX + radius, iconY);
-                    ctx.stroke();
-                } else if (subtype === 'process') {
-                    // Arrow/process icon
-                    ctx.beginPath();
-                    ctx.moveTo(iconX, iconY + size/2);
-                    ctx.lineTo(iconX + size * 0.6, iconY + size/2);
-                    ctx.lineTo(iconX + size * 0.6, iconY + size * 0.2);
-                    ctx.lineTo(iconX + size, iconY + size/2);
-                    ctx.lineTo(iconX + size * 0.6, iconY + size * 0.8);
-                    ctx.lineTo(iconX + size * 0.6, iconY + size/2);
-                    ctx.stroke();
-                } else if (subtype === 'service') {
-                    // Notched rectangle (service icon)
-                    const notchSize = size / 5;
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + notchSize, iconY);
-                    ctx.lineTo(iconX + size - notchSize, iconY);
-                    ctx.lineTo(iconX + size, iconY + notchSize);
-                    ctx.lineTo(iconX + size, iconY + size - notchSize);
-                    ctx.lineTo(iconX + size - notchSize, iconY + size);
-                    ctx.lineTo(iconX + notchSize, iconY + size);
-                    ctx.lineTo(iconX, iconY + size - notchSize);
-                    ctx.lineTo(iconX, iconY + notchSize);
-                    ctx.closePath();
-                    ctx.stroke();
-                } else if (subtype === 'event') {
-                    // Rounded corners (event icon)
-                    const radius = size / 2.5;
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + radius, iconY);
-                    ctx.lineTo(iconX + size - radius, iconY);
-                    ctx.quadraticCurveTo(iconX + size, iconY, iconX + size, iconY + radius);
-                    ctx.lineTo(iconX + size, iconY + size - radius);
-                    ctx.quadraticCurveTo(iconX + size, iconY + size, iconX + size - radius, iconY + size);
-                    ctx.lineTo(iconX + radius, iconY + size);
-                    ctx.quadraticCurveTo(iconX, iconY + size, iconX, iconY + size - radius);
-                    ctx.lineTo(iconX, iconY + radius);
-                    ctx.quadraticCurveTo(iconX, iconY, iconX + radius, iconY);
-                    ctx.stroke();
-                } else if (subtype === 'object') {
-                    // Square (object icon)
-                    ctx.strokeRect(iconX, iconY, size, size);
-                } else {
-                    // Default business icon
-                    ctx.strokeRect(iconX, iconY, size, size);
-                }
-            } else if (type === 'technology') {
-                if (subtype === 'node') {
-                    // 3D cube (node icon)
-                    const offset = size * 0.2;
-                    ctx.beginPath();
-                    // Front face
-                    ctx.rect(iconX, iconY + offset, size - offset, size - offset);
-                    ctx.stroke();
-                    // Top face
-                    ctx.beginPath();
-                    ctx.moveTo(iconX, iconY + offset);
-                    ctx.lineTo(iconX + offset, iconY);
-                    ctx.lineTo(iconX + size, iconY);
-                    ctx.lineTo(iconX + size - offset, iconY + offset);
-                    ctx.closePath();
-                    ctx.stroke();
-                    // Right face
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + size - offset, iconY + offset);
-                    ctx.lineTo(iconX + size, iconY);
-                    ctx.lineTo(iconX + size, iconY + size - offset);
-                    ctx.lineTo(iconX + size - offset, iconY + size);
-                    ctx.closePath();
-                    ctx.stroke();
-                } else if (subtype === 'device') {
-                    // Computer/device icon
-                    ctx.strokeRect(iconX + size * 0.1, iconY, size * 0.8, size * 0.65);
-                    ctx.beginPath();
-                    ctx.moveTo(iconX, iconY + size);
-                    ctx.lineTo(iconX + size, iconY + size);
-                    ctx.lineTo(iconX + size * 0.7, iconY + size * 0.65);
-                    ctx.lineTo(iconX + size * 0.3, iconY + size * 0.65);
-                    ctx.closePath();
-                    ctx.stroke();
-                } else if (subtype === 'system_software') {
-                    // Layered boxes (system software)
-                    ctx.strokeRect(iconX, iconY + size * 0.15, size * 0.9, size * 0.7);
-                    ctx.strokeRect(iconX + size * 0.1, iconY, size * 0.9, size * 0.7);
-                } else if (subtype === 'artifact') {
-                    // Document/artifact icon
-                    ctx.beginPath();
-                    ctx.moveTo(iconX, iconY);
-                    ctx.lineTo(iconX, iconY + size);
-                    ctx.lineTo(iconX + size, iconY + size);
-                    ctx.lineTo(iconX + size, iconY + size * 0.25);
-                    ctx.lineTo(iconX + size * 0.75, iconY);
-                    ctx.closePath();
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(iconX + size * 0.75, iconY);
-                    ctx.lineTo(iconX + size * 0.75, iconY + size * 0.25);
-                    ctx.lineTo(iconX + size, iconY + size * 0.25);
-                    ctx.stroke();
-                } else {
-                    // Default tech icon - simple cube
-                    ctx.strokeRect(iconX, iconY, size, size);
-                }
-            } else {
-                // Default icon - simple square
-                ctx.strokeRect(iconX, iconY, size, size);
-            }
-        }
-
-        function drawDiagram(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-
-            if (nodes.length === 0) {
-                showError('Inga noder hittades. Kontrollera din ArchiMate-kod.');
-                return;
-            }
-
-            // Calculate layout
-            const nodeWidth = 200;
-            const nodeHeight = 70;
-            const padding = 120;
-            const cols = Math.ceil(Math.sqrt(nodes.length * 1.5));
-            const rows = Math.ceil(nodes.length / cols);
-
-            const canvasWidth = Math.max(800, cols * (nodeWidth + padding) + padding);
-            const canvasHeight = Math.max(600, rows * (nodeHeight + padding) + padding * 2);
-
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-
-            // Clear canvas
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-            // Position nodes
-            const nodePositions = {};
-            nodes.forEach((node, i) => {
-                const col = i % cols;
-                const row = Math.floor(i / cols);
-                nodePositions[node.name] = {
-                    x: padding + col * (nodeWidth + padding),
-                    y: padding + row * (nodeHeight + padding),
-                    width: nodeWidth,
-                    height: nodeHeight
-                };
-            });
-
-            // Draw connections
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 2;
-            connections.forEach(conn => {
-                const from = nodePositions[conn.from];
-                const to = nodePositions[conn.to];
-                if (from && to) {
-                    const isDashed = conn.arrow.includes('.');
-                    
-                    if (isDashed) {
-                        ctx.setLineDash([5, 5]);
-                    } else {
-                        ctx.setLineDash([]);
-                    }
-
-                    ctx.beginPath();
-                    ctx.moveTo(from.x + from.width / 2, from.y + from.height / 2);
-                    ctx.lineTo(to.x + to.width / 2, to.y + to.height / 2);
-                    ctx.stroke();
-
-                    // Draw arrow
-                    const angle = Math.atan2(to.y - from.y, to.x - from.x);
-                    const arrowSize = 12;
-                    const endX = to.x + to.width / 2 - Math.cos(angle) * (to.width / 2 + 10);
-                    const endY = to.y + to.height / 2 - Math.sin(angle) * (to.height / 2 + 10);
-                    
-                    ctx.setLineDash([]);
-                    ctx.beginPath();
-                    ctx.moveTo(endX, endY);
-                    ctx.lineTo(
-                        endX - arrowSize * Math.cos(angle - Math.PI / 6),
-                        endY - arrowSize * Math.sin(angle - Math.PI / 6)
-                    );
-                    ctx.moveTo(endX, endY);
-                    ctx.lineTo(
-                        endX - arrowSize * Math.cos(angle + Math.PI / 6),
-                        endY - arrowSize * Math.sin(angle + Math.PI / 6)
-                    );
-                    ctx.stroke();
-                }
-            });
-
-            // Draw nodes
-            nodes.forEach(node => {
-                const pos = nodePositions[node.name];
-                const color = getArchiMateColor(node.category, node.subtype);
-
-                // Draw rectangle with shadow
-                ctx.shadowColor = 'rgba(0,0,0,0.15)';
-                ctx.shadowBlur = 8;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-                
-                ctx.fillStyle = color;
-                ctx.fillRect(pos.x, pos.y, pos.width, pos.height);
-                
-                ctx.shadowColor = 'transparent';
-                ctx.strokeStyle = '#333';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(pos.x, pos.y, pos.width, pos.height);
-
-                // Draw ArchiMate icon in top-right corner INSIDE the box
-                drawArchiMateIcon(ctx, pos.x + pos.width, pos.y, 18, node.category, node.subtype);
-
-                // Draw text (node name)
-                ctx.fillStyle = '#000';
-                ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Word wrap
-                const words = node.name.split(' ');
-                const lines = [];
-                let currentLine = words[0];
-                
-                for (let i = 1; i < words.length; i++) {
-                    const testLine = currentLine + ' ' + words[i];
-                    const metrics = ctx.measureText(testLine);
-                    if (metrics.width > pos.width - 20) {
-                        lines.push(currentLine);
-                        currentLine = words[i];
-                    } else {
-                        currentLine = testLine;
-                    }
-                }
-                lines.push(currentLine);
-                
-                const lineHeight = 18;
-                const startY = pos.y + pos.height / 2 - (lines.length - 1) * lineHeight / 2;
-                lines.forEach((line, i) => {
-                    ctx.fillText(line, pos.x + pos.width / 2, startY + i * lineHeight);
-                });
-            });
-
-            ctx.setLineDash([]);
-        }
-
         function renderDiagram() {
             const code = document.getElementById('codeInput').value;
             if (!code.trim()) {
@@ -781,126 +344,55 @@ Exempel:
             }
 
             try {
-                parseArchiCode(code);
-                drawDiagram('canvas');
-                drawDiagram('fullscreenCanvas');
-                showSuccess(`Diagram renderat! ${nodes.length} noder och ${connections.length} kopplingar.`);
+                // Använd ArchiCode.js från CDN
+                ArchiCode.render(code, '#diagram');
+                showSuccess('Diagram renderat!');
             } catch (error) {
                 showError('Fel vid rendering: ' + error.message);
                 console.error('Rendering error:', error);
             }
         }
 
-        function toggleFullscreen() {
-            const overlay = document.getElementById('fullscreenOverlay');
-            overlay.classList.toggle('active');
-        }
-
-        function downloadPNG() {
-            const canvas = document.getElementById('canvas');
-            if (nodes.length === 0) {
+        function downloadSVG() {
+            const code = document.getElementById('codeInput').value;
+            if (!code.trim()) {
                 showError('Rita ett diagram först innan du laddar ner.');
                 return;
             }
 
             try {
+                // Använd ArchiCode.exportSVG() från CDN
+                const svgString = ArchiCode.exportSVG(code);
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                link.download = 'archicode-diagram.png';
-                link.href = canvas.toDataURL('image/png');
+                link.href = url;
+                link.download = 'archicode-diagram.svg';
                 link.click();
-                showSuccess('PNG-fil nedladdad!');
+                URL.revokeObjectURL(url);
+                showSuccess('SVG-fil nedladdad!');
             } catch (error) {
                 showError('Fel vid nedladdning: ' + error.message);
             }
         }
 
-        function downloadSVG() {
-            if (nodes.length === 0) {
-                showError('Rita ett diagram först innan du laddar ner.');
-                return;
-            }
-            showError('SVG-export är inte implementerad än. Använd PNG istället.');
-        }
-
         function exportToDrawIO() {
-            if (nodes.length === 0) {
+            const code = document.getElementById('codeInput').value;
+            if (!code.trim()) {
                 showError('Rita ett diagram först innan du exporterar.');
                 return;
             }
 
             try {
-                // Create draw.io XML format
-                let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-                xml += '<mxfile host="app.diagrams.net" modified="' + new Date().toISOString() + '" agent="ArchiCode Playground" version="21.0.0" etag="' + Math.random().toString(36).substring(7) + '" type="device">\n';
-                xml += '  <diagram name="ArchiCode Diagram" id="' + Math.random().toString(36).substring(7) + '">\n';
-                xml += '    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">\n';
-                xml += '      <root>\n';
-                xml += '        <mxCell id="0" />\n';
-                xml += '        <mxCell id="1" parent="0" />\n';
-
-                let cellId = 2;
-                const nodeIds = {};
-
-                // Add nodes
-                nodes.forEach((node, index) => {
-                    const nodeId = `node_${cellId}`;
-                    nodeIds[node.name] = nodeId;
-                    
-                    const col = index % Math.ceil(Math.sqrt(nodes.length * 1.5));
-                    const row = Math.floor(index / Math.ceil(Math.sqrt(nodes.length * 1.5)));
-                    const x = 120 + col * 320;
-                    const y = 120 + row * 190;
-                    
-                    const color = getArchiMateColor(node.category, node.subtype);
-                    const fillColor = color.replace('#', '');
-                    
-                    // Escape XML characters
-                    const escapedName = node.name
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&apos;');
-                    
-                    xml += `        <mxCell id="${nodeId}" value="${escapedName}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#${fillColor};strokeColor=#333333;fontStyle=1;fontSize=14;" vertex="1" parent="1">\n`;
-                    xml += `          <mxGeometry x="${x}" y="${y}" width="200" height="70" as="geometry" />\n`;
-                    xml += '        </mxCell>\n';
-                    
-                    cellId++;
-                });
-
-                // Add connections
-                connections.forEach(conn => {
-                    const fromId = nodeIds[conn.from];
-                    const toId = nodeIds[conn.to];
-                    
-                    if (fromId && toId) {
-                        const edgeId = `edge_${cellId}`;
-                        const isDashed = conn.arrow.includes('.');
-                        const style = isDashed ? 'dashed=1;dashPattern=5 5;' : '';
-                        
-                        xml += `        <mxCell id="${edgeId}" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;${style}orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;strokeWidth=2;" edge="1" parent="1" source="${fromId}" target="${toId}">\n`;
-                        xml += '          <mxGeometry relative="1" as="geometry" />\n';
-                        xml += '        </mxCell>\n';
-                        
-                        cellId++;
-                    }
-                });
-
-                xml += '      </root>\n';
-                xml += '    </mxGraphModel>\n';
-                xml += '  </diagram>\n';
-                xml += '</mxfile>';
-
-                // Create download link
-                const blob = new Blob([xml], { type: 'application/xml' });
+                // Använd ArchiCode.exportDrawIO() från CDN
+                const drawIoXml = ArchiCode.exportDrawIO(code);
+                const blob = new Blob([drawIoXml], { type: 'application/xml' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
                 link.download = 'archicode-diagram.drawio';
                 link.click();
                 URL.revokeObjectURL(url);
-                
                 showSuccess('Draw.io-fil exporterad! Öppna filen i draw.io eller diagrams.net.');
             } catch (error) {
                 showError('Fel vid export: ' + error.message);
@@ -1076,7 +568,7 @@ Exempel:
 [<motivation:goal> Ökad lönsamhet]
 [<motivation:requirement> Förbättrad kundupplevelse]
 
-// Strategilager  
+// Strategilager
 [<strategy:capability> Digital transformation]
 [<strategy:resource> IT-avdelning]
 
@@ -1155,7 +647,7 @@ Exempel:
         function loadSelectedExample() {
             const select = document.getElementById('exampleSelect');
             const selectedValue = select.value;
-            
+
             if (selectedValue && examples[selectedValue]) {
                 document.getElementById('codeInput').value = examples[selectedValue];
                 renderDiagram();

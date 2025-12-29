@@ -254,19 +254,110 @@
 
             // Cache för ikonernas data-URL (hämtas från CSS en gång)
             this.iconCache = {};
+
+            // Performance cache för parsade resultat
+            this.parseCache = new Map();
+            this.maxCacheSize = 50; // Begränsa cache-storlek
+
+            // Layout cache
+            this.layoutCache = new Map();
+        }
+
+        /**
+         * Generate cache key from code
+         */
+        getCacheKey(code) {
+            // Simple hash function för cache key
+            let hash = 0;
+            for (let i = 0; i < code.length; i++) {
+                const char = code.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+
+        /**
+         * Clear caches (användbart för att frigöra minne)
+         */
+        clearCache() {
+            this.parseCache.clear();
+            this.layoutCache.clear();
+        }
+
+        /**
+         * Validate ArchiMate relationship according to spec
+         * Returns {valid: boolean, warning: string}
+         */
+        validateRelationship(sourceType, targetType, relationType) {
+            // ArchiMate 3.2 allowed relationships (simplified subset)
+            const allowedRelations = {
+                'composition': ['element', 'component', 'node', 'process', 'function'],
+                'aggregation': ['element', 'component', 'node', 'process', 'function'],
+                'assignment': ['actor', 'role', 'component', 'node'],
+                'realization': ['component', 'service', 'process', 'function'],
+                'serving': ['service', 'process', 'function', 'interface'],
+                'access': ['component', 'process', 'data', 'object'],
+                'triggering': ['event', 'process', 'function'],
+                'flow': ['process', 'function', 'interaction'],
+                'specialization': ['*'], // Allowed between same types
+                'association': ['*'] // Generally allowed
+            };
+
+            // Check if relationship type is valid
+            if (!allowedRelations[relationType]) {
+                return { valid: true, warning: null }; // Unknown type, allow by default
+            }
+
+            const allowed = allowedRelations[relationType];
+
+            // Association and specialization are broadly allowed
+            if (allowed.includes('*')) {
+                if (relationType === 'specialization' && sourceType !== targetType) {
+                    return {
+                        valid: false,
+                        warning: `Specialization relationships should connect elements of the same type (${sourceType} -> ${targetType})`
+                    };
+                }
+                return { valid: true, warning: null };
+            }
+
+            // Check if both source and target types are in allowed list
+            const sourceAllowed = allowed.some(type => sourceType.includes(type));
+            const targetAllowed = allowed.some(type => targetType.includes(type));
+
+            if (!sourceAllowed || !targetAllowed) {
+                return {
+                    valid: false,
+                    warning: `${relationType} relationship may not be valid between ${sourceType} and ${targetType} according to ArchiMate spec`
+                };
+            }
+
+            return { valid: true, warning: null };
         }
 
         /**
          * Parse ArchiMate code
          */
         parse(code) {
+            if (!code || typeof code !== 'string') {
+                throw new Error('Invalid input: code must be a non-empty string');
+            }
+
+            // Check cache först
+            const cacheKey = this.getCacheKey(code);
+            if (this.parseCache.has(cacheKey)) {
+                return this.parseCache.get(cacheKey);
+            }
+
             const lines = code.split('\n');
             const elements = [];
             const relations = [];
             const config = { ...this.config };
+            const errors = [];
 
-            for (let line of lines) {
-                line = line.trim();
+            for (let lineNum = 0; lineNum < lines.length; lineNum++) {
+                let line = lines[lineNum].trim();
                 
                 // Skip empty lines and comments
                 if (!line || line.startsWith('//')) continue;
@@ -394,6 +485,12 @@
                         }
                     }
                     
+                    // Validate syntax
+                    if (!SYNTAX_TO_RELATIONSHIP[syntax] && !syntax.startsWith('<')) {
+                        // Log warning but continue with association as fallback
+                        console.warn(`Line ${lineNum + 1}: Unknown relationship syntax "${syntax}", using association as fallback`);
+                    }
+
                     // Determine relationship type and direction
                     let relType = SYNTAX_TO_RELATIONSHIP[syntax] || 'association';
                     let relSource = source;
@@ -428,6 +525,22 @@
                         }
                     }
                     
+                    // Validate relationship according to ArchiMate spec
+                    const sourceElement = elements.find(e => e.id === relSource);
+                    const targetElement = elements.find(e => e.id === relTarget);
+
+                    if (sourceElement && targetElement) {
+                        const validation = this.validateRelationship(
+                            sourceElement.type,
+                            targetElement.type,
+                            relType
+                        );
+
+                        if (!validation.valid) {
+                            console.warn(`Line ${lineNum + 1}: ${validation.warning}`);
+                        }
+                    }
+
                     // Always push the relation (allow multiple identical relations)
                     relations.push({
                         source: relSource,
@@ -440,7 +553,17 @@
                 }
             }
 
-            return { elements, relations, config };
+            const result = { elements, relations, config };
+
+            // Cache resultatet (med storlek-begränsning)
+            if (this.parseCache.size >= this.maxCacheSize) {
+                // Ta bort äldsta entry (första i Map)
+                const firstKey = this.parseCache.keys().next().value;
+                this.parseCache.delete(firstKey);
+            }
+            this.parseCache.set(cacheKey, result);
+
+            return result;
         }
 
         /**
@@ -570,21 +693,36 @@
          * Render an ArchiMate element
          */
         renderElement(element, config) {
-            const g = this.createSvgElement('g', { 
+            const g = this.createSvgElement('g', {
                 class: 'archimate-element',
                 'data-layer': element.layer,
                 'data-type': element.type
             });
-            
-            const colors = ARCHIMATE_COLORS[element.layer] || { 
-                fill: '#E0E0E0', 
+
+            const colors = ARCHIMATE_COLORS[element.layer] || {
+                fill: '#E0E0E0',
                 stroke: '#616161',
-                badge: '?' 
+                badge: '?'
             };
             const shape = ELEMENT_SHAPES[element.type] || 'square';
-            
+
+            // Add subtle drop shadow
+            const defs = this.createSvgElement('defs');
+            const filter = this.createSvgElement('filter', { id: `shadow-${element.id}` });
+            const feDropShadow = this.createSvgElement('feDropShadow', {
+                dx: '0',
+                dy: '2',
+                'stdDeviation': '3',
+                'flood-opacity': '0.2'
+            });
+            filter.appendChild(feDropShadow);
+            defs.appendChild(filter);
+            g.appendChild(defs);
+
             // Create shape based on type
             let shapeEl;
+            const filterAttr = `url(#shadow-${element.id})`;
+
             if (shape === 'rounded') {
                 shapeEl = this.createSvgElement('rect', {
                     x: element.x,
@@ -595,7 +733,8 @@
                     ry: 12,
                     fill: colors.fill,
                     stroke: colors.stroke,
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': config.lineWidth || 2,
+                    filter: filterAttr
                 });
             } else if (shape === 'diagonal') {
                 // Create polygon for diagonal corners (motivation elements)
@@ -608,23 +747,27 @@
                     [element.x, element.y + element.height],
                     [element.x, element.y + offset]
                 ].map(p => p.join(',')).join(' ');
-                
+
                 shapeEl = this.createSvgElement('polygon', {
                     points: points,
                     fill: colors.fill,
                     stroke: colors.stroke,
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': config.lineWidth || 2,
+                    filter: filterAttr
                 });
             } else {
-                // Square corners
+                // Square corners with subtle rounding
                 shapeEl = this.createSvgElement('rect', {
                     x: element.x,
                     y: element.y,
                     width: element.width,
                     height: element.height,
+                    rx: 3,
+                    ry: 3,
                     fill: colors.fill,
                     stroke: colors.stroke,
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': config.lineWidth || 2,
+                    filter: filterAttr
                 });
             }
             g.appendChild(shapeEl);
@@ -678,29 +821,81 @@
             const baseFontSize = config.fontSize || 14;
             const padding = 16; // Horizontal padding to account for
             const availableWidth = element.width - padding;
-            
-            // Estimate text width (approximate: Arial bold is roughly 0.6 * fontSize per character)
-            // This is a reasonable approximation for Arial bold font
-            const estimatedCharWidth = baseFontSize * 0.6;
-            const estimatedTextWidth = element.name.length * estimatedCharWidth;
-            
-            // Calculate scale factor if text is too wide
-            let fontSize = baseFontSize;
-            if (estimatedTextWidth > availableWidth) {
-                fontSize = Math.max(8, (availableWidth / estimatedTextWidth) * baseFontSize);
+            const availableHeight = element.height - padding;
+
+            // Word wrap text for better rendering
+            const words = element.name.split(/\s+/);
+            const lines = [];
+            let currentLine = '';
+            const estimatedCharWidth = baseFontSize * 0.55;
+            const maxCharsPerLine = Math.floor(availableWidth / estimatedCharWidth);
+
+            for (const word of words) {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                if (testLine.length <= maxCharsPerLine) {
+                    currentLine = testLine;
+                } else {
+                    if (currentLine) lines.push(currentLine);
+                    currentLine = word;
+                }
             }
-            
-            const nameText = this.createSvgElement('text', {
-                x: element.x + element.width / 2,
-                y: element.y + element.height / 2 + 5,
-                'text-anchor': 'middle',
-                'font-size': fontSize,
-                'font-family': 'Arial, sans-serif',
-                'font-weight': 'bold',
-                fill: '#000'
+            if (currentLine) lines.push(currentLine);
+
+            // Calculate font size based on number of lines and available space
+            const lineHeight = baseFontSize * 1.2;
+            const totalTextHeight = lines.length * lineHeight;
+            let fontSize = baseFontSize;
+
+            // Scale down if too many lines
+            if (totalTextHeight > availableHeight) {
+                fontSize = Math.max(8, (availableHeight / totalTextHeight) * baseFontSize);
+            }
+
+            // Scale down if lines are too wide
+            const maxLineLength = Math.max(...lines.map(l => l.length));
+            const estimatedMaxWidth = maxLineLength * fontSize * 0.55;
+            if (estimatedMaxWidth > availableWidth) {
+                fontSize = Math.max(8, (availableWidth / estimatedMaxWidth) * fontSize);
+            }
+
+            const adjustedLineHeight = fontSize * 1.2;
+            const startY = element.y + element.height / 2 - ((lines.length - 1) * adjustedLineHeight) / 2;
+
+            // Render each line with text outline for better readability
+            lines.forEach((line, i) => {
+                const yPos = startY + i * adjustedLineHeight;
+
+                // Text outline (stroke) for better contrast
+                const outlineText = this.createSvgElement('text', {
+                    x: element.x + element.width / 2,
+                    y: yPos,
+                    'text-anchor': 'middle',
+                    'dominant-baseline': 'middle',
+                    'font-size': fontSize,
+                    'font-family': 'Arial, sans-serif',
+                    'font-weight': 'bold',
+                    stroke: colors.fill,
+                    'stroke-width': 3,
+                    'stroke-linejoin': 'round',
+                    fill: 'none'
+                });
+                outlineText.textContent = line;
+                g.appendChild(outlineText);
+
+                // Main text
+                const nameText = this.createSvgElement('text', {
+                    x: element.x + element.width / 2,
+                    y: yPos,
+                    'text-anchor': 'middle',
+                    'dominant-baseline': 'middle',
+                    'font-size': fontSize,
+                    'font-family': 'Arial, sans-serif',
+                    'font-weight': 'bold',
+                    fill: '#000'
+                });
+                nameText.textContent = line;
+                g.appendChild(nameText);
             });
-            nameText.textContent = element.name;
-            g.appendChild(nameText);
             
             return g;
         }
@@ -758,12 +953,13 @@
         }
 
         /**
-         * Create orthogonal (right-angle) path between two points
+         * Create orthogonal (right-angle) path between two points with rounded corners
          * Creates a path with horizontal and vertical segments instead of diagonal lines
          */
         createOrthogonalPath(sourcePoint, targetPoint) {
             const path = [];
-            path.push({ x: sourcePoint.x, y: sourcePoint.y });
+            const cornerRadius = 8; // Radius for rounded corners
+            path.push({ x: sourcePoint.x, y: sourcePoint.y, type: 'start' });
 
             const dx = targetPoint.x - sourcePoint.x;
             const dy = targetPoint.y - sourcePoint.y;
@@ -772,16 +968,20 @@
             if (sourcePoint.side === 'right' || sourcePoint.side === 'left') {
                 // Horizontal exit from source
                 const midX = sourcePoint.x + dx / 2;
-                path.push({ x: midX, y: sourcePoint.y });
-                path.push({ x: midX, y: targetPoint.y });
+
+                // Add intermediate points with curve info
+                path.push({ x: midX, y: sourcePoint.y, type: 'corner', radius: cornerRadius });
+                path.push({ x: midX, y: targetPoint.y, type: 'corner', radius: cornerRadius });
             } else {
                 // Vertical exit from source (top or bottom)
                 const midY = sourcePoint.y + dy / 2;
-                path.push({ x: sourcePoint.x, y: midY });
-                path.push({ x: targetPoint.x, y: midY });
+
+                // Add intermediate points with curve info
+                path.push({ x: sourcePoint.x, y: midY, type: 'corner', radius: cornerRadius });
+                path.push({ x: targetPoint.x, y: midY, type: 'corner', radius: cornerRadius });
             }
 
-            path.push({ x: targetPoint.x, y: targetPoint.y });
+            path.push({ x: targetPoint.x, y: targetPoint.y, type: 'end' });
 
             return path;
         }
@@ -877,10 +1077,44 @@
             // Create orthogonal path
             const pathPoints = this.createOrthogonalPath(sourcePoint, targetPoint);
 
-            // Convert path points to SVG path data
-            const pathData = pathPoints.map((point, i) =>
-                `${i === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
-            ).join(' ');
+            // Convert path points to SVG path data with smooth curves at corners
+            let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+
+            for (let i = 1; i < pathPoints.length - 1; i++) {
+                const prev = pathPoints[i - 1];
+                const curr = pathPoints[i];
+                const next = pathPoints[i + 1];
+
+                if (curr.type === 'corner' && curr.radius) {
+                    // Calculate direction vectors
+                    const dx1 = curr.x - prev.x;
+                    const dy1 = curr.y - prev.y;
+                    const dx2 = next.x - curr.x;
+                    const dy2 = next.y - curr.y;
+
+                    // Calculate actual corner radius (limited by segment lengths)
+                    const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+                    const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+                    const radius = Math.min(curr.radius, len1 / 2, len2 / 2);
+
+                    // Calculate points before and after the corner
+                    const beforeX = curr.x - (dx1 / len1) * radius;
+                    const beforeY = curr.y - (dy1 / len1) * radius;
+                    const afterX = curr.x + (dx2 / len2) * radius;
+                    const afterY = curr.y + (dy2 / len2) * radius;
+
+                    // Line to corner start
+                    pathData += ` L ${beforeX} ${beforeY}`;
+                    // Quadratic curve around corner
+                    pathData += ` Q ${curr.x} ${curr.y} ${afterX} ${afterY}`;
+                } else {
+                    pathData += ` L ${curr.x} ${curr.y}`;
+                }
+            }
+
+            // Line to final point
+            const lastPoint = pathPoints[pathPoints.length - 1];
+            pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
 
             // Draw path
             const pathElement = this.createSvgElement('path', {
@@ -895,7 +1129,7 @@
             // Calculate arrow angle based on last path segment (for correct arrow direction)
             const lastSegment = pathPoints[pathPoints.length - 1];
             const secondLastSegment = pathPoints[pathPoints.length - 2];
-            const arrowSize = config.arrowSize || 8;
+            const arrowSize = (config.arrowSize || 8) * 1.3; // Larger arrows
             const angle = Math.atan2(
                 lastSegment.y - secondLastSegment.y,
                 lastSegment.x - secondLastSegment.x
@@ -909,73 +1143,84 @@
 
             if (relStyle.arrow === 'open') {
                 // Open arrow (for serving, access, triggering, flow)
+                const arrowAngle = Math.PI / 7; // Narrower angle for cleaner look
                 const arrowPoints = [
-                    [x2 - arrowSize * Math.cos(angle - Math.PI / 6), y2 - arrowSize * Math.sin(angle - Math.PI / 6)],
+                    [x2 - arrowSize * Math.cos(angle - arrowAngle), y2 - arrowSize * Math.sin(angle - arrowAngle)],
                     [x2, y2],
-                    [x2 - arrowSize * Math.cos(angle + Math.PI / 6), y2 - arrowSize * Math.sin(angle + Math.PI / 6)]
+                    [x2 - arrowSize * Math.cos(angle + arrowAngle), y2 - arrowSize * Math.sin(angle + arrowAngle)]
                 ];
                 const arrow = this.createSvgElement('polyline', {
                     points: arrowPoints.map(p => p.join(',')).join(' '),
                     fill: 'none',
                     stroke: '#333',
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': (config.lineWidth || 2) * 1.2,
+                    'stroke-linejoin': 'miter'
                 });
                 g.appendChild(arrow);
             } else if (relStyle.arrow === 'empty-triangle') {
                 // Empty triangle (for specialization, realization)
+                const arrowAngle = Math.PI / 7;
                 const arrowPoints = [
-                    [x2 - arrowSize * Math.cos(angle - Math.PI / 6), y2 - arrowSize * Math.sin(angle - Math.PI / 6)],
+                    [x2 - arrowSize * Math.cos(angle - arrowAngle), y2 - arrowSize * Math.sin(angle - arrowAngle)],
                     [x2, y2],
-                    [x2 - arrowSize * Math.cos(angle + Math.PI / 6), y2 - arrowSize * Math.sin(angle + Math.PI / 6)]
+                    [x2 - arrowSize * Math.cos(angle + arrowAngle), y2 - arrowSize * Math.sin(angle + arrowAngle)]
                 ];
                 const arrow = this.createSvgElement('polygon', {
                     points: arrowPoints.map(p => p.join(',')).join(' '),
                     fill: 'white',
                     stroke: '#333',
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': config.lineWidth || 2,
+                    'stroke-linejoin': 'miter'
                 });
                 g.appendChild(arrow);
             } else if (relStyle.arrow === 'filled-diamond') {
-                // Filled diamond (for composition)
-                const diamondSize = arrowSize * 0.8;
+                // Filled diamond (for composition) - improved proportions
+                const diamondLength = arrowSize * 1.2;
+                const diamondWidth = arrowSize * 0.6;
                 const arrowPoints = [
-                    [x2 - diamondSize * Math.cos(angle), y2 - diamondSize * Math.sin(angle)],
-                    [x2 - diamondSize * Math.cos(angle - Math.PI / 2), y2 - diamondSize * Math.sin(angle - Math.PI / 2)],
+                    [x2 - diamondLength * Math.cos(angle), y2 - diamondLength * Math.sin(angle)],
+                    [x2 - diamondLength * 0.5 * Math.cos(angle) - diamondWidth * Math.cos(angle - Math.PI / 2),
+                     y2 - diamondLength * 0.5 * Math.sin(angle) - diamondWidth * Math.sin(angle - Math.PI / 2)],
                     [x2, y2],
-                    [x2 - diamondSize * Math.cos(angle + Math.PI / 2), y2 - diamondSize * Math.sin(angle + Math.PI / 2)]
+                    [x2 - diamondLength * 0.5 * Math.cos(angle) - diamondWidth * Math.cos(angle + Math.PI / 2),
+                     y2 - diamondLength * 0.5 * Math.sin(angle) - diamondWidth * Math.sin(angle + Math.PI / 2)]
                 ];
                 const arrow = this.createSvgElement('polygon', {
                     points: arrowPoints.map(p => p.join(',')).join(' '),
                     fill: '#333',
                     stroke: '#333',
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': config.lineWidth || 2,
+                    'stroke-linejoin': 'miter'
                 });
                 g.appendChild(arrow);
             } else if (relStyle.arrow === 'empty-diamond') {
-                // Empty diamond (for aggregation)
-                const diamondSize = arrowSize * 0.8;
+                // Empty diamond (for aggregation) - improved proportions
+                const diamondLength = arrowSize * 1.2;
+                const diamondWidth = arrowSize * 0.6;
                 const arrowPoints = [
-                    [x2 - diamondSize * Math.cos(angle), y2 - diamondSize * Math.sin(angle)],
-                    [x2 - diamondSize * Math.cos(angle - Math.PI / 2), y2 - diamondSize * Math.sin(angle - Math.PI / 2)],
+                    [x2 - diamondLength * Math.cos(angle), y2 - diamondLength * Math.sin(angle)],
+                    [x2 - diamondLength * 0.5 * Math.cos(angle) - diamondWidth * Math.cos(angle - Math.PI / 2),
+                     y2 - diamondLength * 0.5 * Math.sin(angle) - diamondWidth * Math.sin(angle - Math.PI / 2)],
                     [x2, y2],
-                    [x2 - diamondSize * Math.cos(angle + Math.PI / 2), y2 - diamondSize * Math.sin(angle + Math.PI / 2)]
+                    [x2 - diamondLength * 0.5 * Math.cos(angle) - diamondWidth * Math.cos(angle + Math.PI / 2),
+                     y2 - diamondLength * 0.5 * Math.sin(angle) - diamondWidth * Math.sin(angle + Math.PI / 2)]
                 ];
                 const arrow = this.createSvgElement('polygon', {
                     points: arrowPoints.map(p => p.join(',')).join(' '),
                     fill: 'white',
                     stroke: '#333',
-                    'stroke-width': config.lineWidth || 2
+                    'stroke-width': config.lineWidth || 2,
+                    'stroke-linejoin': 'miter'
                 });
                 g.appendChild(arrow);
             } else if (relStyle.arrow === 'filled-circle') {
-                // Filled circle (for assignment)
+                // Filled circle (for assignment) - larger and cleaner
                 const circle = this.createSvgElement('circle', {
-                    cx: x2 - arrowSize * 0.7 * Math.cos(angle),
-                    cy: y2 - arrowSize * 0.7 * Math.sin(angle),
-                    r: arrowSize * 0.4,
+                    cx: x2 - arrowSize * 0.5 * Math.cos(angle),
+                    cy: y2 - arrowSize * 0.5 * Math.sin(angle),
+                    r: arrowSize * 0.35,
                     fill: '#333',
-                    stroke: '#333',
-                    'stroke-width': config.lineWidth || 2
+                    stroke: 'none'
                 });
                 g.appendChild(circle);
             }
@@ -1022,12 +1267,20 @@
                 container = document.querySelector(container);
             }
             if (!container) {
-                throw new Error('Invalid container element');
+                throw new Error('Invalid container element: container not found');
             }
             container.innerHTML = '';
-            
-            // Parse code
-            const { elements, relations, config } = this.parse(code);
+
+            // Parse code with error handling
+            let parseResult;
+            try {
+                parseResult = this.parse(code);
+            } catch (error) {
+                console.error('Parse error:', error);
+                throw new Error(`Failed to parse ArchiCode: ${error.message}`);
+            }
+
+            const { elements, relations, config } = parseResult;
             
             if (elements.length === 0) {
                 throw new Error('No elements found in code');
