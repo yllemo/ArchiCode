@@ -1097,7 +1097,10 @@
                     const seg2Length = Math.abs(targetPoint.y - sourcePoint.y);
                     const seg3Length = Math.abs(targetPoint.x - midX);
 
-                    if (seg1Length > 1 && seg2Length > 1 && seg3Length > 1) {
+                    // Also check that corners are not on the same position
+                    const cornersAreDifferent = Math.abs(corner2.y - corner1.y) > 1;
+
+                    if (seg1Length > 1 && seg2Length > 1 && seg3Length > 1 && cornersAreDifferent) {
                         path.push(corner1);
                         path.push(corner2);
                     }
@@ -1114,7 +1117,10 @@
                     const seg2Length = Math.abs(targetPoint.x - sourcePoint.x);
                     const seg3Length = Math.abs(targetPoint.y - midY);
 
-                    if (seg1Length > 1 && seg2Length > 1 && seg3Length > 1) {
+                    // Also check that corners are not on the same position
+                    const cornersAreDifferent = Math.abs(corner2.x - corner1.x) > 1;
+
+                    if (seg1Length > 1 && seg2Length > 1 && seg3Length > 1 && cornersAreDifferent) {
                         path.push(corner1);
                         path.push(corner2);
                     }
