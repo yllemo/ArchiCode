@@ -1074,21 +1074,31 @@
             const dx = targetPoint.x - sourcePoint.x;
             const dy = targetPoint.y - sourcePoint.y;
 
-            // Determine routing strategy based on connection sides
-            if (sourcePoint.side === 'right' || sourcePoint.side === 'left') {
-                // Horizontal exit from source
-                const midX = sourcePoint.x + dx / 2;
+            // Check if this is a straight line (no corners needed)
+            const isStraightVertical = Math.abs(dx) < 0.1; // Practically vertical
+            const isStraightHorizontal = Math.abs(dy) < 0.1; // Practically horizontal
 
-                // Add intermediate points with curve info
-                path.push({ x: midX, y: sourcePoint.y, type: 'corner', radius: cornerRadius });
-                path.push({ x: midX, y: targetPoint.y, type: 'corner', radius: cornerRadius });
+            if (isStraightVertical || isStraightHorizontal) {
+                // Straight line - no intermediate corners needed
+                // Just go directly from start to end
             } else {
-                // Vertical exit from source (top or bottom)
-                const midY = sourcePoint.y + dy / 2;
+                // Orthogonal path with corners
+                // Determine routing strategy based on connection sides
+                if (sourcePoint.side === 'right' || sourcePoint.side === 'left') {
+                    // Horizontal exit from source
+                    const midX = sourcePoint.x + dx / 2;
 
-                // Add intermediate points with curve info
-                path.push({ x: sourcePoint.x, y: midY, type: 'corner', radius: cornerRadius });
-                path.push({ x: targetPoint.x, y: midY, type: 'corner', radius: cornerRadius });
+                    // Add intermediate points with curve info
+                    path.push({ x: midX, y: sourcePoint.y, type: 'corner', radius: cornerRadius });
+                    path.push({ x: midX, y: targetPoint.y, type: 'corner', radius: cornerRadius });
+                } else {
+                    // Vertical exit from source (top or bottom)
+                    const midY = sourcePoint.y + dy / 2;
+
+                    // Add intermediate points with curve info
+                    path.push({ x: sourcePoint.x, y: midY, type: 'corner', radius: cornerRadius });
+                    path.push({ x: targetPoint.x, y: midY, type: 'corner', radius: cornerRadius });
+                }
             }
 
             path.push({ x: targetPoint.x, y: targetPoint.y, type: 'end' });
@@ -1209,22 +1219,31 @@
                     // Calculate actual corner radius (limited by segment lengths)
                     const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
                     const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-                    const radius = Math.min(curr.radius, len1 / 2, len2 / 2);
 
-                    // Calculate points before and after the corner
-                    const beforeX = curr.x - (dx1 / len1) * radius;
-                    const beforeY = curr.y - (dy1 / len1) * radius;
-                    const afterX = curr.x + (dx2 / len2) * radius;
-                    const afterY = curr.y + (dy2 / len2) * radius;
+                    // Skip corner if either segment is too short (avoid division by zero)
+                    if (len1 < 0.1 || len2 < 0.1) {
+                        // Just draw a straight line through the corner
+                        pathData += ` L ${curr.x} ${curr.y}`;
+                        lastDrawnX = curr.x;
+                        lastDrawnY = curr.y;
+                    } else {
+                        const radius = Math.min(curr.radius, len1 / 2, len2 / 2);
 
-                    // Line to corner start
-                    pathData += ` L ${beforeX} ${beforeY}`;
-                    // Quadratic curve around corner
-                    pathData += ` Q ${curr.x} ${curr.y} ${afterX} ${afterY}`;
+                        // Calculate points before and after the corner
+                        const beforeX = curr.x - (dx1 / len1) * radius;
+                        const beforeY = curr.y - (dy1 / len1) * radius;
+                        const afterX = curr.x + (dx2 / len2) * radius;
+                        const afterY = curr.y + (dy2 / len2) * radius;
 
-                    // Update last drawn position to the end of the curve
-                    lastDrawnX = afterX;
-                    lastDrawnY = afterY;
+                        // Line to corner start
+                        pathData += ` L ${beforeX} ${beforeY}`;
+                        // Quadratic curve around corner
+                        pathData += ` Q ${curr.x} ${curr.y} ${afterX} ${afterY}`;
+
+                        // Update last drawn position to the end of the curve
+                        lastDrawnX = afterX;
+                        lastDrawnY = afterY;
+                    }
                 } else {
                     pathData += ` L ${curr.x} ${curr.y}`;
                     lastDrawnX = curr.x;
