@@ -1075,8 +1075,8 @@
             const dy = targetPoint.y - sourcePoint.y;
 
             // Check if this is a straight line (no corners needed)
-            const isStraightVertical = Math.abs(dx) < 0.1; // Practically vertical
-            const isStraightHorizontal = Math.abs(dy) < 0.1; // Practically horizontal
+            const isStraightVertical = Math.abs(dx) < 1; // Practically vertical
+            const isStraightHorizontal = Math.abs(dy) < 1; // Practically horizontal
 
             if (isStraightVertical || isStraightHorizontal) {
                 // Straight line - no intermediate corners needed
@@ -1088,16 +1088,36 @@
                     // Horizontal exit from source
                     const midX = sourcePoint.x + dx / 2;
 
-                    // Add intermediate points with curve info
-                    path.push({ x: midX, y: sourcePoint.y, type: 'corner', radius: cornerRadius });
-                    path.push({ x: midX, y: targetPoint.y, type: 'corner', radius: cornerRadius });
+                    // Only add corners if they create meaningful segments
+                    const corner1 = { x: midX, y: sourcePoint.y, type: 'corner', radius: cornerRadius };
+                    const corner2 = { x: midX, y: targetPoint.y, type: 'corner', radius: cornerRadius };
+
+                    // Check that corners are not identical and segments are long enough
+                    const seg1Length = Math.abs(midX - sourcePoint.x);
+                    const seg2Length = Math.abs(targetPoint.y - sourcePoint.y);
+                    const seg3Length = Math.abs(targetPoint.x - midX);
+
+                    if (seg1Length > 1 && seg2Length > 1 && seg3Length > 1) {
+                        path.push(corner1);
+                        path.push(corner2);
+                    }
                 } else {
                     // Vertical exit from source (top or bottom)
                     const midY = sourcePoint.y + dy / 2;
 
-                    // Add intermediate points with curve info
-                    path.push({ x: sourcePoint.x, y: midY, type: 'corner', radius: cornerRadius });
-                    path.push({ x: targetPoint.x, y: midY, type: 'corner', radius: cornerRadius });
+                    // Only add corners if they create meaningful segments
+                    const corner1 = { x: sourcePoint.x, y: midY, type: 'corner', radius: cornerRadius };
+                    const corner2 = { x: targetPoint.x, y: midY, type: 'corner', radius: cornerRadius };
+
+                    // Check that corners are not identical and segments are long enough
+                    const seg1Length = Math.abs(midY - sourcePoint.y);
+                    const seg2Length = Math.abs(targetPoint.x - sourcePoint.x);
+                    const seg3Length = Math.abs(targetPoint.y - midY);
+
+                    if (seg1Length > 1 && seg2Length > 1 && seg3Length > 1) {
+                        path.push(corner1);
+                        path.push(corner2);
+                    }
                 }
             }
 
@@ -1221,7 +1241,7 @@
                     const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
 
                     // Skip corner if either segment is too short (avoid division by zero)
-                    if (len1 < 0.1 || len2 < 0.1) {
+                    if (len1 < 1 || len2 < 1 || !isFinite(len1) || !isFinite(len2)) {
                         // Just draw a straight line through the corner
                         pathData += ` L ${curr.x} ${curr.y}`;
                         lastDrawnX = curr.x;
@@ -1235,14 +1255,22 @@
                         const afterX = curr.x + (dx2 / len2) * radius;
                         const afterY = curr.y + (dy2 / len2) * radius;
 
-                        // Line to corner start
-                        pathData += ` L ${beforeX} ${beforeY}`;
-                        // Quadratic curve around corner
-                        pathData += ` Q ${curr.x} ${curr.y} ${afterX} ${afterY}`;
+                        // Validate calculated points before using them
+                        if (isFinite(beforeX) && isFinite(beforeY) && isFinite(afterX) && isFinite(afterY)) {
+                            // Line to corner start
+                            pathData += ` L ${beforeX} ${beforeY}`;
+                            // Quadratic curve around corner
+                            pathData += ` Q ${curr.x} ${curr.y} ${afterX} ${afterY}`;
 
-                        // Update last drawn position to the end of the curve
-                        lastDrawnX = afterX;
-                        lastDrawnY = afterY;
+                            // Update last drawn position to the end of the curve
+                            lastDrawnX = afterX;
+                            lastDrawnY = afterY;
+                        } else {
+                            // Fallback to straight line if calculation failed
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                            lastDrawnX = curr.x;
+                            lastDrawnY = curr.y;
+                        }
                     }
                 } else {
                     pathData += ` L ${curr.x} ${curr.y}`;
