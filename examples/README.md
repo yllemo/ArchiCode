@@ -2,24 +2,11 @@
 
 This directory contains example ArchiMate diagrams demonstrating various features of ArchiCode.js.
 
-## Basic Examples
+## Available Examples
 
-- [basic-business.archimate](./basic-business.archimate) - Simple business layer diagram
-- [application-architecture.archimate](./application-architecture.archimate) - Application layer with integrations
-- [technology-stack.archimate](./technology-stack.archimate) - Technology infrastructure diagram
-- [complete-enterprise.archimate](./complete-enterprise.archimate) - Multi-layer enterprise architecture
-
-## Advanced Examples
-
-- [motivation-strategy.archimate](./motivation-strategy.archimate) - Motivation and strategy layers
-- [transformation.archimate](./transformation.archimate) - Implementation and migration
-- [relationship-showcase.archimate](./relationship-showcase.archimate) - All relationship types
-
-## Domain-Specific Examples
-
-- [ecommerce-platform.archimate](./ecommerce-platform.archimate) - E-commerce architecture
-- [banking-system.archimate](./banking-system.archimate) - Banking system architecture
-- [healthcare-system.archimate](./healthcare-system.archimate) - Healthcare IT architecture
+- [basic-business.archimate](./basic-business.archimate) - Simple business layer diagram with actors, processes, and services
+- [ecommerce-platform.archimate](./ecommerce-platform.archimate) - Complete e-commerce platform architecture across business, application, and technology layers
+- [relationship-showcase.archimate](./relationship-showcase.archimate) - Comprehensive demonstration of all ArchiMate relationship types
 
 ## How to Use
 

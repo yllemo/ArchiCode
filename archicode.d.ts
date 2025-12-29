@@ -81,6 +81,14 @@ interface ArchiCodeParseResult {
     relations: ArchiCodeRelation[];
     /** Configuration from code directives */
     config: ArchiCodeConfig;
+    /** Array of syntax errors found during parsing */
+    parseErrors?: string[];
+    /** Array of warning messages */
+    warnings?: string[];
+    /** True if any errors were found */
+    hasErrors?: boolean;
+    /** True if any warnings were generated */
+    hasWarnings?: boolean;
 }
 
 /**

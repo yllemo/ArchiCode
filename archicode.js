@@ -286,6 +286,93 @@
         }
 
         /**
+         * Validate and suggest fixes for common syntax errors
+         * Returns {isValid: boolean, error: string, suggestion: string, fixed: string}
+         */
+        validateAndFixSyntax(line, lineNum) {
+            const errors = [];
+            const suggestions = [];
+            let fixedLine = line;
+
+            // Check for unmatched brackets
+            const openBrackets = (line.match(/\[/g) || []).length;
+            const closeBrackets = (line.match(/\]/g) || []).length;
+
+            if (openBrackets > closeBrackets) {
+                const missing = openBrackets - closeBrackets;
+                errors.push(`Rad ${lineNum + 1}: Saknar ${missing} stängande hakparentes ']'`);
+                suggestions.push(`Lägg till ']' i slutet`);
+                fixedLine = line + ']'.repeat(missing);
+            } else if (closeBrackets > openBrackets) {
+                const extra = closeBrackets - openBrackets;
+                errors.push(`Rad ${lineNum + 1}: ${extra} extra stängande hakparentes ']'`);
+                suggestions.push(`Ta bort extra ']'`);
+                fixedLine = line.replace(/\]$/, '');
+            }
+
+            // Check for unmatched angle brackets in element definitions
+            const openAngle = (line.match(/</g) || []).length;
+            const closeAngle = (line.match(/>/g) || []).length;
+
+            if (openAngle > closeAngle) {
+                errors.push(`Rad ${lineNum + 1}: Saknar stängande vinkelparentes '>' i elementdefinition`);
+                suggestions.push(`Lägg till '>' efter element-typen, t.ex. [<business:actor> Namn]`);
+                fixedLine = fixedLine.replace(/<([^>]+)([^\]]+)/, '<$1>$2');
+            } else if (closeAngle > openAngle) {
+                errors.push(`Rad ${lineNum + 1}: Extra stängande vinkelparentes '>'`);
+                suggestions.push(`Ta bort extra '>'`);
+            }
+
+            // Check for missing colon in element type
+            if (line.includes('<') && line.includes('>') && !line.match(/<[^:>]+:[^>]+>/)) {
+                const elementMatch = line.match(/<([^>]+)>/);
+                if (elementMatch && !elementMatch[1].includes(':')) {
+                    errors.push(`Rad ${lineNum + 1}: Element-typ saknar ':' - måste vara <lager:typ>`);
+                    suggestions.push(`Använd format <lager:typ>, t.ex. <business:actor> eller <application:component>`);
+                }
+            }
+
+            // Check for common misspellings of relationship arrows
+            const commonMistakes = {
+                '-->': 'Korrekt (serving)',
+                '->': 'Korrekt (serving)',
+                '<--': 'Använd <-- eller <- för omvänd riktning',
+                '<-': 'Korrekt (omvänd serving)',
+                '--:>': 'Korrekt (realization)',
+                '<:--': 'Använd --:> för realization (inte <:--)',
+                '+-': 'Korrekt (composition)',
+                '-+': 'Använd +- för composition (inte -+)',
+                'o-': 'Korrekt (aggregation)',
+                '-o': 'Använd o- för aggregation (inte -o)',
+                '.-': 'Korrekt start för assignment',
+                '-.': 'Använd .- för assignment (inte -.)'
+            };
+
+            // Suggest relationship if brackets exist but no valid relationship found
+            if (line.includes('[') && line.includes(']')) {
+                const hasRelation = /\[([^\]]+)\]\s*([^\[]+)\s*\[([^\]]+)\]/.test(line);
+                if (hasRelation) {
+                    const middlePart = line.match(/\]\s*([^\[]+)\s*\[/);
+                    if (middlePart) {
+                        const relSyntax = middlePart[1].trim();
+                        // Check if it looks like an attempt at a relationship but with wrong syntax
+                        if (relSyntax.length > 0 && !relSyntax.match(/^(-:>|<-:|<:--|\+\-|\-\+|o-|-o|\.--\.|\.->|\.-\|>|\.--\|>|<-\||<-\|\.|--:>|-\|>|<\|-|->|<-|-->|<--|<->|---)$/)) {
+                            errors.push(`Rad ${lineNum + 1}: Ogiltig relations-syntax "${relSyntax}"`);
+                            suggestions.push(`Använd någon av: --> (serving), --:> (realization), +- (composition), o- (aggregation), .- (assignment), <-> (access), -|> (triggering), --- (association)`);
+                        }
+                    }
+                }
+            }
+
+            return {
+                isValid: errors.length === 0,
+                errors: errors,
+                suggestions: suggestions,
+                fixed: fixedLine
+            };
+        }
+
+        /**
          * Validate ArchiMate relationship according to spec
          * Returns {valid: boolean, warning: string}
          */
@@ -354,13 +441,38 @@
             const elements = [];
             const relations = [];
             const config = { ...this.config };
-            const errors = [];
+            const parseErrors = [];
+            const warnings = [];
 
             for (let lineNum = 0; lineNum < lines.length; lineNum++) {
                 let line = lines[lineNum].trim();
-                
+
                 // Skip empty lines and comments
                 if (!line || line.startsWith('//')) continue;
+
+                // Skip configuration lines for validation (they have their own format)
+                if (!line.startsWith('#')) {
+                    // Validate syntax and get suggestions
+                    const validation = this.validateAndFixSyntax(line, lineNum);
+
+                    if (!validation.isValid) {
+                        // Collect errors but continue parsing with fixed line
+                        validation.errors.forEach(err => parseErrors.push(err));
+                        validation.suggestions.forEach(sug => warnings.push(sug));
+
+                        // Log to console for debugging
+                        console.warn(`Syntax-varning: ${validation.errors.join(', ')}`);
+                        if (validation.suggestions.length > 0) {
+                            console.info(`Förslag: ${validation.suggestions.join(', ')}`);
+                        }
+
+                        // Try to use fixed line
+                        if (validation.fixed !== line) {
+                            console.info(`Auto-fix tillämpat på rad ${lineNum + 1}: "${line}" → "${validation.fixed}"`);
+                            line = validation.fixed;
+                        }
+                    }
+                }
                 
                 // Configuration directives
                 if (line.startsWith('#')) {
@@ -553,7 +665,20 @@
                 }
             }
 
-            const result = { elements, relations, config };
+            const result = {
+                elements,
+                relations,
+                config,
+                parseErrors: parseErrors,
+                warnings: warnings,
+                hasErrors: parseErrors.length > 0,
+                hasWarnings: warnings.length > 0
+            };
+
+            // Log summary if there were issues
+            if (parseErrors.length > 0) {
+                console.warn(`⚠️ ${parseErrors.length} syntax-fel hittades. Parsing fortsatte med auto-fix där möjligt.`);
+            }
 
             // Cache resultatet (med storlek-begränsning)
             if (this.parseCache.size >= this.maxCacheSize) {
@@ -1280,10 +1405,25 @@
                 throw new Error(`Failed to parse ArchiCode: ${error.message}`);
             }
 
-            const { elements, relations, config } = parseResult;
-            
+            const { elements, relations, config, parseErrors, warnings, hasErrors } = parseResult;
+
+            // Show warnings/errors in console with helpful information
+            if (hasErrors && parseErrors && parseErrors.length > 0) {
+                console.group('⚠️ Syntax-fel hittades och har auto-fixats där möjligt:');
+                parseErrors.forEach(error => console.warn(error));
+                if (warnings && warnings.length > 0) {
+                    console.group('💡 Förslag för att fixa:');
+                    warnings.forEach(warning => console.info(warning));
+                    console.groupEnd();
+                }
+                console.groupEnd();
+            }
+
             if (elements.length === 0) {
-                throw new Error('No elements found in code');
+                const errorMsg = parseErrors && parseErrors.length > 0
+                    ? `Inga element hittades. Syntax-fel: ${parseErrors.join('; ')}`
+                    : 'Inga element hittades i koden. Kontrollera syntaxen.';
+                throw new Error(errorMsg);
             }
             
             // Calculate layout

@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArchiCode Playground</title>
 
-    <!-- ArchiCode Library från CDN -->
+    <!-- ArchiCode Library - Try CDN first, fallback to local -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.css">
+    <link rel="stylesheet" href="../archicode.css">
     <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@main/archicode.js"></script>
+    <script src="../archicode.js"></script>
 
     <style>
         * {
@@ -49,6 +51,42 @@
             font-size: 1.1em;
         }
 
+        .instructions {
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .instructions code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .error-message, .success-message {
+            padding: 15px 20px;
+            margin: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .error-message.show, .success-message.show {
+            display: block;
+        }
+
         .content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -56,15 +94,13 @@
             min-height: 600px;
         }
 
-        .editor-section {
-            border-right: 2px solid #e0e0e0;
+        .editor-section, .viewer-section {
             display: flex;
             flex-direction: column;
         }
 
-        .viewer-section {
-            display: flex;
-            flex-direction: column;
+        .editor-section {
+            border-right: 2px solid #e0e0e0;
         }
 
         .section-header {
@@ -76,6 +112,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .button-group {
@@ -84,7 +122,7 @@
             flex-wrap: wrap;
         }
 
-        button {
+        button, select {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -94,37 +132,11 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        button:hover {
+        button:hover, select:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        select {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            min-width: 180px;
-            outline: none;
-        }
-
-        select:hover {
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        select option {
-            background: white;
-            color: #333;
-            padding: 8px 12px;
         }
 
         button:active {
@@ -137,6 +149,16 @@
 
         button.secondary:hover {
             box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        select {
+            min-width: 180px;
+            outline: none;
+        }
+
+        select option {
+            background: white;
+            color: #333;
         }
 
         textarea {
@@ -155,10 +177,6 @@
             padding: 20px;
             overflow: auto;
             background: #fafafa;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-            position: relative;
         }
 
         #diagram {
@@ -171,99 +189,14 @@
             height: auto;
         }
 
-        .fullscreen-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            cursor: zoom-out;
-        }
-
-        .fullscreen-overlay.active {
-            display: flex;
-        }
-
-        .fullscreen-overlay canvas {
-            max-width: 95vw;
-            max-height: 95vh;
-            border: none;
-        }
-
-        .close-fullscreen {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            color: #333;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            z-index: 10000;
-        }
-
-        .close-fullscreen:hover {
-            background: #f0f0f0;
-        }
-
-        .error-message {
-            background: #ff4444;
-            color: white;
-            padding: 15px 20px;
-            margin: 20px;
-            border-radius: 6px;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        .success-message {
-            background: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            margin: 20px;
-            border-radius: 6px;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
         @media (max-width: 968px) {
             .content {
                 grid-template-columns: 1fr;
             }
-
             .editor-section {
                 border-right: none;
                 border-bottom: 2px solid #e0e0e0;
             }
-        }
-
-        .instructions {
-            padding: 20px;
-            background: #f9f9f9;
-            border-bottom: 2px solid #e0e0e0;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .instructions code {
-            background: #e0e0e0;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
         }
     </style>
 </head>
@@ -291,9 +224,6 @@
                             <option value="">Välj exempel...</option>
                             <option value="business-process">Affärsprocess</option>
                             <option value="ecommerce">E-handel</option>
-                            <option value="banking">Banksystem</option>
-                            <option value="healthcare">Vårdsystem</option>
-                            <option value="enterprise">Företagsarkitektur</option>
                             <option value="relationships">Relationstyper</option>
                         </select>
                     </div>
@@ -322,6 +252,7 @@ Exempel:
         </div>
     </div>
 
+    <script>
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
@@ -344,11 +275,26 @@ Exempel:
             }
 
             try {
-                // Använd ArchiCode.js från CDN
+                // Check if ArchiCode is loaded
+                if (typeof ArchiCode === 'undefined') {
+                    showError('ArchiCode-biblioteket kunde inte laddas. Kontrollera internetanslutningen eller ladda ner filen lokalt.');
+                    return;
+                }
+
+                // Parse först för att få fel/varningar
+                const parseResult = ArchiCode.parse(code);
+
+                // Rendera diagrammet
                 ArchiCode.render(code, '#diagram');
-                showSuccess('Diagram renderat!');
+
+                // Visa meddelande baserat på resultat
+                if (parseResult.hasErrors) {
+                    showSuccess(`Diagram renderat med ${parseResult.parseErrors.length} auto-fixade syntax-fel. Kontrollera konsolen (F12) för detaljer.`);
+                } else {
+                    showSuccess('Diagram renderat!');
+                }
             } catch (error) {
-                showError('Fel vid rendering: ' + error.message);
+                showError('Fel vid rendering: ' + error.message + ' (Öppna konsolen F12 för mer info)');
                 console.error('Rendering error:', error);
             }
         }
@@ -361,7 +307,11 @@ Exempel:
             }
 
             try {
-                // Använd ArchiCode.exportSVG() från CDN
+                if (typeof ArchiCode === 'undefined') {
+                    showError('ArchiCode-biblioteket kunde inte laddas.');
+                    return;
+                }
+
                 const svgString = ArchiCode.exportSVG(code);
                 const blob = new Blob([svgString], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
@@ -384,7 +334,11 @@ Exempel:
             }
 
             try {
-                // Använd ArchiCode.exportDrawIO() från CDN
+                if (typeof ArchiCode === 'undefined') {
+                    showError('ArchiCode-biblioteket kunde inte laddas.');
+                    return;
+                }
+
                 const drawIoXml = ArchiCode.exportDrawIO(code);
                 const blob = new Blob([drawIoXml], { type: 'application/xml' });
                 const url = URL.createObjectURL(blob);
@@ -393,10 +347,9 @@ Exempel:
                 link.download = 'archicode-diagram.drawio';
                 link.click();
                 URL.revokeObjectURL(url);
-                showSuccess('Draw.io-fil exporterad! Öppna filen i draw.io eller diagrams.net.');
+                showSuccess('Draw.io-fil exporterad!');
             } catch (error) {
                 showError('Fel vid export: ' + error.message);
-                console.error('Export error:', error);
             }
         }
 
@@ -413,7 +366,6 @@ Exempel:
 [<business:process> Leveransprocess]
 [<business:service> Kundtjänst]
 [<business:object> Beställning]
-[<business:product> Mjukvarulicens]
 
 // Relationer
 [Kund] --> [Försäljningsprocess]
@@ -421,185 +373,32 @@ Exempel:
 [Försäljningsprocess] --> [Kundtjänst]
 [Försäljningsprocess] --> [Beställning]
 [Beställning] --> [Leveransprocess]
-[Leveransprocess] --> [Mjukvarulicens]
 [Projektledare] .-- [Kund]`,
 
             'ecommerce': `#spacing: 100
 #direction: down
 
 // E-handelsplattform
-// Affärslager
 [<business:actor> Kund]
-[<business:actor> Handlare]
 [<business:process> Orderhantering]
-[<business:process> Betalning]
 [<business:service> Webbutik]
-[<business:object> Produktkatalog]
-[<business:object> Varukorg]
 
-// Applikationslager
 [<application:component> Webbfrontend]
 [<application:component> Orderservice]
-[<application:component> Betalservice]
-[<application:component> Lagerservice]
 [<application:service> REST API]
 [<application:data> Produktdatabas]
-[<application:data> Användardatabas]
 
-// Tekniklager
 [<technology:node> Lastbalanserare]
 [<technology:node> Applikationsserver]
-[<technology:node> Databasserver]
-[<technology:device> CDN]
 
 // Relationer
 [Kund] --> [Webbutik]
-[Handlare] --> [Orderhantering]
 [Webbutik] --> [REST API]
 [REST API] --> [Orderservice]
-[Orderservice] --> [Betalservice]
 [Orderservice] <-> [Produktdatabas]
 [Webbfrontend] --:> [Webbutik]
 [Webbfrontend] --> [Lastbalanserare]
-[Lastbalanserare] --> [Applikationsserver]
-[Applikationsserver] --> [Databasserver]`,
-
-            'banking': `#spacing: 90
-#fontSize: 13
-
-// Banksystemarkitektur
-// Affärslager
-[<business:actor> Bankkund]
-[<business:actor> Bankpersonal]
-[<business:process> Kontounderhåll]
-[<business:process> Kreditbedömning]
-[<business:process> Transaktionshantering]
-[<business:service> Internetbank]
-[<business:service> Mobilbank]
-[<business:object> Konto]
-[<business:object> Transaktion]
-
-// Applikationslager
-[<application:component> Internetbanksystem]
-[<application:component> Mobilapp]
-[<application:component> Kärnbanksystem]
-[<application:component> Kreditmotor]
-[<application:component> Antibedrägeri]
-[<application:data> Kunddatabas]
-[<application:data> Transaktionsregister]
-
-// Tekniklager
-[<technology:node> Säkerhetsgateway]
-[<technology:node> Applikationskluster]
-[<technology:device> HSM (Hardware Security Module)]
-[<technology:network> Privat nätverk]
-
-// Externa aktörer
-[<business:actor> Riksbank]
-[<business:actor> Andra banker]
-
-// Relationer
-[Bankkund] --> [Internetbank]
-[Bankkund] --> [Mobilbank]
-[Bankpersonal] --> [Kontounderhåll]
-[Internetbanksystem] --:> [Internetbank]
-[Mobilapp] --:> [Mobilbank]
-[Internetbanksystem] --> [Kärnbanksystem]
-[Kärnbanksystem] --> [Kreditmotor]
-[Kärnbanksystem] --> [Antibedrägeri]
-[Kärnbanksystem] <-> [Kunddatabas]
-[Transaktionshantering] <-> [Transaktionsregister]
-[Kärnbanksystem] --> [Riksbank]
-[Kärnbanksystem] <-> [Andra banker]`,
-
-            'healthcare': `#spacing: 85
-#fontSize: 12
-
-// Vårdsystemarkitektur
-// Affärslager
-[<business:actor> Patient]
-[<business:actor> Läkare]
-[<business:actor> Sjuksköterska]
-[<business:process> Patientmottagning]
-[<business:process> Diagnos]
-[<business:process> Behandling]
-[<business:service> Journalsystem]
-[<business:service> Bokningssystem]
-[<business:object> Patientjournal]
-[<business:object> Recepter]
-
-// Applikationslager
-[<application:component> Elektronisk journal]
-[<application:component> Bokningssystem]
-[<application:component> Medicinregister]
-[<application:component> Bildarkiv (PACS)]
-[<application:service> Patientportal]
-[<application:data> Patientdatabas]
-[<application:data> Medicindatabas]
-
-// Tekniklager
-[<technology:node> Sjukhusserver]
-[<technology:device> Medicinsk utrustning]
-[<technology:network> Sjukhusnätverk]
-
-// Externa
-[<business:actor> Apotek]
-[<business:actor> Socialstyrelsen]
-
-// Relationer
-[Patient] --> [Bokningssystem]
-[Läkare] --> [Patientmottagning]
-[Sjuksköterska] --> [Behandling]
-[Elektronisk journal] --:> [Journalsystem]
-[Bokningssystem] --:> [Bokningssystem]
-[Elektronisk journal] <-> [Patientdatabas]
-[Medicinregister] <-> [Medicindatabas]
-[Läkare] --> [Diagnos]
-[Diagnos] --> [Recepter]
-[Recepter] --> [Apotek]
-[Patientjournal] --> [Socialstyrelsen]`,
-
-            'enterprise': `#spacing: 70
-#fontSize: 13
-
-// Fullständig företagsarkitektur
-// Motivationslager
-[<motivation:stakeholder> Styrelse]
-[<motivation:goal> Ökad lönsamhet]
-[<motivation:requirement> Förbättrad kundupplevelse]
-
-// Strategilager
-[<strategy:capability> Digital transformation]
-[<strategy:resource> IT-avdelning]
-
-// Affärslager
-[<business:actor> Kunder]
-[<business:process> Säljprocess]
-[<business:service> Webbtjänster]
-
-// Applikationslager
-[<application:component> CRM-system]
-[<application:component> ERP-system]
-[<application:service> API Gateway]
-
-// Tekniklager
-[<technology:node> Molnplattform]
-[<technology:device> Enheter]
-
-// Implementeringslager
-[<implementation:workpackage> Digitalisering]
-[<implementation:deliverable> Ny webbplats]
-
-// Relationer
-[Styrelse] --> [Ökad lönsamhet]
-[Ökad lönsamhet] --> [Förbättrad kundupplevelse]
-[Förbättrad kundupplevelse] --> [Digital transformation]
-[Digital transformation] --> [IT-avdelning]
-[Säljprocess] --> [Webbtjänster]
-[CRM-system] --:> [Webbtjänster]
-[API Gateway] --> [CRM-system]
-[Molnplattform] --> [API Gateway]
-[Digitalisering] --> [Ny webbplats]`,
+[Lastbalanserare] --> [Applikationsserver]`,
 
             'relationships': `#spacing: 70
 #fontSize: 13
@@ -652,12 +451,6 @@ Exempel:
                 document.getElementById('codeInput').value = examples[selectedValue];
                 renderDiagram();
             }
-        }
-
-        // Bakåtkompatibilitet för gamla loadExample()
-        function loadExample() {
-            document.getElementById('exampleSelect').value = 'business-process';
-            loadSelectedExample();
         }
 
         // Auto-render on page load if there's code
