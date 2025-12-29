@@ -1190,6 +1190,10 @@
             // Convert path points to SVG path data with smooth curves at corners
             let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
 
+            // Track the last actual position drawn (for arrow angle calculation)
+            let lastDrawnX = pathPoints[0].x;
+            let lastDrawnY = pathPoints[0].y;
+
             for (let i = 1; i < pathPoints.length - 1; i++) {
                 const prev = pathPoints[i - 1];
                 const curr = pathPoints[i];
@@ -1217,8 +1221,14 @@
                     pathData += ` L ${beforeX} ${beforeY}`;
                     // Quadratic curve around corner
                     pathData += ` Q ${curr.x} ${curr.y} ${afterX} ${afterY}`;
+
+                    // Update last drawn position to the end of the curve
+                    lastDrawnX = afterX;
+                    lastDrawnY = afterY;
                 } else {
                     pathData += ` L ${curr.x} ${curr.y}`;
+                    lastDrawnX = curr.x;
+                    lastDrawnY = curr.y;
                 }
             }
 
@@ -1236,13 +1246,12 @@
             });
             g.appendChild(pathElement);
 
-            // Calculate arrow angle based on last path segment (for correct arrow direction)
+            // Calculate arrow angle based on actual last drawn segment (for correct arrow direction after curves)
             const lastSegment = pathPoints[pathPoints.length - 1];
-            const secondLastSegment = pathPoints[pathPoints.length - 2];
             const arrowSize = (config.arrowSize || 8) * 1.3; // Larger arrows
             const angle = Math.atan2(
-                lastSegment.y - secondLastSegment.y,
-                lastSegment.x - secondLastSegment.x
+                lastSegment.y - lastDrawnY,
+                lastSegment.x - lastDrawnX
             );
 
             // Final coordinates for arrow
