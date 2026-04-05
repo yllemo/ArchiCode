@@ -5,13 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArchiCode Playground</title>
 
-    <link rel="stylesheet" href="../archicode.css">
-    <script src="../archicode.js"></script>
+    <link id="archicode-css" rel="stylesheet" href="">
+    <script>
+        (function () {
+            var STORAGE_THEME = 'archicodeDemoTheme';
+            var STORAGE_SOURCE = 'archicodeDemoSource';
+            var CDN_BASE = 'https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@latest/';
+            /* Samma katalog som index.html (lägg archicode.js + archicode.css bredvid denna fil) */
+            var LOCAL_BASE = '';
 
-    <!-- CDN (om du visar demo utanför repot): byt till
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.css">
-    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.js"></script>
-    -->
+            var theme = localStorage.getItem(STORAGE_THEME);
+            if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+
+            var source = localStorage.getItem(STORAGE_SOURCE);
+            if (source !== 'cdn' && source !== 'local') source = 'local';
+            var base = source === 'cdn' ? CDN_BASE : LOCAL_BASE;
+
+            var link = document.getElementById('archicode-css');
+            link.href = base + 'archicode.css';
+
+            var scr = document.createElement('script');
+            scr.src = base + 'archicode.js';
+            scr.async = false;
+            scr.defer = false;
+            scr.onload = function () {
+                window.dispatchEvent(new CustomEvent('archicodeloaded'));
+            };
+            scr.onerror = function () {
+                window.__ARCHICODE_DEMO_LOAD_FAILED__ = true;
+                window.dispatchEvent(new CustomEvent('archicodeloaderror'));
+            };
+            document.head.appendChild(scr);
+            if (typeof ArchiCode !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('archicodeloaded'));
+            }
+        })();
+    </script>
 
     <style>
         * {
@@ -41,19 +71,56 @@
         .top-bar {
             flex-shrink: 0;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            flex-direction: column;
+            gap: 10px;
             padding: 10px 16px;
             background: rgba(0, 0, 0, 0.35);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .top-bar-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .top-bar h1 {
             font-size: 1.15rem;
             font-weight: 700;
             letter-spacing: -0.02em;
+        }
+
+        .top-settings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            align-items: center;
+        }
+
+        .top-settings .setting-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.92;
+            white-space: nowrap;
+        }
+
+        .top-settings .setting-line select {
+            min-width: 130px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .top-settings .setting-line select option {
+            background: #2d3250;
+            color: #eee;
         }
 
         .top-bar .hint {
@@ -262,15 +329,106 @@
                 border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             }
         }
+
+        /* —— Ljust tema —— */
+        html[data-theme="light"] body {
+            background: linear-gradient(160deg, #e8eaf6 0%, #d1d6ef 45%, #bfc4ea 100%);
+            color: #1a1a2e;
+        }
+
+        html[data-theme="light"] .top-bar {
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html[data-theme="light"] .top-bar h1 {
+            color: #1a237e;
+        }
+
+        html[data-theme="light"] .top-bar .hint {
+            color: #37474f;
+            opacity: 0.95;
+        }
+
+        html[data-theme="light"] .top-bar .hint code {
+            background: rgba(0, 0, 0, 0.06);
+            color: #263238;
+        }
+
+        html[data-theme="light"] .top-settings .setting-line {
+            color: #37474f;
+        }
+
+        html[data-theme="light"] .top-settings .setting-line select {
+            background: #fff;
+            color: #1a1a2e;
+            border: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
+        html[data-theme="light"] .top-settings .setting-line select option {
+            background: #fff;
+            color: #1a1a2e;
+        }
+
+        html[data-theme="light"] .content {
+            border-top-color: rgba(0, 0, 0, 0.06);
+        }
+
+        html[data-theme="light"] .editor-section {
+            border-right-color: rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+
+        html[data-theme="light"] .viewer-section {
+            background: #eceff1;
+        }
+
+        html[data-theme="light"] .viewer-section .section-header {
+            color: #263238;
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html[data-theme="light"] .diagram-viewport {
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                #cfd8dc;
+            background-size: 24px 24px;
+        }
+
+        html[data-theme="light"] .diagram-viewport::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.22);
+        }
+
+        html[data-theme="light"] #diagram svg {
+            filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.12));
+        }
     </style>
 </head>
 <body>
     <div class="app">
         <header class="top-bar">
-            <h1>ArchiCode Playground</h1>
+            <div class="top-bar-main">
+                <h1>ArchiCode Playground</h1>
+                <div class="top-settings">
+                    <label class="setting-line">Tema
+                        <select id="themeSelect" onchange="onDemoThemeChange()" title="Ljust eller mörkt läge">
+                            <option value="dark">Mörk</option>
+                            <option value="light">Ljust</option>
+                        </select>
+                    </label>
+                    <label class="setting-line">ArchiCode
+                        <select id="sourceSelect" onchange="onDemoSourceChange()" title="Laddar om sidan">
+                            <option value="local">Lokalt (samma mapp)</option>
+                            <option value="cdn">CDN (jsDelivr)</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
             <p class="hint">
                 <strong>Ctrl+Enter</strong> ritar diagram. I diagramytan: <strong>Ctrl+rulla</strong> (eller Cmd+rulla) zoomar.
-                Scrolla för att panorera. Exempel laddas i listan till vänster.
+                Scrolla för att panorera. <strong>Tema</strong> sparas i webbläsaren. <strong>ArchiCode</strong> byter källa och laddar om sidan.
             </p>
         </header>
 
@@ -325,6 +483,40 @@
     </div>
 
     <script>
+        var STORAGE_THEME = 'archicodeDemoTheme';
+        var STORAGE_SOURCE = 'archicodeDemoSource';
+
+        function onDemoThemeChange() {
+            var v = document.getElementById('themeSelect').value;
+            localStorage.setItem(STORAGE_THEME, v);
+            document.documentElement.setAttribute('data-theme', v);
+        }
+
+        function onDemoSourceChange() {
+            localStorage.setItem(STORAGE_SOURCE, document.getElementById('sourceSelect').value);
+            location.reload();
+        }
+
+        function syncDemoChromeFromStorage() {
+            var theme = localStorage.getItem(STORAGE_THEME);
+            if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            var ts = document.getElementById('themeSelect');
+            if (ts) ts.value = theme;
+
+            var src = localStorage.getItem(STORAGE_SOURCE);
+            if (src !== 'cdn' && src !== 'local') src = 'local';
+            var ss = document.getElementById('sourceSelect');
+            if (ss) ss.value = src;
+        }
+
+        var archiDemoStarted = false;
+
+        function initArchiCodeDemo() {
+            if (archiDemoStarted) return;
+            if (typeof ArchiCode === 'undefined') return;
+            archiDemoStarted = true;
+
         let diagramZoom = 1;
         let svgBaseWidth = 0;
         let svgBaseHeight = 0;
@@ -376,7 +568,7 @@
 
             try {
                 if (typeof ArchiCode === 'undefined') {
-                    showError('ArchiCode laddades inte. Kontrollera att ../archicode.js finns.');
+                    showError('ArchiCode laddades inte. Byt källa i menyn (Lokalt/CDN) eller öppna sidan via en lokal server.');
                     return;
                 }
 
@@ -633,6 +825,32 @@
                 renderDiagram();
             }
         });
+
+        window.adjustZoom = adjustZoom;
+        window.resetZoom = resetZoom;
+        window.renderDiagram = renderDiagram;
+        window.downloadSVG = downloadSVG;
+        window.exportToDrawIO = exportToDrawIO;
+        window.loadSelectedExample = loadSelectedExample;
+        }
+
+        syncDemoChromeFromStorage();
+
+        window.addEventListener('archicodeloaded', function () {
+            initArchiCodeDemo();
+        }, { once: true });
+
+        window.addEventListener('archicodeloaderror', function () {
+            syncDemoChromeFromStorage();
+            var err = document.getElementById('errorMessage');
+            if (err) {
+                err.textContent = 'Kunde inte ladda archicode.js (nätverk eller fel sökväg). Välj annan källa i menyn ArchiCode och ladda om.';
+                err.classList.add('show');
+            }
+        }, { once: true });
+
+        initArchiCodeDemo();
+        setTimeout(initArchiCodeDemo, 0);
     </script>
 </body>
 </html>

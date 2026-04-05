@@ -49,6 +49,7 @@
         'actor': 'square',
         'role': 'square',
         'collaboration': 'square',
+        'technology-collaboration': 'square',
         'interface': 'square',
         'component': 'square',
         'node': 'square',
@@ -56,6 +57,7 @@
         'system-software': 'square',
         'path': 'square',
         'network': 'square',
+        'distribution-network': 'square',
         'equipment': 'square',
         'facility': 'square',
         'material': 'square',
@@ -79,6 +81,13 @@
         'gap': 'rounded',
         'plateau': 'rounded',
         'course-of-action': 'rounded',
+        'implementation-event': 'rounded',
+        'application-process': 'rounded',
+        'technology-process': 'rounded',
+        'technology-function': 'rounded',
+        'technology-interaction': 'rounded',
+        'technology-event': 'rounded',
+        'value-stream': 'rounded',
         
         // Motivation elements (diagonal corners)
         'stakeholder': 'diagonal',
@@ -91,6 +100,9 @@
         'constraint': 'diagonal',
         'meaning': 'diagonal',
         'value': 'diagonal',
+
+        'location': 'square',
+        'grouping': 'square',
         
         // Default
         'default': 'square'
@@ -123,6 +135,8 @@
         'business-contract': 'contract',
         'product': 'product',
         'business-product': 'product',
+        'representation': 'representation',
+        'business-representation': 'representation',
         
         // Application Layer
         'component': 'application-component',
@@ -133,6 +147,7 @@
         'application-interaction': 'application-interaction',
         'application-event': 'application-event',
         'application-service': 'application-service',
+        'application-process': 'application-process',
         'data-object': 'data-object',
         'application-data': 'data-object',
         
@@ -142,7 +157,7 @@
         'system-software': 'system-software',
         'technology-system-software': 'system-software',
         'network': 'network',
-        'path': 'network',
+        'path': 'path',
         'communication-network': 'network',
         'technology-network': 'network',
         'technology-service': 'technology-service',
@@ -151,6 +166,11 @@
         'equipment': 'equipment',
         'facility': 'facility',
         'material': 'material',
+        'technology-process': 'technology-process',
+        'technology-function': 'technology-function',
+        'technology-interaction': 'technology-interaction',
+        'technology-event': 'technology-event',
+        'technology-collaboration': 'technology-collaboration',
         
         // Motivation Layer
         'stakeholder': 'stakeholder',
@@ -168,6 +188,7 @@
         'capability': 'capability',
         'resource': 'resource',
         'course-of-action': 'course-of-action',
+        'value-stream': 'value-stream',
         
         // Implementation & Migration Layer
         'workpackage': 'workpackage',
@@ -175,11 +196,17 @@
         'deliverable': 'deliverable',
         'plateau': 'plateau',
         'gap': 'gap',
+        'implementation-event': 'implementation-event',
         
         // Physical Layer
         'physical-equipment': 'physical-equipment',
         'physical-facility': 'physical-facility',
-        'physical-material': 'physical-material'
+        'physical-material': 'physical-material',
+        'distribution-network': 'distribution-network',
+        'physical-distribution-network': 'distribution-network',
+
+        'location': 'location',
+        'grouping': 'grouping'
     };
 
     // Relationship types and their visual representations (ArchiMate 3.2 standard)
@@ -638,17 +665,7 @@
                     const sourceElement = elements.find(e => e.id === relSource);
                     const targetElement = elements.find(e => e.id === relTarget);
 
-                    if (sourceElement && targetElement) {
-                        const validation = this.validateRelationship(
-                            sourceElement.type,
-                            targetElement.type,
-                            relType
-                        );
-
-                        if (!validation.valid) {
-                            console.warn(`Line ${lineNum + 1}: ${validation.warning}`);
-                        }
-                    }
+                    // Relationer ritas alltid; ArchiMate-spec-validering körs inte (för strikt för vanliga diagram)
 
                     // Always push the relation (allow multiple identical relations)
                     relations.push({

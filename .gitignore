@@ -51,3 +51,7 @@ build/
 vendor/
 composer.lock
 .phpunit.result.cache
+
+# ArchiCode - exclude generated/dev files
+svg/
+tools/
