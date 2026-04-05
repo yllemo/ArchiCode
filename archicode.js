@@ -234,6 +234,16 @@
         '---': 'association'
     };
 
+    /** Full-string match for relation operator between two [bracket] blocks (keeps validateAndFixSyntax in sync with SYNTAX_TO_RELATIONSHIP) */
+    const RELATION_SYNTAX_FULL_MATCH = new RegExp(
+        '^(' +
+        Object.keys(SYNTAX_TO_RELATIONSHIP)
+            .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .sort((a, b) => b.length - a.length)
+            .join('|') +
+        ')$'
+    );
+
     /**
      * Main ArchiCode class
      */
@@ -308,17 +318,20 @@
                 fixedLine = line.replace(/\]$/, '');
             }
 
-            // Check for unmatched angle brackets in element definitions
-            const openAngle = (line.match(/</g) || []).length;
-            const closeAngle = (line.match(/>/g) || []).length;
+            // Angle brackets in element defs only — relation operators like ->, -->, <-> also contain '>' / '<'
+            const looksLikeRelationLine = /\]\s*.+?\s*\[/.test(line);
+            if (!looksLikeRelationLine) {
+                const openAngle = (line.match(/</g) || []).length;
+                const closeAngle = (line.match(/>/g) || []).length;
 
-            if (openAngle > closeAngle) {
-                errors.push(`Rad ${lineNum + 1}: Saknar stängande vinkelparentes '>' i elementdefinition`);
-                suggestions.push(`Lägg till '>' efter element-typen, t.ex. [<business:actor> Namn]`);
-                fixedLine = fixedLine.replace(/<([^>]+)([^\]]+)/, '<$1>$2');
-            } else if (closeAngle > openAngle) {
-                errors.push(`Rad ${lineNum + 1}: Extra stängande vinkelparentes '>'`);
-                suggestions.push(`Ta bort extra '>'`);
+                if (openAngle > closeAngle) {
+                    errors.push(`Rad ${lineNum + 1}: Saknar stängande vinkelparentes '>' i elementdefinition`);
+                    suggestions.push(`Lägg till '>' efter element-typen, t.ex. [<business:actor> Namn]`);
+                    fixedLine = fixedLine.replace(/<([^>]+)([^\]]+)/, '<$1>$2');
+                } else if (closeAngle > openAngle) {
+                    errors.push(`Rad ${lineNum + 1}: Extra stängande vinkelparentes '>'`);
+                    suggestions.push(`Ta bort extra '>'`);
+                }
             }
 
             // Check for missing colon in element type
@@ -337,11 +350,9 @@
                     const middlePart = line.match(/\]\s*([^\[]+)\s*\[/);
                     if (middlePart) {
                         const relSyntax = middlePart[1].trim();
-                        // All valid relationship syntaxes (updated to match SYNTAX_TO_RELATIONSHIP)
-                        const validSyntaxes = /^(-:>|<:-|\+-|-\+|o-|-o|\.--|--\.|\.->|<-\.|\.-\|>|<-\|\.|\--:>|<:--|-\|>|<\|-->|<-|-->|<--|<->|---)$/;
 
                         // Check if it looks like an attempt at a relationship but with wrong syntax
-                        if (relSyntax.length > 0 && !validSyntaxes.test(relSyntax)) {
+                        if (relSyntax.length > 0 && !RELATION_SYNTAX_FULL_MATCH.test(relSyntax)) {
                             errors.push(`Rad ${lineNum + 1}: Ogiltig relations-syntax "${relSyntax}"`);
                             suggestions.push(`Giltiga syntaxer:\n  -> (serving), --> (flow), --:> (realization)\n  +- (composition), o- (aggregation), .-- (assignment)\n  <-> (access), -|> (triggering), --- (association)\n  -:> (specialization)`);
                         }
@@ -470,7 +481,8 @@
                 }
                 
                 // Element: [<layer:type> Name] or [Name] (without type)
-                const elementMatchWithType = line.match(/\[<([^:>]+):([^>]+)>\s*([^\]]+)\]/);
+                // Must be the whole line (trimmed); otherwise "[<a> A] -> [<b> B]" would match only the first box and skip relation parsing
+                const elementMatchWithType = line.match(/^\s*\[<([^:>]+):([^>]+)>\s*([^\]]+)\]\s*$/);
                 const elementMatchWithoutType = line.match(/^\[([^\]]+)\]$/);
                 
                 if (elementMatchWithType) {
@@ -1075,8 +1087,9 @@
             const dy = targetPoint.y - sourcePoint.y;
 
             // Check if this is a straight line (no corners needed)
-            const isStraightVertical = Math.abs(dx) < 1; // Practically vertical
-            const isStraightHorizontal = Math.abs(dy) < 1; // Practically horizontal
+            // Slightly generous threshold avoids tiny Z-shaped kinks when box centers differ by a few px
+            const isStraightVertical = Math.abs(dx) < 3;
+            const isStraightHorizontal = Math.abs(dy) < 3;
 
             if (isStraightVertical || isStraightHorizontal) {
                 // Straight line - no intermediate corners needed
@@ -1223,6 +1236,8 @@
             // Create orthogonal path
             const pathPoints = this.createOrthogonalPath(sourcePoint, targetPoint);
 
+            const arrowSize = (config.arrowSize || 8) * 1.3;
+
             // Convert path points to SVG path data with smooth curves at corners
             let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
 
@@ -1285,9 +1300,36 @@
                 }
             }
 
-            // Line to final point
+            // End the path slightly before the node edge when there is an arrow or head, so dashed strokes
+            // meet the arrow base instead of stopping short with a visible gap (SVG dash pattern vs. path end).
             const lastPoint = pathPoints[pathPoints.length - 1];
-            pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
+            const tx = lastPoint.x;
+            const ty = lastPoint.y;
+            const vx = tx - lastDrawnX;
+            const vy = ty - lastDrawnY;
+            const vlen = Math.sqrt(vx * vx + vy * vy);
+
+            let pathInset = 0;
+            if (relStyle.arrow === 'open' || relStyle.arrow === 'empty-triangle') {
+                pathInset = arrowSize * 0.92;
+            } else if (relStyle.arrow === 'filled-diamond' || relStyle.arrow === 'empty-diamond') {
+                pathInset = arrowSize * 1.18;
+            } else if (relStyle.arrow === 'filled-circle') {
+                pathInset = arrowSize * 0.88;
+            }
+
+            let pathEndX = tx;
+            let pathEndY = ty;
+            if (pathInset > 0 && vlen > 1e-6) {
+                if (vlen > pathInset + 0.5) {
+                    pathEndX = tx - (vx / vlen) * pathInset;
+                    pathEndY = ty - (vy / vlen) * pathInset;
+                } else {
+                    pathEndX = lastDrawnX + vx * 0.45;
+                    pathEndY = lastDrawnY + vy * 0.45;
+                }
+            }
+            pathData += ` L ${pathEndX} ${pathEndY}`;
 
             // Draw path
             const pathElement = this.createSvgElement('path', {
@@ -1295,17 +1337,15 @@
                 stroke: '#333',
                 'stroke-width': config.lineWidth || 2,
                 fill: 'none',
-                'stroke-dasharray': relStyle.line === 'dashed' ? '5,5' : 'none'
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-dasharray': relStyle.line === 'dashed' ? '6,5' : 'none'
             });
             g.appendChild(pathElement);
 
-            // Calculate arrow angle based on actual last drawn segment (for correct arrow direction after curves)
-            const lastSegment = pathPoints[pathPoints.length - 1];
-            const arrowSize = (config.arrowSize || 8) * 1.3; // Larger arrows
-            const angle = Math.atan2(
-                lastSegment.y - lastDrawnY,
-                lastSegment.x - lastDrawnX
-            );
+            const angle = vlen > 1e-6
+                ? Math.atan2(ty - lastDrawnY, tx - lastDrawnX)
+                : 0;
 
             // Final coordinates for arrow
             const x1 = sourcePoint.x;
@@ -1326,7 +1366,8 @@
                     fill: 'none',
                     stroke: '#333',
                     'stroke-width': (config.lineWidth || 2) * 1.2,
-                    'stroke-linejoin': 'miter'
+                    'stroke-linecap': 'round',
+                    'stroke-linejoin': 'round'
                 });
                 g.appendChild(arrow);
             } else if (relStyle.arrow === 'empty-triangle') {

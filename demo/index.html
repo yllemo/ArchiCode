@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArchiCode Playground</title>
 
-    <!-- ArchiCode Library - CDN version (online) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.css">
-    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.js"></script>
-
-    <!-- Local version (for development) - Uncomment to use instead:
     <link rel="stylesheet" href="../archicode.css">
     <script src="../archicode.js"></script>
+
+    <!-- CDN (om du visar demo utanför repot): byt till
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.css">
+    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.js"></script>
     -->
 
     <style>
@@ -21,69 +20,77 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        html, body {
+            height: 100%;
             overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #4c4f6b 0%, #2d3250 45%, #1a1d2e 100%);
+            color: #e8e8ec;
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
+        .top-bar {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.35);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            flex-wrap: wrap;
         }
 
-        .instructions {
-            padding: 20px;
-            background: #f9f9f9;
-            border-bottom: 2px solid #e0e0e0;
-            font-size: 14px;
-            color: #666;
+        .top-bar h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
-        .instructions code {
-            background: #e0e0e0;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
+        .top-bar .hint {
+            font-size: 12px;
+            opacity: 0.75;
+            max-width: 420px;
+            line-height: 1.35;
+        }
+
+        .top-bar .hint code {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .messages {
+            flex-shrink: 0;
+            padding: 0 16px;
         }
 
         .error-message, .success-message {
-            padding: 15px 20px;
-            margin: 20px;
+            padding: 10px 14px;
+            margin: 8px 0 0;
             border-radius: 6px;
             display: none;
+            font-size: 13px;
         }
 
         .error-message {
-            background: #ff4444;
-            color: white;
+            background: #c62828;
+            color: #fff;
         }
 
         .success-message {
-            background: #4CAF50;
-            color: white;
+            background: #2e7d32;
+            color: #fff;
         }
 
         .error-message.show, .success-message.show {
@@ -91,55 +98,72 @@
         }
 
         .content {
+            flex: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr);
             gap: 0;
-            min-height: 600px;
+            min-height: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .editor-section, .viewer-section {
             display: flex;
             flex-direction: column;
+            min-height: 0;
+            min-width: 0;
         }
 
         .editor-section {
-            border-right: 2px solid #e0e0e0;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.97);
+            color: #222;
+        }
+
+        .viewer-section {
+            background: #1e2130;
         }
 
         .section-header {
-            background: #f5f5f5;
-            padding: 15px 20px;
+            flex-shrink: 0;
+            padding: 10px 14px;
             font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #e0e0e0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .viewer-section .section-header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+            color: #e8e8ec;
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 6px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         button, select {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5c6bc0 0%, #7e57c2 100%);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 7px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
         button:hover, select:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.45);
         }
 
         button:active {
@@ -147,93 +171,134 @@
         }
 
         button.secondary {
-            background: #6c757d;
+            background: #455a64;
         }
 
         button.secondary:hover {
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+            box-shadow: 0 4px 12px rgba(69, 90, 100, 0.45);
+        }
+
+        button.zoom-btn {
+            min-width: 40px;
+            padding: 7px 10px;
+            font-size: 14px;
         }
 
         select {
-            min-width: 180px;
+            min-width: 160px;
+            max-width: 220px;
             outline: none;
         }
 
         select option {
-            background: white;
-            color: #333;
+            background: #fff;
+            color: #222;
+        }
+
+        .zoom-label {
+            font-size: 11px;
+            opacity: 0.85;
+            min-width: 3.5rem;
+            text-align: center;
         }
 
         textarea {
             flex: 1;
-            padding: 20px;
+            min-height: 0;
+            padding: 14px;
             border: none;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
             resize: none;
             outline: none;
-            line-height: 1.6;
+            line-height: 1.55;
+            background: #fafafa;
+            color: #1a1a1a;
         }
 
-        .diagram-container {
+        .diagram-viewport {
             flex: 1;
-            padding: 20px;
+            min-height: 0;
             overflow: auto;
-            background: #fafafa;
+            overscroll-behavior: contain;
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                #252836;
+            background-size: 24px 24px;
+        }
+
+        .diagram-viewport::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        .diagram-viewport::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
         }
 
         #diagram {
-            min-width: 100%;
-            min-height: 400px;
+            display: inline-block;
+            padding: 28px;
+            vertical-align: top;
         }
 
         #diagram svg {
-            max-width: 100%;
+            display: block;
+            max-width: none;
             height: auto;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
         }
 
-        @media (max-width: 968px) {
+        @media (max-width: 900px) {
             .content {
                 grid-template-columns: 1fr;
+                grid-template-rows: minmax(200px, 40vh) minmax(240px, 1fr);
             }
+
             .editor-section {
                 border-right: none;
-                border-bottom: 2px solid #e0e0e0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏗️ ArchiCode Playground</h1>
-            <p>Visualisera ditt systemlandskap med ArchiMate-stöd</p>
-        </div>
+    <div class="app">
+        <header class="top-bar">
+            <h1>ArchiCode Playground</h1>
+            <p class="hint">
+                <strong>Ctrl+Enter</strong> ritar diagram. I diagramytan: <strong>Ctrl+rulla</strong> (eller Cmd+rulla) zoomar.
+                Scrolla för att panorera. Exempel laddas i listan till vänster.
+            </p>
+        </header>
 
-        <div class="instructions">
-            <strong>Instruktioner:</strong> Klistra in din ArchiMate-kod i vänster fält och klicka på "Rita diagram". 
-            Använd syntax som <code>[&lt;application:component&gt; System Name]</code> och <code>[System A] -> [System B]</code> för kopplingar.
+        <div class="messages">
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
         </div>
-
-        <div class="error-message" id="errorMessage"></div>
-        <div class="success-message" id="successMessage"></div>
 
         <div class="content">
             <div class="editor-section">
                 <div class="section-header">
-                    <span>📝 ArchiCode</span>
+                    <span>ArchiCode</span>
                     <div class="button-group">
                         <select id="exampleSelect" onchange="loadSelectedExample()">
-                            <option value="">Välj exempel...</option>
-                            <option value="business-process">Affärsprocess</option>
-                            <option value="ecommerce">E-handel</option>
-                            <option value="relationships">Relationstyper</option>
+                            <option value="">Välj exempel…</option>
+                            <option value="business-process">Affärsprocess (kund &amp; sälj)</option>
+                            <option value="ecommerce">E-handel (tre lager)</option>
+                            <option value="relationships">Alla relationstyper</option>
+                            <option value="inline-one-line">Inline på en rad</option>
+                            <option value="strategy-motivation">Strategi &amp; motivation</option>
+                            <option value="app-crud">Applikation: CRUD-flöde</option>
+                            <option value="tech-infra">Teknisk infrastruktur</option>
+                            <option value="large">Stort diagram (scroll/zoom)</option>
                         </select>
                     </div>
                 </div>
-                <textarea id="codeInput" placeholder="Klistra in din ArchiMate-kod här...
+                <textarea id="codeInput" placeholder="ArchiMate-kod här…
 
-Exempel:
 [<application:component> System A]
 [<application:component> System B]
 [System A] -> [System B]"></textarea>
@@ -241,14 +306,18 @@ Exempel:
 
             <div class="viewer-section">
                 <div class="section-header">
-                    <span>🎨 Diagram</span>
+                    <span>Diagram</span>
                     <div class="button-group">
-                        <button onclick="renderDiagram()">🔄 Rita diagram</button>
-                        <button class="secondary" onclick="downloadSVG()">📄 Ladda ner SVG</button>
-                        <button class="secondary" onclick="exportToDrawIO()">📊 Exportera till Draw.io</button>
+                        <button type="button" class="zoom-btn secondary" onclick="adjustZoom(1/1.15)" title="Zooma ut">−</button>
+                        <span class="zoom-label" id="zoomLabel">100%</span>
+                        <button type="button" class="zoom-btn secondary" onclick="adjustZoom(1.15)" title="Zooma in">+</button>
+                        <button type="button" class="secondary" onclick="resetZoom()" title="Återställ zoom">100%</button>
+                        <button onclick="renderDiagram()">Rita</button>
+                        <button class="secondary" onclick="downloadSVG()">SVG</button>
+                        <button class="secondary" onclick="exportToDrawIO()">Draw.io</button>
                     </div>
                 </div>
-                <div class="diagram-container">
+                <div class="diagram-viewport" id="diagramViewport" title="Scrolla = panorera · Ctrl/Cmd + mushjul = zoom">
                     <div id="diagram"></div>
                 </div>
             </div>
@@ -256,6 +325,10 @@ Exempel:
     </div>
 
     <script>
+        let diagramZoom = 1;
+        let svgBaseWidth = 0;
+        let svgBaseHeight = 0;
+
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
@@ -270,34 +343,60 @@ Exempel:
             setTimeout(() => successDiv.classList.remove('show'), 3000);
         }
 
+        function updateZoomLabel() {
+            const el = document.getElementById('zoomLabel');
+            if (el) el.textContent = Math.round(diagramZoom * 100) + '%';
+        }
+
+        function applyZoomToSvg() {
+            const svg = document.querySelector('#diagram svg');
+            if (!svg || !svgBaseWidth || !svgBaseHeight) return;
+            diagramZoom = Math.min(4, Math.max(0.2, diagramZoom));
+            svg.setAttribute('width', String(Math.round(svgBaseWidth * diagramZoom)));
+            svg.setAttribute('height', String(Math.round(svgBaseHeight * diagramZoom)));
+            updateZoomLabel();
+        }
+
+        function adjustZoom(factor) {
+            diagramZoom *= factor;
+            applyZoomToSvg();
+        }
+
+        function resetZoom() {
+            diagramZoom = 1;
+            applyZoomToSvg();
+        }
+
         function renderDiagram() {
             const code = document.getElementById('codeInput').value;
             if (!code.trim()) {
-                showError('Vänligen ange ArchiMate-kod först.');
+                showError('Ange ArchiMate-kod först.');
                 return;
             }
 
             try {
-                // Check if ArchiCode is loaded
                 if (typeof ArchiCode === 'undefined') {
-                    showError('ArchiCode-biblioteket kunde inte laddas. Kontrollera internetanslutningen eller ladda ner filen lokalt.');
+                    showError('ArchiCode laddades inte. Kontrollera att ../archicode.js finns.');
                     return;
                 }
 
-                // Parse först för att få fel/varningar
                 const parseResult = ArchiCode.parse(code);
-
-                // Rendera diagrammet
                 ArchiCode.render(code, '#diagram');
 
-                // Visa meddelande baserat på resultat
+                const svg = document.querySelector('#diagram svg');
+                if (svg) {
+                    svgBaseWidth = parseFloat(svg.getAttribute('width')) || svg.getBoundingClientRect().width;
+                    svgBaseHeight = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+                    applyZoomToSvg();
+                }
+
                 if (parseResult.hasErrors) {
-                    showSuccess(`Diagram renderat med ${parseResult.parseErrors.length} auto-fixade syntax-fel. Kontrollera konsolen (F12) för detaljer.`);
+                    showSuccess('Diagram renderat med auto-fixade syntaxvarningar — se konsolen (F12).');
                 } else {
-                    showSuccess('Diagram renderat!');
+                    showSuccess('Diagram renderat.');
                 }
             } catch (error) {
-                showError('Fel vid rendering: ' + error.message + ' (Öppna konsolen F12 för mer info)');
+                showError('Fel: ' + error.message);
                 console.error('Rendering error:', error);
             }
         }
@@ -305,13 +404,13 @@ Exempel:
         function downloadSVG() {
             const code = document.getElementById('codeInput').value;
             if (!code.trim()) {
-                showError('Rita ett diagram först innan du laddar ner.');
+                showError('Rita ett diagram först.');
                 return;
             }
 
             try {
                 if (typeof ArchiCode === 'undefined') {
-                    showError('ArchiCode-biblioteket kunde inte laddas.');
+                    showError('ArchiCode laddades inte.');
                     return;
                 }
 
@@ -323,22 +422,22 @@ Exempel:
                 link.download = 'archicode-diagram.svg';
                 link.click();
                 URL.revokeObjectURL(url);
-                showSuccess('SVG-fil nedladdad!');
+                showSuccess('SVG nedladdad.');
             } catch (error) {
-                showError('Fel vid nedladdning: ' + error.message);
+                showError('Nedladdning misslyckades: ' + error.message);
             }
         }
 
         function exportToDrawIO() {
             const code = document.getElementById('codeInput').value;
             if (!code.trim()) {
-                showError('Rita ett diagram först innan du exporterar.');
+                showError('Rita ett diagram först.');
                 return;
             }
 
             try {
                 if (typeof ArchiCode === 'undefined') {
-                    showError('ArchiCode-biblioteket kunde inte laddas.');
+                    showError('ArchiCode laddades inte.');
                     return;
                 }
 
@@ -350,18 +449,16 @@ Exempel:
                 link.download = 'archicode-diagram.drawio';
                 link.click();
                 URL.revokeObjectURL(url);
-                showSuccess('Draw.io-fil exporterad!');
+                showSuccess('Draw.io-fil exporterad.');
             } catch (error) {
-                showError('Fel vid export: ' + error.message);
+                showError('Export misslyckades: ' + error.message);
             }
         }
 
         const examples = {
             'business-process': `#spacing: 80
 #fontSize: 14
-#showBadges: true
 
-// Affärsprocessexempel
 [<business:actor> Kund]
 [<business:actor> Säljare]
 [<business:role> Projektledare]
@@ -370,7 +467,6 @@ Exempel:
 [<business:service> Kundtjänst]
 [<business:object> Beställning]
 
-// Relationer
 [Kund] -> [Försäljningsprocess]
 [Säljare] -> [Försäljningsprocess]
 [Försäljningsprocess] -> [Kundtjänst]
@@ -379,9 +475,7 @@ Exempel:
 [Projektledare] .-- [Kund]`,
 
             'ecommerce': `#spacing: 100
-#direction: down
 
-// E-handelsplattform
 [<business:actor> Kund]
 [<business:process> Orderhantering]
 [<business:service> Webbutik]
@@ -394,7 +488,6 @@ Exempel:
 [<technology:node> Lastbalanserare]
 [<technology:node> Applikationsserver]
 
-// Relationer
 [Kund] -> [Webbutik]
 [Webbutik] -> [REST API]
 [REST API] -> [Orderservice]
@@ -406,7 +499,6 @@ Exempel:
             'relationships': `#spacing: 70
 #fontSize: 13
 
-// Demonstration av alla relationstyper
 [<business:actor> Källa]
 [<business:actor> Mål]
 [<business:role> Chef]
@@ -418,35 +510,96 @@ Exempel:
 [<application:component> System B]
 [<application:data> Databas]
 
-// Association - enkel koppling (solid, no arrow)
 [Källa] --- [Mål]
-
-// Serving - tjänar (solid, open arrow)
 [Tjänst A] -> [Process A]
-
-// Flow - flöde (dashed, open arrow)
 [Process A] --> [Process B]
-
-// Realization - realiserar (dashed, empty triangle)
 [System A] --:> [Tjänst A]
-
-// Triggering - utlöser (solid, open arrow)
 [Process B] -|> [Process A]
-
-// Assignment - tilldelning (solid, filled circle)
 [Chef] .-- [Process A]
-
-// Composition - består av (solid, filled diamond)
 [System A] +- [Databas]
-
-// Aggregation - består av (solid, empty diamond)
 [Tjänst A] o- [System A]
-
-// Specialization - specialisering (solid, empty triangle)
 [Chef] -:> [Anställd]
+[System B] <-> [Databas]`,
 
-// Access - åtkomst (dashed, bidirectional)
-[System B] <-> [Databas]`
+            'inline-one-line': `#spacing: 90
+#fontSize: 13
+
+// Samma rad: inline-definition + relation (som i test-syntax)
+[<business:actor> Beställare] -> [<business:process> Godkännande]
+[<business:process> Godkännande] -|> [<business:event> Signerat kontrakt]
+[<business:event> Signerat kontrakt] --> [<business:service> Aktivering]`,
+
+            'strategy-motivation': `#spacing: 85
+#fontSize: 13
+
+[<motivation:driver> Digital konkurrens]
+[<motivation:assessment> NPS under mål]
+[<motivation:goal> Öka kundnöjdhet]
+[<motivation:outcome> Högre återkommande köp]
+[<motivation:principle> Kund först]
+
+[<business:service> Självserviceportal]
+
+[Digital konkurrens] -> [NPS under mål]
+[NPS under mål] -> [Öka kundnöjdhet]
+[Öka kundnöjdhet] -> [Högre återkommande köp]
+[Kund först] -> [Självserviceportal]
+[Självserviceportal] -> [Högre återkommande köp]`,
+
+            'app-crud': `#spacing: 75
+
+[<business:actor> Administratör]
+[<business:process> Hantera användare]
+
+[<application:component> Admin UI]
+[<application:component> Identity API]
+[<application:data> Användartabell]
+
+[Administratör] -> [Hantera användare]
+[Hantera användare] -> [Admin UI]
+[Admin UI] -> [Identity API]
+[Identity API] <-> [Användartabell]
+[Identity API] --:> [Hantera användare]`,
+
+            'tech-infra': `#spacing: 88
+
+[<application:component> Webbapp]
+[<technology:node> Kubernetes-kluster]
+[<technology:device> Brandvägg]
+[<technology:system-software> PostgreSQL]
+[<technology:node> Backup-server]
+
+[Webbapp] -> [Kubernetes-kluster]
+[Kubernetes-kluster] -> [PostgreSQL]
+[Brandvägg] -> [Webbapp]
+[Kubernetes-kluster] -> [Backup-server]`,
+
+            'large': `#spacing: 55
+#fontSize: 12
+
+[<business:actor> A1]
+[<business:actor> A2]
+[<business:process> P1]
+[<business:process> P2]
+[<business:process> P3]
+[<business:service> S1]
+[<business:service> S2]
+
+[<application:component> C1]
+[<application:component> C2]
+[<application:data> D1]
+
+[A1] -> [P1]
+[A2] -> [P2]
+[P1] -> [S1]
+[P2] -> [S1]
+[P3] -> [S2]
+[S1] -> [C1]
+[S2] -> [C2]
+[C1] <-> [D1]
+[C2] --:> [S2]
+[P1] --> [P3]
+[P2] -|> [P3]`
         };
 
         function loadSelectedExample() {
@@ -459,15 +612,22 @@ Exempel:
             }
         }
 
-        // Auto-render on page load if there's code
+        document.getElementById('diagramViewport').addEventListener('wheel', (e) => {
+            if (!e.ctrlKey && !e.metaKey) return;
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+            diagramZoom *= factor;
+            applyZoomToSvg();
+        }, { passive: false });
+
         window.addEventListener('load', () => {
+            updateZoomLabel();
             const code = document.getElementById('codeInput').value;
             if (code.trim()) {
                 renderDiagram();
             }
         });
 
-        // Enable keyboard shortcut: Ctrl+Enter to render
         document.getElementById('codeInput').addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') {
                 renderDiagram();
