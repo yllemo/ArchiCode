@@ -944,11 +944,18 @@
             typeLabel.textContent = `«${element.type}»`;
             g.appendChild(typeLabel);
             
-            // Element name (bold, centered) - scales down if too wide
+            // Element name (bold, centered) — below «type»; never overlap stereotype when wrapping
             const baseFontSize = config.fontSize || 14;
-            const padding = 16; // Horizontal padding to account for
+            const padding = 16; // Horizontal padding
+            const bottomPad = 12;
+            // Space for badge row + «type» (baseline ~y+20, ascenders reach ~y+12)
+            const headerReserve = config.showBadges ? 32 : 28;
             const availableWidth = element.width - padding;
-            const availableHeight = element.height - padding;
+            const nameZoneTop = element.y + headerReserve;
+            const nameZoneHeight = Math.max(
+                element.height - headerReserve - bottomPad,
+                baseFontSize * 1.2
+            );
 
             // Word wrap text for better rendering
             const words = element.name.split(/\s+/);
@@ -968,29 +975,29 @@
             }
             if (currentLine) lines.push(currentLine);
 
-            // Calculate font size based on number of lines and available space
+            // Calculate font size based on number of lines and available vertical space in name zone
             const lineHeight = baseFontSize * 1.2;
             const totalTextHeight = lines.length * lineHeight;
             let fontSize = baseFontSize;
 
-            // Scale down if too many lines
-            if (totalTextHeight > availableHeight) {
-                fontSize = Math.max(8, (availableHeight / totalTextHeight) * baseFontSize);
+            if (totalTextHeight > nameZoneHeight) {
+                fontSize = Math.max(8, (nameZoneHeight / totalTextHeight) * baseFontSize);
             }
 
-            // Scale down if lines are too wide
-            const maxLineLength = Math.max(...lines.map(l => l.length));
+            const maxLineLength = Math.max(...lines.map(l => l.length), 1);
             const estimatedMaxWidth = maxLineLength * fontSize * 0.55;
             if (estimatedMaxWidth > availableWidth) {
                 fontSize = Math.max(8, (availableWidth / estimatedMaxWidth) * fontSize);
             }
 
             const adjustedLineHeight = fontSize * 1.2;
-            const startY = element.y + element.height / 2 - ((lines.length - 1) * adjustedLineHeight) / 2;
+            const blockCenterOffset = ((lines.length - 1) * adjustedLineHeight) / 2;
+            const nameZoneMidY = nameZoneTop + nameZoneHeight / 2;
+            const firstLineCenterY = nameZoneMidY - blockCenterOffset;
 
             // Render each line with text outline for better readability
             lines.forEach((line, i) => {
-                const yPos = startY + i * adjustedLineHeight;
+                const yPos = firstLineCenterY + i * adjustedLineHeight;
 
                 // Text outline (stroke) for better contrast
                 const outlineText = this.createSvgElement('text', {

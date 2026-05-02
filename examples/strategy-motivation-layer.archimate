@@ -1,0 +1,35 @@
+#spacing: 85
+#fontSize: 13
+#showBadges: true
+
+// ArchiMate 2025: Motivation + Strategy (Modern Color Set)
+// Motivation: varför och vad vi vill uppnå
+// Strategy: kapabiliteter, resurser och handlingsplaner
+
+[<motivation:driver> Digital konkurrens]
+[<motivation:assessment> NPS under mål]
+[<motivation:goal> Öka kundnöjdhet]
+[<motivation:outcome> Högre återkommande köp]
+[<motivation:principle> Kund först]
+
+[<strategy:capability> Kundnära digital försäljning]
+[<strategy:resource> Kunddata och CRM]
+[<strategy:course-of-action> Utöka självservice]
+
+[<business:service> Självserviceportal]
+
+// Motivation — orsakskedja
+[Digital konkurrens] -> [NPS under mål]
+[NPS under mål] -> [Öka kundnöjdhet]
+[Öka kundnöjdhet] -> [Högre återkommande köp]
+
+// Motivation -> Strategy
+[Öka kundnöjdhet] -> [Kundnära digital försäljning]
+[Kund först] -> [Utöka självservice]
+
+// Strategy — realisering mot verksamhet
+[Kundnära digital försäljning] --:> [Självserviceportal]
+[Kunddata & CRM] -> [Självserviceportal]
+[Utöka självservice] -> [Självserviceportal]
+
+[Självserviceportal] -> [Högre återkommande köp]

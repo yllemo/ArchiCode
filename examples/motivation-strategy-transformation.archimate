@@ -1,0 +1,38 @@
+#spacing: 90
+#fontSize: 13
+#showBadges: true
+
+// Motivation + Strategy: målstyrd förändring (2025-lager)
+// Visar koppling från drivkraft till kapabilitet och vidare till affärsprocess
+
+[<motivation:driver> Regulatoriska krav]
+[<motivation:requirement> Spårbarhet i orderflöde]
+[<motivation:goal> Effektivare order-till-kassa]
+
+[<strategy:capability> Order & leverans]
+[<strategy:capability> Risk & regelefterlevnad]
+[<strategy:resource> Integrationsplattform]
+[<strategy:value-stream> Lead till faktura]
+
+[<business:process> Orderhantering]
+[<business:process> Leverans]
+[<business:service> Orderportal]
+
+// Motivation
+[Regulatoriska krav] -> [Spårbarhet i orderflöde]
+[Spårbarhet i orderflöde] -> [Effektivare order-till-kassa]
+
+// Motivation -> Strategy
+[Effektivare order-till-kassa] -> [Order & leverans]
+[Effektivare order-till-kassa] -> [Risk & regelefterlevnad]
+
+// Strategy — samspel
+[Order & leverans] -> [Lead till faktura]
+[Risk & regelefterlevnad] -> [Lead till faktura]
+[Integrationsplattform] -> [Order & leverans]
+
+// Strategy -> Business (realisering / stöd)
+[Order & leverans] --:> [Orderhantering]
+[Order & leverans] --:> [Leverans]
+[Lead till faktura] -> [Orderportal]
+[Orderportal] -> [Orderhantering]

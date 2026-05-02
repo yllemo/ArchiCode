@@ -448,7 +448,8 @@
                             <option value="ecommerce">E-handel (tre lager)</option>
                             <option value="relationships">Alla relationstyper</option>
                             <option value="inline-one-line">Inline på en rad</option>
-                            <option value="strategy-motivation">Strategi &amp; motivation</option>
+                            <option value="strategy-motivation">Motivation &amp; strategi — portal</option>
+                            <option value="motivation-strategy-order">Motivation &amp; strategi — orderflöde</option>
                             <option value="app-crud">Applikation: CRUD-flöde</option>
                             <option value="tech-infra">Teknisk infrastruktur</option>
                             <option value="large">Stort diagram (scroll/zoom)</option>
@@ -730,13 +731,49 @@
 [<motivation:outcome> Högre återkommande köp]
 [<motivation:principle> Kund först]
 
+[<strategy:capability> Kundnära digital försäljning]
+[<strategy:resource> Kunddata och CRM]
+[<strategy:course-of-action> Utöka självservice]
+
 [<business:service> Självserviceportal]
 
 [Digital konkurrens] -> [NPS under mål]
 [NPS under mål] -> [Öka kundnöjdhet]
 [Öka kundnöjdhet] -> [Högre återkommande köp]
-[Kund först] -> [Självserviceportal]
+[Öka kundnöjdhet] -> [Kundnära digital försäljning]
+[Kund först] -> [Utöka självservice]
+[Kundnära digital försäljning] --:> [Självserviceportal]
+[Kunddata & CRM] -> [Självserviceportal]
+[Utöka självservice] -> [Självserviceportal]
 [Självserviceportal] -> [Högre återkommande köp]`,
+
+            'motivation-strategy-order': `#spacing: 90
+#fontSize: 13
+
+[<motivation:driver> Regulatoriska krav]
+[<motivation:requirement> Spårbarhet i orderflöde]
+[<motivation:goal> Effektivare order-till-kassa]
+
+[<strategy:capability> Order & leverans]
+[<strategy:capability> Risk & regelefterlevnad]
+[<strategy:resource> Integrationsplattform]
+[<strategy:value-stream> Lead till faktura]
+
+[<business:process> Orderhantering]
+[<business:process> Leverans]
+[<business:service> Orderportal]
+
+[Regulatoriska krav] -> [Spårbarhet i orderflöde]
+[Spårbarhet i orderflöde] -> [Effektivare order-till-kassa]
+[Effektivare order-till-kassa] -> [Order & leverans]
+[Effektivare order-till-kassa] -> [Risk & regelefterlevnad]
+[Order & leverans] -> [Lead till faktura]
+[Risk & regelefterlevnad] -> [Lead till faktura]
+[Integrationsplattform] -> [Order & leverans]
+[Order & leverans] --:> [Orderhantering]
+[Order & leverans] --:> [Leverans]
+[Lead till faktura] -> [Orderportal]
+[Orderportal] -> [Orderhantering]`,
 
             'app-crud': `#spacing: 75
 
