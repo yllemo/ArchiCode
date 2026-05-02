@@ -117,8 +117,9 @@
         'business-service': 'service',
         'object': 'object',
         'business-object': 'object',
-        'data': 'data',
-        'business-data': 'data',
+        // Data object (ArchiMate) — application layer; samma ikon som data-object (blå)
+        'data': 'data-object',
+        'business-data': 'data-object',
         'contract': 'contract',
         'business-contract': 'contract',
         'product': 'product',
