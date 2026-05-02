@@ -456,19 +456,19 @@ Generera om med korrekta lager.
 - `ArchiCode.exportDrawIO(code)` - Exportera till draw.io format
 - `ArchiCode.parse(code)` - Parsa kod till intern struktur
 
-### ArchiMate 3.2 Officiella Färger
+### ArchiMate 2025 — Modern Color Set
 
-ArchiCode.js använder de officiella färgerna från ArchiMate 3.2-specifikationen:
+ArchiCode.js använder samma fyllnad/kant per lager som i `archimate-2025.md` (The Open Group, Modern Color Set):
 
 | Lager | Fyllnadsfärg | Kantfärg | Beskrivning |
 |-------|-------------|----------|-------------|
-| **Motivation** | `#FFCCDD` | `#CC0066` | Rosa/Magenta - Intressenter, mål, krav |
-| **Strategy** | `#FFE0B2` | `#FF6F00` | Orange - Kapabiliteter, resurser, handlingsplaner |
-| **Business** | `#FFF9C4` | `#F9A825` | Gul - Affärsaktörer, processer, tjänster |
-| **Application** | `#B3E5FC` | `#0277BD` | Ljusblå - Mjukvarukomponenter, tjänster, data |
-| **Technology** | `#C8E6C9` | `#388E3C` | Grön - Hårdvara, nätverk, systemmjukvara |
-| **Physical** | `#E1BEE7` | `#7B1FA2` | Lila - Fysisk utrustning och anläggningar |
-| **Implementation** | `#F8BBD0` | `#C2185B` | Rosa - Arbetspaket, leveranser, migration |
+| **Motivation** | `#D8C1E4` | `#B39BCF` | Lavendel — intressenter, mål, krav |
+| **Strategy** | `#EFBD5D` | `#D4A43B` | Guld/gul — kapabiliteter, resurser, handlingsplaner |
+| **Business** | `#F4DE7F` | `#E8C555` | Jasmine — affärsaktörer, processer, tjänster |
+| **Application** | `#B6D7E1` | `#8CC5D4` | Ljus aqua — applikationer, tjänster, data |
+| **Technology** | `#C3E1B4` | `#9BD083` | Ljusgrön — infrastruktur, plattform |
+| **Physical / Composite** | `#E8E5D3` | `#D4CDB4` | Satin Linen — fysisk utrustning, plats, gruppering |
+| **Implementation** | `#F8C2BE` | `#F09B95` | Korall/te ros — arbetspaket, leveranser, migration |
 
 ### ArchiMate Standarder
 - [ArchiMate 3.2 Specification](https://pubs.opengroup.org/architecture/archimate32-doc/)

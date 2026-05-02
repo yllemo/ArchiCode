@@ -16,28 +16,16 @@
 (function(global) {
     'use strict';
 
-    // ArchiMate 3.2 Standard Colors (based on official specification)
+    // ArchiMate 2025 — Modern Color Set (fill/stroke per layer; see archimate-2025.md)
     const ARCHIMATE_COLORS = {
-        // Motivation Layer - Pink/Magenta
-        'motivation': { fill: '#FFCCDD', stroke: '#CC0066', badge: 'M' },
-        
-        // Strategy Layer - Orange
-        'strategy': { fill: '#FFE0B2', stroke: '#FF6F00', badge: 'S' },
-        
-        // Business Layer - Yellow
-        'business': { fill: '#FFF9C4', stroke: '#F9A825', badge: 'B' },
-        
-        // Application Layer - Light Blue
-        'application': { fill: '#B3E5FC', stroke: '#0277BD', badge: 'A' },
-        
-        // Technology Layer - Green
-        'technology': { fill: '#C8E6C9', stroke: '#388E3C', badge: 'T' },
-        
-        // Physical Layer - Light Purple
-        'physical': { fill: '#E1BEE7', stroke: '#7B1FA2', badge: 'P' },
-        
-        // Implementation & Migration Layer - Pink
-        'implementation': { fill: '#F8BBD0', stroke: '#C2185B', badge: 'I' }
+        'motivation': { fill: '#D8C1E4', stroke: '#B39BCF', badge: 'M' },
+        'strategy': { fill: '#EFBD5D', stroke: '#D4A43B', badge: 'S' },
+        'business': { fill: '#F4DE7F', stroke: '#E8C555', badge: 'B' },
+        'application': { fill: '#B6D7E1', stroke: '#8CC5D4', badge: 'A' },
+        'technology': { fill: '#C3E1B4', stroke: '#9BD083', badge: 'T' },
+        'physical': { fill: '#E8E5D3', stroke: '#D4CDB4', badge: 'P' },
+        'composite': { fill: '#E8E5D3', stroke: '#D4CDB4', badge: 'C' },
+        'implementation': { fill: '#F8C2BE', stroke: '#F09B95', badge: 'I' }
     };
 
     // ArchiMate Element Types (corners indicate element type)

@@ -60,7 +60,7 @@ ArchiCode.render(myCode, '#myDiagram');
 
 ## ✨ Features
 
-- 🎨 **ArchiMate 3.2 Standard** - Official colors, shapes, and symbols
+- 🎨 **ArchiMate 2025 colors** - Modern Color Set; shapes and metamodel per ArchiMate 3.2
 - 🔧 **Autonomous Library** - Zero external dependencies
 - 📝 **Architext.dev Compatible** - Uses same syntax
 - 🌙 **Modern Design** - Professional styling
@@ -87,19 +87,19 @@ Define ArchiMate elements with the following syntax:
 [<technology:node> Application Server]
 ```
 
-### ArchiMate 3.2 Layers and Colors
+### ArchiMate 2025 — Modern Color Set
 
-ArchiCode.js follows the official ArchiMate 3.2 standard with the official color palette:
+ArchiCode.js uses the **ArchiMate 2025 Modern Color Set** (same hex values as `archimate-2025.md`):
 
 | Layer | Fill Color | Stroke Color | Description |
 |-------|-----------|--------------|-------------|
-| **Motivation** | `#FFCCDD` | `#CC0066` | Pink/Magenta - Stakeholders, goals, requirements |
-| **Strategy** | `#FFE0B2` | `#FF6F00` | Orange - Capabilities, resources, courses of action |
-| **Business** | `#FFF9C4` | `#F9A825` | Yellow - Business actors, processes, services |
-| **Application** | `#B3E5FC` | `#0277BD` | Light Blue - Software components, services, data |
-| **Technology** | `#C8E6C9` | `#388E3C` | Green - Hardware, networks, system software |
-| **Physical** | `#E1BEE7` | `#7B1FA2` | Light Purple - Physical equipment and facilities |
-| **Implementation** | `#F8BBD0` | `#C2185B` | Pink - Work packages, deliverables, migration |
+| **Motivation** | `#D8C1E4` | `#B39BCF` | Lavender — stakeholders, goals, requirements |
+| **Strategy** | `#EFBD5D` | `#D4A43B` | Gold/yellow — capabilities, resources, courses of action |
+| **Business** | `#F4DE7F` | `#E8C555` | Jasmine — business actors, processes, services |
+| **Application** | `#B6D7E1` | `#8CC5D4` | Pale aqua — applications, services, data |
+| **Technology** | `#C3E1B4` | `#9BD083` | Light green — infrastructure, platform |
+| **Physical / Composite** | `#E8E5D3` | `#D4CDB4` | Satin Linen — physical equipment, location, grouping |
+| **Implementation** | `#F8C2BE` | `#F09B95` | Coral/tea rose — work packages, deliverables, migration |
 
 **Layer Examples:**
 

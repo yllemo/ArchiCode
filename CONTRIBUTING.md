@@ -111,7 +111,7 @@ function renderElement(element) {
 ### ArchiMate Standards
 
 - Follow ArchiMate 3.2 specification
-- Use official colors and shapes
+- Use ArchiMate 2025 Modern Color Set for layer fill/stroke (see `archimate-2025.md`, `ARCHIMATE_COLORS` in `archicode.js`)
 - Maintain compatibility with Architext.dev syntax
 - Document any deviations from standards
 

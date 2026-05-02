@@ -15,7 +15,7 @@ ArchiCode.js är ett autonomt JavaScript-bibliotek för rendering av ArchiMate-d
 
 ### ✨ Funktioner
 
-- 🎨 **ArchiMate 3.2-standard** - Officiella färger, former och symboler
+- 🎨 **ArchiMate 2025-färger** - Modern Color Set, former och symboler enligt ArchiMate 3.2-metamodell
 - 🔧 **Autonomt bibliotek** - ArchiCode.js kan användas fristående i egna projekt
 - 📝 **Architext.dev-kompatibel** - Använder samma syntax
 - 🌙 **Dark mode** - Modern och professionell design
@@ -247,9 +247,9 @@ Element kan ha långa namn - texten skalas automatiskt för att passa i boxen:
 **Ikoner:**
 Varje element får automatiskt en ArchiMate-ikon i övre högra hörnet enligt sin typ.
 
-### ArchiMate 3.2 Lager och Färger
+### ArchiMate 3.2 Lager och färger (Modern Color Set 2025)
 
-ArchiCode.js följer den officiella ArchiMate 3.2-standarden:
+ArchiCode.js följer ArchiMate 3.2-metamodellen; **färgerna** kommer från ArchiMate 2025 Modern Color Set:
 
 #### Motivation Layer (Rosa/Magenta)
 - `<motivation:stakeholder>` - Intressent
@@ -431,21 +431,21 @@ Anpassa diagrammets utseende:
 [Application Server] --> [Web Server]
 ```
 
-## 🎨 ArchiMate 3.2 Standardfärger
+## 🎨 ArchiMate 2025 — Modern Color Set
 
-ArchiCode.js använder de officiella färgerna från ArchiMate 3.2-specifikationen:
+ArchiCode.js använder **ArchiMate 2025 Modern Color Set** (samma hex som `archimate-2025.md` / [archimate.yllemo.com](https://archimate.yllemo.com)):
 
 | Lager | Fyllnadsfärg | Kantfärg | Beskrivning |
 |-------|-------------|----------|-------------|
-| **Motivation** | `#FFCCDD` | `#CC0066` | Rosa/Magenta - Intressenter, mål, krav |
-| **Strategy** | `#FFE0B2` | `#FF6F00` | Orange - Kapabiliteter, resurser, handlingsplaner |
-| **Business** | `#FFF9C4` | `#F9A825` | Gul - Affärsaktörer, processer, tjänster |
-| **Application** | `#B3E5FC` | `#0277BD` | Ljusblå - Mjukvarukomponenter, tjänster, data |
-| **Technology** | `#C8E6C9` | `#388E3C` | Grön - Hårdvara, nätverk, systemmjukvara |
-| **Physical** | `#E1BEE7` | `#7B1FA2` | Lila - Fysisk utrustning och anläggningar |
-| **Implementation** | `#F8BBD0` | `#C2185B` | Rosa - Arbetspaket, leveranser, migration |
+| **Motivation** | `#D8C1E4` | `#B39BCF` | Lavendel — intressenter, mål, krav |
+| **Strategy** | `#EFBD5D` | `#D4A43B` | Guld/gul — kapabiliteter, resurser, handlingsplaner |
+| **Business** | `#F4DE7F` | `#E8C555` | Jasmine — affärsaktörer, processer, tjänster |
+| **Application** | `#B6D7E1` | `#8CC5D4` | Ljus aqua — applikationer, tjänster, data |
+| **Technology** | `#C3E1B4` | `#9BD083` | Ljusgrön — infrastruktur, plattform |
+| **Physical / Composite** | `#E8E5D3` | `#D4CDB4` | Satin Linen — fysisk utrustning, plats, gruppering |
+| **Implementation** | `#F8C2BE` | `#F09B95` | Korall/te ros — arbetspaket, leveranser, migration |
 
-Varje element har också en lager-badge (M, S, B, A, T, P, I) i det övre vänstra hörnet.
+Varje element har också en lager-badge (M, S, B, A, T, P, C, I) i det övre vänstra hörnet (C = composite, t.ex. plats/gruppering).
 
 ## 💾 Export
 
