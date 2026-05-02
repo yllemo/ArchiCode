@@ -15,9 +15,9 @@ An autonomous JavaScript library for rendering ArchiMate 3.2 diagrams from text,
 <html>
 <head>
     <title>ArchiCode Example</title>
-    <!-- Use specific commit for stability (update hash for latest version) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.css">
-    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@56b9715/archicode.js"></script>
+    <!-- Use @latest for newest version -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@latest/archicode.css">
+    <script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@latest/archicode.js"></script>
 </head>
 <body>
     <div id="diagram"></div>
@@ -36,12 +36,6 @@ An autonomous JavaScript library for rendering ArchiMate 3.2 diagrams from text,
     </script>
 </body>
 </html>
-```
-
-**Option 2: unpkg (After NPM publishing)**
-```html
-<link rel="stylesheet" href="https://unpkg.com/@yllemo/archicode@1.0.0/archicode.css">
-<script src="https://unpkg.com/@yllemo/archicode@1.0.0/archicode.js"></script>
 ```
 
 ### NPM Installation

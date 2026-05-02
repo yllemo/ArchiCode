@@ -137,6 +137,31 @@
             font-size: 11px;
         }
 
+        .top-bar .demo-links {
+            font-size: 12px;
+            opacity: 0.9;
+            margin: 6px 0 0;
+            line-height: 1.5;
+            flex-wrap: wrap;
+        }
+
+        .top-bar .demo-links a {
+            color: #9ecbff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(158, 203, 255, 0.45);
+        }
+
+        .top-bar .demo-links a:hover {
+            color: #e3f0ff;
+            border-bottom-color: rgba(227, 240, 255, 0.85);
+        }
+
+        .top-bar .demo-links .sep {
+            opacity: 0.55;
+            margin: 0 0.35em;
+            user-select: none;
+        }
+
         .messages {
             flex-shrink: 0;
             padding: 0 16px;
@@ -355,6 +380,16 @@
             color: #263238;
         }
 
+        html[data-theme="light"] .top-bar .demo-links a {
+            color: #0d47a1;
+            border-bottom-color: rgba(13, 71, 161, 0.35);
+        }
+
+        html[data-theme="light"] .top-bar .demo-links a:hover {
+            color: #1565c0;
+            border-bottom-color: rgba(21, 101, 192, 0.65);
+        }
+
         html[data-theme="light"] .top-settings .setting-line {
             color: #37474f;
         }
@@ -429,6 +464,9 @@
             <p class="hint">
                 <strong>Ctrl+Enter</strong> ritar diagram. I diagramytan: <strong>Ctrl+rulla</strong> (eller Cmd+rulla) zoomar.
                 Scrolla för att panorera. <strong>Tema</strong> sparas i webbläsaren. <strong>ArchiCode</strong> byter källa och laddar om sidan.
+            </p>
+            <p class="demo-links">
+                <a href="https://github.com/yllemo/ArchiCode" target="_blank" rel="noopener noreferrer">GitHub-repositorium</a><span class="sep" aria-hidden="true">·</span><a href="https://archimate.yllemo.com/" target="_blank" rel="noopener noreferrer" title="ArchiMate 2025 Modern Color Set — samma palett som archimate-2025.md i repot">archimate.yllemo.com — färger &amp; lager (2025)</a><span class="sep" aria-hidden="true">·</span><a href="https://github.com/yllemo/ArchiCode/blob/main/archimate-2025.md" target="_blank" rel="noopener noreferrer" title="Källtext för färgreferensen">archimate-2025.md</a>
             </p>
         </header>
 

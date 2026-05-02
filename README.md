@@ -55,18 +55,9 @@ ArchiCode.render(code, '#diagram');
 
 **Alternativ 1: jsDelivr (Fungerar direkt från GitHub)**
 ```html
-<!-- Använd specifik commit för stabilitet (uppdatera hash för senaste version) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@08a55e2/archicode.css">
-<script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@08a55e2/archicode.js"></script>
-<script>
-    ArchiCode.render(myCode, '#diagram');
-</script>
-```
-
-**Alternativ 2: unpkg (Efter NPM-publicering)**
-```html
-<link rel="stylesheet" href="https://unpkg.com/@yllemo/archicode@1.0.0/archicode.css">
-<script src="https://unpkg.com/@yllemo/archicode@1.0.0/archicode.js"></script>
+<!-- Använd @latest för senaste versionen -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@latest/archicode.css">
+<script src="https://cdn.jsdelivr.net/gh/yllemo/ArchiCode@latest/archicode.js"></script>
 <script>
     ArchiCode.render(myCode, '#diagram');
 </script>
