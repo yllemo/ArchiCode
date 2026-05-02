@@ -272,7 +272,11 @@
                 arrowSize: 8,
                 direction: 'down',
                 showBadges: true,
-                showIcons: true
+                showIcons: true,
+                /** Dölj «type» om titeln har fler än så här många ord (0 = ordregel av) */
+                stereotypeWordThreshold: 12,
+                /** Dölj «type» när titeln når så här många rader eller fler (0 = ordregel + rad räknas ej) */
+                stereotypeHideLineCount: 3
             };
 
             // Cache för ikonernas data-URL (hämtas från CSS en gång)
@@ -931,38 +935,18 @@
                 g.appendChild(badge);
             }
             
-            // Type label (italic, small)
-            const typeLabel = this.createSvgElement('text', {
-                x: element.x + element.width / 2,
-                y: element.y + 20,
-                'text-anchor': 'middle',
-                'font-size': '10',
-                'font-family': 'Arial, sans-serif',
-                'font-style': 'italic',
-                fill: '#666'
-            });
-            typeLabel.textContent = `«${element.type}»`;
-            g.appendChild(typeLabel);
-            
-            // Element name (bold, centered) — below «type»; never overlap stereotype when wrapping
+            // Element name (bold, horisontellt centrerad) — växer nedåt; «type» döljs vid många rader/ord
             const baseFontSize = config.fontSize || 14;
             const padding = 16; // Horizontal padding
             const bottomPad = 12;
-            // Space for badge row + «type» (baseline ~y+20, ascenders reach ~y+12)
-            const headerReserve = config.showBadges ? 32 : 28;
             const availableWidth = element.width - padding;
-            const nameZoneTop = element.y + headerReserve;
-            const nameZoneHeight = Math.max(
-                element.height - headerReserve - bottomPad,
-                baseFontSize * 1.2
-            );
 
-            // Word wrap text for better rendering
-            const words = element.name.split(/\s+/);
+            const words = element.name.split(/\s+/).filter(Boolean);
+            const wordCount = words.length;
             const lines = [];
             let currentLine = '';
             const estimatedCharWidth = baseFontSize * 0.55;
-            const maxCharsPerLine = Math.floor(availableWidth / estimatedCharWidth);
+            const maxCharsPerLine = Math.max(4, Math.floor(availableWidth / estimatedCharWidth));
 
             for (const word of words) {
                 const testLine = currentLine ? `${currentLine} ${word}` : word;
@@ -974,6 +958,39 @@
                 }
             }
             if (currentLine) lines.push(currentLine);
+
+            const rawTh = config.stereotypeWordThreshold;
+            const threshold = typeof rawTh === 'number' && !Number.isNaN(rawTh) ? rawTh : 12;
+            const useWordLimit = threshold > 0;
+
+            const rawLineHide = config.stereotypeHideLineCount;
+            const lineHideAt = typeof rawLineHide === 'number' && !Number.isNaN(rawLineHide) ? rawLineHide : 3;
+            const useLineRule = lineHideAt > 0;
+            const hideStereotype = (useLineRule && lines.length >= lineHideAt)
+                || (useWordLimit && wordCount > threshold);
+
+            if (!hideStereotype) {
+                const typeLabel = this.createSvgElement('text', {
+                    x: element.x + element.width / 2,
+                    y: element.y + 20,
+                    'text-anchor': 'middle',
+                    'font-size': '10',
+                    'font-family': 'Arial, sans-serif',
+                    'font-style': 'italic',
+                    fill: '#666'
+                });
+                typeLabel.textContent = `«${element.type}»`;
+                g.appendChild(typeLabel);
+            }
+
+            const headerReserve = hideStereotype
+                ? (config.showBadges ? 22 : 14)
+                : (config.showBadges ? 32 : 28);
+            const nameZoneTop = element.y + headerReserve;
+            const nameZoneHeight = Math.max(
+                element.height - headerReserve - bottomPad,
+                baseFontSize * 1.2
+            );
 
             // Calculate font size based on number of lines and available vertical space in name zone
             const lineHeight = baseFontSize * 1.2;
@@ -991,9 +1008,8 @@
             }
 
             const adjustedLineHeight = fontSize * 1.2;
-            const blockCenterOffset = ((lines.length - 1) * adjustedLineHeight) / 2;
-            const nameZoneMidY = nameZoneTop + nameZoneHeight / 2;
-            const firstLineCenterY = nameZoneMidY - blockCenterOffset;
+            // Första raden ankrad upptill i namn-zonen; fler rader läggs under (väx nedåt)
+            const firstLineCenterY = nameZoneTop + adjustedLineHeight / 2;
 
             // Render each line with text outline for better readability
             lines.forEach((line, i) => {

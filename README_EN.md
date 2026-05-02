@@ -314,7 +314,9 @@ Customize diagram appearance:
 #lineWidth: 2         # Line thickness
 #arrowSize: 8         # Arrow size
 #direction: down      # Layout direction (down/right)
-#showBadges: true     # Show layer badges (M, S, B, A, T, P, I)
+#showBadges: true     # Show layer badges (M, S, B, A, T, P, C, I)
+#stereotypeWordThreshold: 12  # Hide «type» if title has more than N words (0 = disable word rule)
+#stereotypeHideLineCount: 3   # Hide «type» at this many lines or more (0 = never by line count)
 ```
 
 ## 🚀 Live Demo

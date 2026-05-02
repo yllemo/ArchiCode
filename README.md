@@ -390,7 +390,9 @@ Anpassa diagrammets utseende:
 #lineWidth: 2         # Tjocklek på linjer
 #arrowSize: 8         # Storlek på pilar
 #direction: down      # Riktning (down/right)
-#showBadges: true     # Visa lager-badges (M, S, B, A, T, P, I)
+#showBadges: true     # Visa lager-badges (M, S, B, A, T, P, C, I)
+#stereotypeWordThreshold: 12  # Dölj «type» om titeln har fler än N ord (0 = ordregel av)
+#stereotypeHideLineCount: 3   # Dölj «type» vid så många rader eller fler (0 = aldrig p.g.a. radantal)
 ```
 
 ### Komplett exempel

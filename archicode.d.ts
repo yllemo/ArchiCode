@@ -19,10 +19,14 @@ interface ArchiCodeConfig {
     arrowSize?: number;
     /** Layout direction (default: 'down') */
     direction?: 'down' | 'right';
-    /** Show layer badges (M, S, B, A, T, P, I) (default: true) */
+    /** Show layer badges (M, S, B, A, T, P, C, I) (default: true) */
     showBadges?: boolean;
     /** Show element type icons (default: true) */
     showIcons?: boolean;
+    /** Hide «type» when title exceeds this many words; 0 disables (default: 12) */
+    stereotypeWordThreshold?: number;
+    /** Hide «type» when wrapped title has this many lines or more; 0 disables (default: 3) */
+    stereotypeHideLineCount?: number;
 }
 
 /**
