@@ -1,6 +1,6 @@
 /**
  * ArchiCode.js TypeScript Definitions
- * Version 1.0.0
+ * Version 2.0.0
  */
 
 /**
@@ -19,7 +19,7 @@ interface ArchiCodeConfig {
     arrowSize?: number;
     /** Layout direction (default: 'down') */
     direction?: 'down' | 'right';
-    /** Show layer badges (M, S, B, A, T, P, C, I) (default: true) */
+    /** Show layer badges (M, S, Co, B, A, T, I) (default: true) */
     showBadges?: boolean;
     /** Show element type icons (default: true) */
     showIcons?: boolean;
@@ -37,8 +37,8 @@ interface ArchiCodeElement {
     id: string;
     /** Display name */
     name: string;
-    /** ArchiMate layer (motivation, strategy, business, application, technology, physical, implementation) */
-    layer: 'motivation' | 'strategy' | 'business' | 'application' | 'technology' | 'physical' | 'implementation';
+    /** ArchiMate 4 domain (motivation, strategy, common, business, application, technology, implementation) */
+    layer: 'motivation' | 'strategy' | 'common' | 'business' | 'application' | 'technology' | 'implementation';
     /** ArchiMate element type */
     type: string;
 }

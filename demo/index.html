@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArchiCode Playground</title>
+    <title>ArchiCode — ArchiMate 4</title>
 
     <link id="archicode-css" rel="stylesheet" href="">
     <script>
@@ -137,26 +137,33 @@
             font-size: 11px;
         }
 
-        .top-bar .demo-links {
-            font-size: 12px;
-            opacity: 0.9;
-            margin: 6px 0 0;
-            line-height: 1.5;
-            flex-wrap: wrap;
+        .app-footer {
+            flex-shrink: 0;
+            padding: 8px 16px 10px;
+            background: rgba(0, 0, 0, 0.35);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
         }
 
-        .top-bar .demo-links a {
+        .app-footer .demo-links {
+            font-size: 11px;
+            opacity: 0.88;
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .app-footer .demo-links a {
             color: #9ecbff;
             text-decoration: none;
             border-bottom: 1px solid rgba(158, 203, 255, 0.45);
         }
 
-        .top-bar .demo-links a:hover {
+        .app-footer .demo-links a:hover {
             color: #e3f0ff;
             border-bottom-color: rgba(227, 240, 255, 0.85);
         }
 
-        .top-bar .demo-links .sep {
+        .app-footer .demo-links .sep {
             opacity: 0.55;
             margin: 0 0.35em;
             user-select: none;
@@ -380,12 +387,17 @@
             color: #263238;
         }
 
-        html[data-theme="light"] .top-bar .demo-links a {
+        html[data-theme="light"] .app-footer {
+            background: rgba(255, 255, 255, 0.92);
+            border-top-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html[data-theme="light"] .app-footer .demo-links a {
             color: #0d47a1;
             border-bottom-color: rgba(13, 71, 161, 0.35);
         }
 
-        html[data-theme="light"] .top-bar .demo-links a:hover {
+        html[data-theme="light"] .app-footer .demo-links a:hover {
             color: #1565c0;
             border-bottom-color: rgba(21, 101, 192, 0.65);
         }
@@ -445,7 +457,7 @@
     <div class="app">
         <header class="top-bar">
             <div class="top-bar-main">
-                <h1>ArchiCode Playground</h1>
+                <h1>ArchiCode <span style="font-size:0.65em;font-weight:400;opacity:0.65">ArchiMate 4</span></h1>
                 <div class="top-settings">
                     <label class="setting-line">Tema
                         <select id="themeSelect" onchange="onDemoThemeChange()" title="Ljust eller mörkt läge">
@@ -465,9 +477,6 @@
                 <strong>Ctrl+Enter</strong> ritar diagram. I diagramytan: <strong>Ctrl+rulla</strong> (eller Cmd+rulla) zoomar.
                 Scrolla för att panorera. <strong>Tema</strong> sparas i webbläsaren. <strong>ArchiCode</strong> byter källa och laddar om sidan.
             </p>
-            <p class="demo-links">
-                <a href="https://github.com/yllemo/ArchiCode" target="_blank" rel="noopener noreferrer">GitHub-repositorium</a><span class="sep" aria-hidden="true">·</span><a href="https://archimate.yllemo.com/" target="_blank" rel="noopener noreferrer" title="ArchiMate 2025 Modern Color Set — samma palett som archimate-2025.md i repot">archimate.yllemo.com — färger &amp; lager (2025)</a><span class="sep" aria-hidden="true">·</span><a href="https://github.com/yllemo/ArchiCode/blob/main/archimate-2025.md" target="_blank" rel="noopener noreferrer" title="Källtext för färgreferensen">archimate-2025.md</a>
-            </p>
         </header>
 
         <div class="messages">
@@ -482,9 +491,10 @@
                     <div class="button-group">
                         <select id="exampleSelect" onchange="loadSelectedExample()">
                             <option value="">Välj exempel…</option>
+                            <option value="common-domain">Common-domän (AM4 nytt)</option>
                             <option value="business-process">Affärsprocess (kund &amp; sälj)</option>
-                            <option value="ecommerce">E-handel (tre lager)</option>
-                            <option value="relationships">Alla relationstyper</option>
+                            <option value="ecommerce">E-handel (tre domäner)</option>
+                            <option value="relationships">Relationstyper (AM4)</option>
                             <option value="inline-one-line">Inline på en rad</option>
                             <option value="strategy-motivation">Motivation &amp; strategi — portal</option>
                             <option value="motivation-strategy-order">Motivation &amp; strategi — orderflöde</option>
@@ -494,11 +504,12 @@
                         </select>
                     </div>
                 </div>
-                <textarea id="codeInput" placeholder="ArchiMate-kod här…
+                <textarea id="codeInput" placeholder="ArchiMate 4-kod här…
 
-[<application:component> System A]
+// Domäner: motivation strategy common business application technology implementation
+[<common:process> Process A]
 [<application:component> System B]
-[System A] -> [System B]"></textarea>
+[Process A] -> [System B]"></textarea>
             </div>
 
             <div class="viewer-section">
@@ -519,6 +530,12 @@
                 </div>
             </div>
         </div>
+
+        <footer class="app-footer">
+            <p class="demo-links">
+                <a href="https://github.com/yllemo/ArchiCode" target="_blank" rel="noopener noreferrer" title="ArchiCode på GitHub">GitHub</a><span class="sep" aria-hidden="true">·</span><a href="https://archimate.yllemo.com/" target="_blank" rel="noopener noreferrer" title="ArchiMate 4 — domäner och färger">archimate.yllemo.com</a><span class="sep" aria-hidden="true">·</span><a href="https://github.com/yllemo/ArchiCode/blob/main/README.md" target="_blank" rel="noopener noreferrer" title="ArchiCode dokumentation">Docs</a><span class="sep" aria-hidden="true">·</span>ArchiMate 4 (C260)
+            </p>
+        </footer>
     </div>
 
     <script>
@@ -687,15 +704,53 @@
         }
 
         const examples = {
+            'common-domain': `// ArchiMate 4 — Common-domän (ny i AM4)
+// Beteendeelement (process, funktion, tjänst, händelse) är nu
+// generiska och kan användas i alla domäner via <common:...>
+#spacing: 85
+#fontSize: 13
+
+// Motivation — Varför?
+[<motivation:goal> Effektivare orderflöde]
+[<motivation:driver> Kundkrav på snabbhet]
+
+// Strategy — Hur skapar vi värde?
+[<strategy:capability> Order & leverans]
+
+// Common — Delade beteendeelement (beige)
+[<common:process> Orderprocess]
+[<common:service> Ordertjänst]
+[<common:event> Order mottagen]
+
+// Business — Domänspecifika aktörer och objekt (gul)
+[<business:actor> Kund]
+[<business:object> Beställning]
+
+// Application — IT-stöd (blå)
+[<application:component> Ordersystem]
+[<application:data> Orderdatabas]
+
+// Relationer
+[Kundkrav på snabbhet] -> [Effektivare orderflöde]
+[Effektivare orderflöde] -> [Order & leverans]
+[Order & leverans] --:> [Ordertjänst]
+[Kund] -> [Orderprocess]
+[Order mottagen] -|> [Orderprocess]
+[Orderprocess] -> [Ordertjänst]
+[Ordertjänst] --:> [Ordersystem]
+[Ordersystem] <-> [Orderdatabas]
+[Orderprocess] -> [Beställning]`,
+
             'business-process': `#spacing: 80
 #fontSize: 14
 
+// ArchiMate 4 — Business-domän
 [<business:actor> Kund]
 [<business:actor> Säljare]
 [<business:role> Projektledare]
-[<business:process> Försäljningsprocess]
-[<business:process> Leveransprocess]
-[<business:service> Kundtjänst]
+[<common:process> Försäljningsprocess]
+[<common:process> Leveransprocess]
+[<common:service> Kundtjänst]
 [<business:object> Beställning]
 
 [Kund] -> [Försäljningsprocess]
@@ -705,11 +760,12 @@
 [Beställning] -> [Leveransprocess]
 [Projektledare] .-- [Kund]`,
 
-            'ecommerce': `#spacing: 100
+            'ecommerce': `// ArchiMate 4 — E-handel (tre domäner)
+#spacing: 100
 
 [<business:actor> Kund]
-[<business:process> Orderhantering]
-[<business:service> Webbutik]
+[<common:process> Orderhantering]
+[<common:service> Webbutik]
 
 [<application:component> Webbfrontend]
 [<application:component> Orderservice]
@@ -727,16 +783,18 @@
 [Webbfrontend] -> [Lastbalanserare]
 [Lastbalanserare] -> [Applikationsserver]`,
 
-            'relationships': `#spacing: 70
+            'relationships': `// ArchiMate 4 — Relationstyper
+// OBS: composition (+- / -+) är borttagen i AM4, ersatt av aggregation
+#spacing: 70
 #fontSize: 13
 
 [<business:actor> Källa]
 [<business:actor> Mål]
 [<business:role> Chef]
 [<business:role> Anställd]
-[<business:process> Process A]
-[<business:process> Process B]
-[<business:service> Tjänst A]
+[<common:process> Process A]
+[<common:process> Process B]
+[<common:service> Tjänst A]
 [<application:component> System A]
 [<application:component> System B]
 [<application:data> Databas]
@@ -747,7 +805,6 @@
 [System A] --:> [Tjänst A]
 [Process B] -|> [Process A]
 [Chef] .-- [Process A]
-[System A] +- [Databas]
 [Tjänst A] o- [System A]
 [Chef] -:> [Anställd]
 [System B] <-> [Databas]`,

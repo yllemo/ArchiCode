@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchiMate 4 – Domänmodell</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f3;
+    color: #333;
+    padding: 40px 20px 60px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #222; }
+  .page-header p  { font-size: 13px; color: #888; margin-top: 4px; }
+
+  #hex-wrap {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .layer-shape {
+    cursor: pointer;
+    transition: filter 0.15s ease;
+  }
+  .layer-shape:hover { filter: brightness(0.84) saturate(1.3); }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: fixed;
+    display: none;
+    width: 300px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    z-index: 999;
+    pointer-events: none;
+    overflow: hidden;
+    animation: pop .14s ease;
+  }
+  @keyframes pop {
+    from { opacity:0; transform:scale(.95) translateY(5px); }
+    to   { opacity:1; transform:scale(1)   translateY(0);   }
+  }
+  .tt-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px 10px;
+    border-bottom: 2px solid;
+  }
+  .tt-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; flex-shrink: 0;
+  }
+  .tt-name { font-size: 14px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+  .tt-hex  { font-size: 10.5px; color: #aaa; margin-top: 2px; font-family: monospace; }
+  .tt-body { padding: 10px 14px 12px; }
+  .tt-kw   { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase;
+             letter-spacing: .07em; margin-bottom: 5px; }
+  .tt-desc { font-size: 12px; color: #444; line-height: 1.6; margin-bottom: 9px; }
+  .tt-tags { display:flex; flex-wrap:wrap; gap:4px; }
+  .tt-tag  { font-size: 11px; border-radius: 20px; padding: 2px 8px;
+             background: rgba(0,0,0,0.07); color: #444; }
+
+  /* ── Förklaringssektion ── */
+  .info-section {
+    max-width: 680px;
+    margin: 44px auto 0;
+  }
+  .info-section h2 {
+    font-size: 17px; font-weight: 700; color: #222;
+    margin-bottom: 6px;
+  }
+  .info-section .version-badge {
+    display: inline-block;
+    background: #0077bc; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .info-section .intro {
+    font-size: 13.5px; color: #555; line-height: 1.65;
+    margin-bottom: 24px;
+  }
+
+  .change-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 520px) { .change-grid { grid-template-columns: 1fr; } }
+
+  .change-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 4px solid;
+  }
+  .change-card h3 {
+    font-size: 13px; font-weight: 700; color: #1a1a1a;
+    margin-bottom: 5px;
+  }
+  .change-card p {
+    font-size: 12.5px; color: #555; line-height: 1.55;
+  }
+  .change-card .old-new {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11.5px; margin-top: 7px; flex-wrap: wrap;
+  }
+  .chip {
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .chip-old  { background: #fee; color: #a33; text-decoration: line-through; }
+  .chip-new  { background: #e6f4e6; color: #2a6a2a; }
+  .arrow-lbl { color: #aaa; font-size: 13px; }
+
+  .removed-section h3 {
+    font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;
+  }
+  .removed-list {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;
+  }
+  .removed-item {
+    background: #fff3f3; border: 1px solid #f5c6c6;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 11.5px; color: #a33;
+  }
+
+  .source-note {
+    font-size: 11.5px; color: #aaa; border-top: 1px solid #e5e5e0;
+    padding-top: 12px; margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>ArchiMate 4 – Domänmodell</h1>
+  <p>Hover eller klicka på ett domänlager för att se vad det innehåller</p>
+</div>
+
+<div id="hex-wrap">
+<svg width="100%" viewBox="0 0 750 681" xmlns="http://www.w3.org/2000/svg">
+  <title>ArchiMate 4 domänmodell</title>
+
+  <!-- Implementering & Migration – rosa ring (evenodd: r1 yttre, r2 hål) -->
+  <path class="layer-shape" data-layer="impl"
+    d="M670,340 L525,591.147 L235,591.147 L90,340 L235,88.853 L525,88.853 Z
+       M497.5,136.484 L262.5,136.484 L145,340 L262.5,543.516 L497.5,543.516 L615,340 Z"
+    fill="#F8C2BE" fill-rule="evenodd" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Verksamhetsdomän – gul, vänster+topp fasett (r2→r3) -->
+  <polygon class="layer-shape" data-layer="bus"
+    points="145,340 262.5,136.484 497.5,136.484 469,185.847 291,185.847 202,340"
+    fill="#F4DE7F" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Applikationsdomän – blå, höger fasett (r2→r3) -->
+  <polygon class="layer-shape" data-layer="app"
+    points="497.5,136.484 615,340 497.5,543.516 469,494.153 558,340 469,185.847"
+    fill="#B6D7E1" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Teknologidomän – grön, nedre fasett (r2→r3) -->
+  <polygon class="layer-shape" data-layer="tech"
+    points="497.5,543.516 262.5,543.516 145,340 202,340 291,494.153 469,494.153"
+    fill="#C3E1B4" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Common-domän – beige, hela r3-hexagonen -->
+  <polygon class="layer-shape" data-layer="common"
+    points="558,340 469,494.153 291,494.153 202,340 291,185.847 469,185.847"
+    fill="#E8E5D3" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Strategidomän – guld, r4-hexagonen -->
+  <polygon class="layer-shape" data-layer="strat"
+    points="502,340 441,445.655 319,445.655 258,340 319,234.345 441,234.345"
+    fill="#EFBD5D" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Motivationsdomän – lila, r5-hexagonen (innerst) -->
+  <polygon class="layer-shape" data-layer="motiv"
+    points="446,340 413,397.158 347,397.158 314,340 347,282.842 413,282.842"
+    fill="#D8C1E4" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
+
+  <!-- Etiketter (pointer-events:none så de inte blockerar hover) -->
+  <text font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700"
+    fill="#3A3630" text-anchor="middle" dominant-baseline="middle"
+    x="380" y="215" style="pointer-events:none">Common</text>
+
+  <text font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"
+    fill="#5A3A08" text-anchor="middle" dominant-baseline="middle"
+    x="380" y="264" style="pointer-events:none">Strategi</text>
+
+  <text font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"
+    fill="#4A2A68" text-anchor="middle" dominant-baseline="middle"
+    x="380" y="340" style="pointer-events:none">Motivation</text>
+
+  <text font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700"
+    fill="#5A4A08" text-anchor="middle" dominant-baseline="middle"
+    transform="translate(222,251) rotate(-60)" style="pointer-events:none">Verksamhet</text>
+
+  <text font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700"
+    fill="#1E4E62" text-anchor="middle" dominant-baseline="middle"
+    transform="translate(538,251) rotate(60)" style="pointer-events:none">Applikation</text>
+
+  <text font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"
+    fill="#2D5C22" text-anchor="middle" dominant-baseline="middle"
+    x="380" y="519" style="pointer-events:none">Teknologi</text>
+
+  <text font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700"
+    fill="#5A2A26" text-anchor="middle" dominant-baseline="middle"
+    x="380" y="567" style="pointer-events:none">Implementering &amp; Migration</text>
+</svg>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     FÖRKLARINGSSEKTION – Vad är nytt i ArchiMate 4?
+     ═══════════════════════════════════════════════ -->
+<div class="info-section">
+
+  <h2>Vad är nytt i ArchiMate 4? <span class="version-badge">Publicerad april 2026</span></h2>
+  <p class="intro">
+    ArchiMate 4 är inte en revolution – det är en <strong>medveten förenkling</strong> av ett moget modelleringsspråk.
+    The Open Group (dokumentnr C260) har städat bort onödig komplexitet och gjort språket lättare att lära sig och använda,
+    utan att ändra de grundläggande principerna. Kärnfilosofin är enkel: <em>enkelhet framför komplexitet</em>.
+  </p>
+
+  <div class="change-grid">
+
+    <div class="change-card" style="border-color:#EFBD5D;">
+      <h3>🔄 Lager → Domäner</h3>
+      <p>Det strikta lager-begreppet (Business/Application/Technology) ersätts av det mer flexibla <strong>domän</strong>-begreppet. Domänerna kan användas fritt och kombineras utan att följa en strikt hierarki.</p>
+      <div class="old-new">
+        <span class="chip chip-old">Lager</span>
+        <span class="arrow-lbl">→</span>
+        <span class="chip chip-new">Domän</span>
+      </div>
+    </div>
+
+    <div class="change-card" style="border-color:#E8E5D3;">
+      <h3>🔗 Ny Common-domän</h3>
+      <p>I ArchiMate 3.2 fanns <em>BusinessProcess</em>, <em>ApplicationProcess</em> och <em>TechnologyProcess</em> som separata element. Nu finns bara ett <strong>Process</strong>-element i Common – som alla domäner delar och specialiserar.</p>
+      <div class="old-new">
+        <span class="chip chip-old">BusinessProcess</span>
+        <span class="chip chip-old">AppProcess</span>
+        <span class="arrow-lbl">→</span>
+        <span class="chip chip-new">Process (Common)</span>
+      </div>
+    </div>
+
+    <div class="change-card" style="border-color:#D8C1E4;">
+      <h3>💡 Motivation i centrum</h3>
+      <p>Motivationsdomänen placeras i <strong>mitten av hexagonen</strong> – ett medvetet val för att betona att all arkitektur ska börja med mål och drivkrafter, inte med teknik.</p>
+    </div>
+
+    <div class="change-card" style="border-color:#B6D7E1;">
+      <h3>📐 Multiplicitet på relationer</h3>
+      <p>ArchiMate 4 introducerar <strong>kardinalitet</strong> (t.ex. 1..*, 0..1) direkt på relationer i modellen. Det möjliggör precisare modellering av affärsregler och systemberoenden.</p>
+      <div class="old-new">
+        <span class="chip chip-old">Ingen kardinalitet</span>
+        <span class="arrow-lbl">→</span>
+        <span class="chip chip-new">1..* / 0..1 / 1..1</span>
+      </div>
+    </div>
+
+    <div class="change-card" style="border-color:#C3E1B4;">
+      <h3>⚙️ Teknologi inkluderar fysiskt lager</h3>
+      <p>Det separata <strong>Physical Layer</strong> från ArchiMate 3.2 (utrustning, anläggningar) är nu inbakat i Teknologidomänen, som täcker både IT-infrastruktur och operativ teknik (OT).</p>
+      <div class="old-new">
+        <span class="chip chip-old">Technology Layer</span>
+        <span class="chip chip-old">Physical Layer</span>
+        <span class="arrow-lbl">→</span>
+        <span class="chip chip-new">Teknologidomän</span>
+      </div>
+    </div>
+
+    <div class="change-card" style="border-color:#F4DE7F;">
+      <h3>👤 Generisk Roll och Kollaboration</h3>
+      <p><em>Business Role</em> är generaliserat till ett generiskt <strong>Roll</strong>-element. Samma sak med Kollaboration – det finns nu ett enda element som används i alla domäner.</p>
+      <div class="old-new">
+        <span class="chip chip-old">BusinessRole</span>
+        <span class="chip chip-old">AppCollaboration</span>
+        <span class="arrow-lbl">→</span>
+        <span class="chip chip-new">Roll / Kollaboration</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="removed-section">
+    <h3>🗑️ Element som tagits bort i ArchiMate 4</h3>
+    <div class="removed-list">
+      <span class="removed-item">BusinessInteraction</span>
+      <span class="removed-item">ApplicationInteraction</span>
+      <span class="removed-item">TechnologyInteraction</span>
+      <span class="removed-item">Contract</span>
+      <span class="removed-item">Constraint</span>
+      <span class="removed-item">Gap</span>
+      <span class="removed-item">Representation</span>
+      <span class="removed-item">ImplementationEvent</span>
+      <span class="removed-item">Composition (relation)</span>
+    </div>
+    <p style="font-size:12.5px;color:#666;line-height:1.55;">
+      Dessa modelleras nu som specialiseringar av generiska element. Exempel: <em>Contract</em> → <strong>BusinessObject</strong> med stereotype, <em>Constraint</em> → <strong>Requirement</strong>, <em>Gap</em> → specialisering av <strong>Deliverable</strong>.
+    </p>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       BLOCK 2 – Information, TOGAF ADM & BDAT/VIAT
+       ═══════════════════════════════════════════ -->
+  <div style="margin-top:36px;">
+    <h2 style="font-size:17px;font-weight:700;color:#222;margin-bottom:6px;">
+      Var hamnar informationen?
+      <span style="display:inline-block;background:#5a3a08;color:#fff;font-size:11px;font-weight:700;
+             padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;">VIAT / BDAT</span>
+    </h2>
+    <p style="font-size:13.5px;color:#555;line-height:1.65;margin-bottom:22px;">
+      En vanlig fråga när man börjar arbeta med ArchiMate är: <em>var modelleras informationsmängder,
+      datakataloger och informationsstrukturer?</em> Svaret är att ArchiMate saknar ett dedikerat
+      informationslager — information sprider sig över flera domäner som <strong>passiva strukturelement</strong>,
+      det vill säga de objekt som beteenden (processer, tjänster) skapar, läser och förändrar.
+    </p>
+
+    <!-- Tre nivåer av information -->
+    <div style="background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:16px;
+                border-left:4px solid #EFBD5D;">
+      <h3 style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:10px;">
+        📦 Information på tre abstraktionsnivåer i ArchiMate 4
+      </h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+
+        <div style="background:#F4DE7F33;border-radius:8px;padding:12px;border:1px solid #F4DE7F;">
+          <div style="font-size:12px;font-weight:700;color:#5A4A08;margin-bottom:4px;">
+            💼 Verksamhetsdomän
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#222;margin-bottom:3px;">Affärsobjekt</div>
+          <div style="font-size:11.5px;color:#555;line-height:1.5;">
+            Det <em>konceptuella</em> informationsbehovet: vad verksamheten tänker på.
+            T.ex. <em>Ärende</em>, <em>Medarbetare</em>, <em>Faktura</em>, <em>Avtal</em>.
+            Oberoende av hur det lagras tekniskt.
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#888;">Realiseras av → Dataobjekt</div>
+        </div>
+
+        <div style="background:#B6D7E133;border-radius:8px;padding:12px;border:1px solid #B6D7E1;">
+          <div style="font-size:12px;font-weight:700;color:#1E4E62;margin-bottom:4px;">
+            🖥️ Applikationsdomän
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#222;margin-bottom:3px;">Dataobjekt</div>
+          <div style="font-size:11.5px;color:#555;line-height:1.5;">
+            Den <em>logiska datastrukturen</em> som applikationer hanterar.
+            T.ex. tabeller, API-modeller, datakatalogposter, JSON-scheman.
+            Realiserar affärsobjektet ovanför.
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#888;">Realiserar → Affärsobjekt</div>
+        </div>
+
+        <div style="background:#C3E1B433;border-radius:8px;padding:12px;border:1px solid #C3E1B4;">
+          <div style="font-size:12px;font-weight:700;color:#2D5C22;margin-bottom:4px;">
+            ⚙️ Teknologidomän
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#222;margin-bottom:3px;">Artefakt</div>
+          <div style="font-size:11.5px;color:#555;line-height:1.5;">
+            Den <em>fysiska manifestationen</em>: en fil, en databas, ett meddelandepaket,
+            ett arkiverat dokument. Det som faktiskt lagras på ett medium.
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#888;">Implementerar → Dataobjekt</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:#888;margin-top:10px;line-height:1.5;">
+        <strong>Exempel:</strong> Affärsobjektet <em>Medarbetare</em> (Verksamhet) realiseras av
+        Dataobjektet <em>Employee-record</em> (Applikation) som implementeras av
+        Artefakten <em>HR_DB.table_employees</em> (Teknologi).
+      </p>
+    </div>
+
+    <!-- TOGAF ADM koppling -->
+    <div style="background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:16px;
+                border-left:4px solid #0077bc;">
+      <h3 style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">
+        🔄 Koppling till TOGAF ADM
+      </h3>
+      <p style="font-size:12.5px;color:#555;line-height:1.6;margin-bottom:10px;">
+        TOGAF ADM (Architecture Development Method) är den metod som styr hur arkitekturarbetet
+        bedrivs i faser. ArchiMate är <em>språket</em> du använder för att dokumentera resultaten.
+        De är komplementära — TOGAF ger processen, ArchiMate ger notationen.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        <div style="text-align:center;padding:10px 6px;background:#f9f7f2;border-radius:8px;">
+          <div style="font-size:18px;margin-bottom:4px;">A</div>
+          <div style="font-size:11px;font-weight:700;color:#222;">Arkitekturvision</div>
+          <div style="font-size:10.5px;color:#888;margin-top:3px;">Motivation + Strategi</div>
+        </div>
+        <div style="text-align:center;padding:10px 6px;background:#F4DE7F33;border-radius:8px;">
+          <div style="font-size:18px;margin-bottom:4px;">B</div>
+          <div style="font-size:11px;font-weight:700;color:#222;">Verksamhetsarkitektur</div>
+          <div style="font-size:10.5px;color:#888;margin-top:3px;">Verksamhetsdomän</div>
+        </div>
+        <div style="text-align:center;padding:10px 6px;background:#B6D7E133;border-radius:8px;border:2px solid #0077bc;">
+          <div style="font-size:18px;margin-bottom:4px;">C</div>
+          <div style="font-size:11px;font-weight:700;color:#0077bc;">Informationssystemarkitektur</div>
+          <div style="font-size:10.5px;color:#0077bc;margin-top:3px;">Data + Applikation</div>
+        </div>
+        <div style="text-align:center;padding:10px 6px;background:#C3E1B433;border-radius:8px;">
+          <div style="font-size:18px;margin-bottom:4px;">D</div>
+          <div style="font-size:11px;font-weight:700;color:#222;">Teknikarkitektur</div>
+          <div style="font-size:10.5px;color:#888;margin-top:3px;">Teknologidomän</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:#888;margin-top:10px;line-height:1.5;">
+        <strong>Fas C</strong> i TOGAF ADM heter "Informationssystemarkitektur" och är uppdelad i
+        två delar: <em>Dataarkitektur</em> (informationsstrukturer, datakatalog, informationsprinciper)
+        och <em>Applikationsarkitektur</em> (systemlandskap, integrationer). Det är här datakataloger
+        och informationsmängder formellt definieras.
+      </p>
+    </div>
+
+    <!-- BDAT / VIAT förklaring -->
+    <div style="background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:16px;
+                border-left:4px solid #674b99;">
+      <h3 style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">
+        🇸🇪 BDAT och det saknade I:et — varför VIAT?
+      </h3>
+      <p style="font-size:12.5px;color:#555;line-height:1.6;margin-bottom:12px;">
+        <strong>BDAT</strong> är den svenska/nordiska förkortningen för de fyra arkitekturlagren
+        <em>Verksamhet (Business) → Data → Applikation → Teknik</em>, hämtad från TOGAF och
+        vanlig i svensk offentlig sektor. Logiken är hierarkisk:
+      </p>
+
+      <!-- Pyramid/kedja -->
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;max-width:380px;">
+        <div style="background:#F8C2BE;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;min-width:28px;text-align:center;">💼</span>
+          <div>
+            <span style="font-size:12px;font-weight:700;color:#5A2A26;">V – Verksamhet</span>
+            <span style="font-size:11px;color:#888;margin-left:6px;">Vad vi gör och varför</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-start;padding-left:14px;color:#aaa;font-size:13px;">↓ kräver</div>
+        <div style="background:#F4DE7F;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;min-width:28px;text-align:center;">📋</span>
+          <div>
+            <span style="font-size:12px;font-weight:700;color:#5A4A08;">I – Information</span>
+            <span style="font-size:11px;color:#888;margin-left:6px;">Vilken information behövs</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-start;padding-left:14px;color:#aaa;font-size:13px;">↓ kräver</div>
+        <div style="background:#B6D7E1;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;min-width:28px;text-align:center;">🖥️</span>
+          <div>
+            <span style="font-size:12px;font-weight:700;color:#1E4E62;">A – Applikation</span>
+            <span style="font-size:11px;color:#888;margin-left:6px;">System som hanterar informationen</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-start;padding-left:14px;color:#aaa;font-size:13px;">↓ kräver</div>
+        <div style="background:#C3E1B4;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:16px;min-width:28px;text-align:center;">⚙️</span>
+          <div>
+            <span style="font-size:12px;font-weight:700;color:#2D5C22;">T – Teknik</span>
+            <span style="font-size:11px;color:#888;margin-left:6px;">Infrastruktur som kör systemen</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#f3f0f9;border-radius:8px;padding:12px 14px;">
+        <div style="font-size:12px;font-weight:700;color:#674b99;margin-bottom:5px;">
+          ⚠️ Varför saknas I:et i ArchiMate 4?
+        </div>
+        <p style="font-size:12px;color:#555;line-height:1.6;">
+          ArchiMate har inget dedikerat <strong>Informationslager</strong> — det är en medveten
+          designprincip. Information modelleras istället som <em>passiva strukturelement</em>
+          fördelade över tre domäner:
+          <strong>Affärsobjekt</strong> (Verksamhet) →
+          <strong>Dataobjekt</strong> (Applikation) →
+          <strong>Artefakt</strong> (Teknologi).
+          Det ger en mer precis bild av <em>på vilken abstraktionsnivå</em> informationen befinner sig,
+          men innebär att informationsarkitektur som disciplin <strong>spänner över flera domäner</strong>
+          och måste hanteras som en tvärgående vy (viewpoint) snarare än ett eget lager.
+        </p>
+        <p style="font-size:12px;color:#555;line-height:1.6;margin-top:8px;">
+          I praktiken används <strong>Affärsobjekt</strong> för informationsmängder och
+          begreppsmodeller, <strong>Dataobjekt</strong> för datakataloger och logiska datamodeller,
+          och <strong>Artefakt</strong> för fysiska datafiler och databastabeller.
+          Informationsarkitekten arbetar med alla tre nivåerna och kopplar ihop dem med
+          realiseringsrelationer.
+        </p>
+      </div>
+    </div>
+
+    <p style="font-size:11.5px;color:#aaa;border-top:1px solid #e5e5e0;padding-top:12px;margin-top:4px;">
+      Källor: The Open Group, <em>ArchiMate® 4 Specification</em> (C260), april 2026 ·
+      The Open Group, <em>TOGAF® Standard</em>, ADM Fas C ·
+      IASA Sverige, BDAT-ramverket
+    </p>
+  </div>
+
+  <p class="source-note">
+    Källa: The Open Group, <em>ArchiMate® 4 Specification</em> (C260), publicerad april 2026. Visualisering baserad på officiell ArchiMate 2025 Modern Color Set.
+  </p>
+
+</div>
+
+<!-- ── Tooltip ── -->
+<div id="tooltip"></div>
+
+<script>
+const DOMANER = {
+  motiv: {
+    namn: "Motivationsdomän",
+    hex: "#D8C1E4 / #B39BCF",
+    ikon: "💡", bg: "#D8C1E4",
+    nyckel: "Varför – drivkrafter och mål",
+    beskr: "Modellerar de mål, krav och drivkrafter som motiverar och rättfärdigar arkitekturbeslut. Placerad i mitten av hexagonen – all arkitektur ska starta i motivationen.",
+    taggar: ["intressent","drivkraft","bedömning","mål","utfall","princip","krav","begränsning","värde","betydelse"]
+  },
+  strat: {
+    namn: "Strategidomän",
+    hex: "#EFBD5D / #D4A43B",
+    ikon: "🎯", bg: "#EFBD5D",
+    nyckel: "Hur vi skapar värde",
+    beskr: "Modellerar organisationens strategiska riktning: vilka förmågor och resurser som behövs, och hur de omsätts i konkreta handlingsplaner. Bryggan mellan varför och vad.",
+    taggar: ["resurs","förmåga","värdeström","handlingsplan"]
+  },
+  common: {
+    namn: "Common-domän",
+    hex: "#E8E5D3 / #C4BFA6",
+    ikon: "🔗", bg: "#C4BFA6",
+    nyckel: "Generiska, delade element",
+    beskr: "Innehåller de universella beteendeelementen som delas av alla domäner. Nytt i ArchiMate 4: Process, Funktion, Tjänst och Händelse finns nu bara en gång här – inte duplicerade per lager som i v3.2.",
+    taggar: ["process","funktion","tjänst","händelse","kollaboration","roll","interaktion","stig"]
+  },
+  bus: {
+    namn: "Verksamhetsdomän",
+    hex: "#F4DE7F / #E8C555",
+    ikon: "💼", bg: "#F4DE7F",
+    nyckel: "Organisation och affär",
+    beskr: "Modellerar organisationsstrukturer, aktörer och värdeskapande mot kunder och intressenter. De verksamhetsspecifika elementen är Aktör, Roll, Samarbete, Affärsobjekt och Produkt. Beteenden (process, tjänst) ärvs från Common.",
+    taggar: ["aktör","roll","samarbete","affärsobjekt","produkt","gränssnitt"]
+  },
+  app: {
+    namn: "Applikationsdomän",
+    hex: "#B6D7E1 / #8CC5D4",
+    ikon: "🖥️", bg: "#B6D7E1",
+    nyckel: "IT-stöd och mjukvara",
+    beskr: "Modellerar applikationer, gränssnitt och dataobjekt som stödjer verksamheten. De applikationsspecifika elementen är Applikationskomponent, Gränssnitt och Dataobjekt. Beteenden ärvs från Common.",
+    taggar: ["applikationskomponent","gränssnitt","dataobjekt","samarbete"]
+  },
+  tech: {
+    namn: "Teknologidomän",
+    hex: "#C3E1B4 / #9BD083",
+    ikon: "⚙️", bg: "#C3E1B4",
+    nyckel: "Infrastruktur och fysisk teknik",
+    beskr: "Modellerar IT-infrastruktur och fysisk operativ teknik (OT). I ArchiMate 4 är det tidigare Physical Layer inbakat här. Täcker allt från servrar och nätverk till fysisk utrustning och anläggningar.",
+    taggar: ["nod","enhet","systemprogramvara","nätverk","kommunikationsväg","artefakt","utrustning","anläggning","distributionsnät","material"]
+  },
+  impl: {
+    namn: "Implementering & Migration",
+    hex: "#F8C2BE / #F09B95",
+    ikon: "🔄", bg: "#F8C2BE",
+    nyckel: "Förändring och transformation",
+    beskr: "Modellerar program, projekt och leveranser som driver övergången från nuläge till målbild. Beskriver platåer i transformationsresan. Händelse-elementet från Common används nu i stället för det borttagna ImplementationEvent.",
+    taggar: ["arbetspaket","leverans","platå","program","projekt","fas"]
+  }
+};
+
+const tooltip = document.getElementById('tooltip');
+let active = null;
+
+function render(id) {
+  const d = DOMANER[id];
+  tooltip.innerHTML = `
+    <div class="tt-head" style="background:${d.bg}33;border-color:${d.bg}">
+      <div class="tt-icon" style="background:${d.bg}">${d.ikon}</div>
+      <div>
+        <div class="tt-name">${d.namn}</div>
+        <div class="tt-hex">${d.hex}</div>
+      </div>
+    </div>
+    <div class="tt-body">
+      <div class="tt-kw">${d.nyckel}</div>
+      <div class="tt-desc">${d.beskr}</div>
+      <div class="tt-tags">${d.taggar.map(t=>`<span class="tt-tag">${t}</span>`).join('')}</div>
+    </div>`;
+}
+
+function place(e) {
+  if (!active) return;
+  const pad=16, tw=300, th=tooltip.offsetHeight||210;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  let x=e.clientX+pad, y=e.clientY+pad;
+  if (x+tw>vw-pad) x=e.clientX-tw-pad;
+  if (y+th>vh-pad) y=e.clientY-th-pad;
+  if (y<pad) y=pad;
+  tooltip.style.left=x+'px';
+  tooltip.style.top=y+'px';
+}
+
+document.querySelectorAll('.layer-shape').forEach(el => {
+  el.addEventListener('mouseenter', e => {
+    active = el.dataset.layer;
+    render(active);
+    tooltip.style.display = 'block';
+    place(e);
+  });
+  el.addEventListener('mousemove', place);
+  el.addEventListener('mouseleave', () => {
+    active = null;
+    tooltip.style.display = 'none';
+  });
+});
+</script>
+</body>
+</html>

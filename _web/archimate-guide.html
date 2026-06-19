@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArchiMate 4 — Interaktiv Referensguide</title>
+  <link rel="stylesheet" href="../archicode.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --motivation:   #D8C1E4; --motivation-b:   #B39BCF;
+      --strategy:     #EFBD5D; --strategy-b:     #D4A43B;
+      --common:       #E8E5D3; --common-b:       #C4BFA6;
+      --business:     #F4DE7F; --business-b:     #E8C555;
+      --application:  #B6D7E1; --application-b:  #8CC5D4;
+      --technology:   #C3E1B4; --technology-b:   #9BD083;
+      --implementation: #F8C2BE; --implementation-b: #F09B95;
+
+      --sidebar-bg: #1e2130;
+      --sidebar-text: #e2e8f0;
+      --sidebar-muted: #8892a4;
+      --sidebar-border: rgba(255,255,255,0.07);
+      --sidebar-hover: rgba(255,255,255,0.06);
+      --sidebar-active: rgba(255,255,255,0.12);
+      --panel-bg: #f5f6f8;
+      --surface: #ffffff;
+      --text: #1a1c2e;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 10px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --accent: #4f7cff;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: Arial, system-ui, -apple-system, sans-serif;
+      background: var(--sidebar-bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      background: #151724;
+      border-bottom: 1px solid var(--sidebar-border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 52px;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+    .top-nav .logo {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #EFBD5D;
+      white-space: nowrap;
+      letter-spacing: -0.3px;
+    }
+    .top-nav .logo span { color: var(--sidebar-muted); font-weight: 400; font-size: 0.85rem; }
+    .top-nav-links {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .top-nav-links a {
+      color: var(--sidebar-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .top-nav-links a:hover { background: var(--sidebar-hover); color: var(--sidebar-text); }
+
+    /* ── APP LAYOUT ── */
+    .app {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      overflow-y: auto;
+      padding: 16px 0 24px;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    .sidebar-section { margin-bottom: 6px; }
+
+    .sidebar-domain-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px 6px;
+    }
+    .domain-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sidebar-domain-header span {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--sidebar-muted);
+    }
+
+    .sidebar-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 7px 16px 7px 34px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      color: var(--sidebar-muted);
+      cursor: pointer;
+      border-radius: 0;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .sidebar-item:hover {
+      background: var(--sidebar-hover);
+      color: var(--sidebar-text);
+    }
+    .sidebar-item.active {
+      background: var(--sidebar-active);
+      color: white;
+      font-weight: 600;
+    }
+    .sidebar-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 4px; bottom: 4px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      background: var(--accent);
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--sidebar-border);
+      margin: 8px 16px;
+    }
+
+    /* ── MAIN PANEL ── */
+    .main-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel-bg);
+      overflow: hidden;
+    }
+
+    /* ── PANEL HEADER ── */
+    .panel-header {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+    .panel-header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .panel-header .domain-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 100px;
+      border: 1.5px solid;
+    }
+    .panel-header p.desc {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── PANEL BODY ── */
+    .panel-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px 24px;
+      gap: 20px;
+    }
+
+    /* ── DIAGRAM CARD ── */
+    .diagram-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .diagram-card-header {
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .diagram-output {
+      padding: 24px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: auto;
+    }
+    .diagram-output svg { max-width: 100%; }
+
+    /* ── CODE CARD ── */
+    .code-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .code-card-header {
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+    }
+    pre.code-block {
+      padding: 16px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #374151;
+      overflow-x: auto;
+      white-space: pre;
+      background: transparent;
+    }
+    pre.code-block .c  { color: #9ca3af; } /* comment */
+    pre.code-block .el { color: #0277BD; } /* element */
+    pre.code-block .tp { color: #7c3aed; } /* type */
+    pre.code-block .nm { color: #1a1c2e; } /* name */
+    pre.code-block .ar { color: #b45309; } /* arrow */
+
+    /* ── RELATION TABLE ── */
+    .relation-section { margin-top: 4px; }
+    .relation-section h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .rel-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      font-size: 0.83rem;
+    }
+    .rel-table thead th {
+      background: #1e2130;
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.78rem;
+    }
+    .rel-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .rel-table tbody tr:last-child td { border-bottom: none; }
+    .rel-table tbody tr:hover { background: #f9fafb; }
+    .rel-table code {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #374151;
+    }
+    .rel-mini { width: 100%; min-width: 120px; }
+    .rel-mini svg { max-width: 180px; }
+
+    /* ── WELCOME PANEL ── */
+    .welcome-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 40px;
+    }
+    .welcome-panel .icon { font-size: 3rem; opacity: 0.3; }
+    .welcome-panel p { max-width: 320px; font-size: 0.9rem; line-height: 1.6; }
+
+    /* ── ELEMENT TAGS ── */
+    .element-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .epill {
+      font-size: 0.72rem;
+      font-family: monospace;
+      padding: 2px 8px;
+      border-radius: 100px;
+      background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.1);
+      color: #374151;
+    }
+
+    @media (max-width: 640px) {
+      .sidebar { width: 200px; }
+      .panel-body { padding: 14px; }
+    }
+    @media (max-width: 480px) {
+      .app { flex-direction: column; }
+      .sidebar { width: 100%; height: 200px; overflow-x: auto; overflow-y: hidden; border-right: none; border-bottom: 1px solid var(--sidebar-border); }
+      .sidebar-domain-header, .sidebar-item { display: inline-block; vertical-align: top; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="logo">ArchiCode <span>/ ArchiMate 4 Guide</span></div>
+  <div class="top-nav-links">
+    <a href="index.html">Startsida</a>
+    <a href="../demo/index.html">Editor</a>
+    <a href="archimate-mermaid.html">vs Mermaid</a>
+  </div>
+</nav>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" role="navigation" aria-label="Domaner och element">
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#D8C1E4; border:1.5px solid #B39BCF;"></div>
+        <span>Motivation</span>
+      </div>
+      <button class="sidebar-item" data-key="motivation-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="motivation-goal" onclick="showExample(this)">goal</button>
+      <button class="sidebar-item" data-key="motivation-driver" onclick="showExample(this)">driver</button>
+      <button class="sidebar-item" data-key="motivation-stakeholder" onclick="showExample(this)">stakeholder</button>
+      <button class="sidebar-item" data-key="motivation-requirement" onclick="showExample(this)">requirement</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#EFBD5D; border:1.5px solid #D4A43B;"></div>
+        <span>Strategy</span>
+      </div>
+      <button class="sidebar-item" data-key="strategy-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="strategy-capability" onclick="showExample(this)">capability</button>
+      <button class="sidebar-item" data-key="strategy-resource" onclick="showExample(this)">resource</button>
+      <button class="sidebar-item" data-key="strategy-valuestream" onclick="showExample(this)">value-stream</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#E8E5D3; border:1.5px solid #C4BFA6;"></div>
+        <span>Common</span>
+      </div>
+      <button class="sidebar-item" data-key="common-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="common-process" onclick="showExample(this)">process</button>
+      <button class="sidebar-item" data-key="common-service" onclick="showExample(this)">service</button>
+      <button class="sidebar-item" data-key="common-event" onclick="showExample(this)">event</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#F4DE7F; border:1.5px solid #E8C555;"></div>
+        <span>Business</span>
+      </div>
+      <button class="sidebar-item" data-key="business-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="business-actor" onclick="showExample(this)">actor</button>
+      <button class="sidebar-item" data-key="business-role" onclick="showExample(this)">role</button>
+      <button class="sidebar-item" data-key="business-object" onclick="showExample(this)">object</button>
+      <button class="sidebar-item" data-key="business-product" onclick="showExample(this)">product</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#B6D7E1; border:1.5px solid #8CC5D4;"></div>
+        <span>Application</span>
+      </div>
+      <button class="sidebar-item" data-key="application-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="application-component" onclick="showExample(this)">component</button>
+      <button class="sidebar-item" data-key="application-service" onclick="showExample(this)">service</button>
+      <button class="sidebar-item" data-key="application-data" onclick="showExample(this)">data</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#C3E1B4; border:1.5px solid #9BD083;"></div>
+        <span>Technology</span>
+      </div>
+      <button class="sidebar-item" data-key="technology-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="technology-node" onclick="showExample(this)">node</button>
+      <button class="sidebar-item" data-key="technology-device" onclick="showExample(this)">device</button>
+      <button class="sidebar-item" data-key="technology-system-software" onclick="showExample(this)">system-software</button>
+      <button class="sidebar-item" data-key="technology-equipment" onclick="showExample(this)">equipment</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#F8C2BE; border:1.5px solid #F09B95;"></div>
+        <span>Implementation</span>
+      </div>
+      <button class="sidebar-item" data-key="implementation-overview" onclick="showExample(this)">Domänoverview</button>
+      <button class="sidebar-item" data-key="implementation-workpackage" onclick="showExample(this)">workpackage</button>
+      <button class="sidebar-item" data-key="implementation-deliverable" onclick="showExample(this)">deliverable</button>
+      <button class="sidebar-item" data-key="implementation-plateau" onclick="showExample(this)">plateau</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-domain-header">
+        <div class="domain-dot" style="background:#6c8ebf; border:1.5px solid #4a6a9e;"></div>
+        <span>Relationer</span>
+      </div>
+      <button class="sidebar-item" data-key="relations-all" onclick="showExample(this)">Alla relationer</button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN PANEL -->
+  <main class="main-panel">
+    <div class="panel-header" id="panel-header" style="display:none;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h1 id="ph-title">–</h1>
+        <span class="domain-badge" id="ph-badge"></span>
+      </div>
+      <div class="element-pills" id="ph-pills"></div>
+      <p class="desc" id="ph-desc"></p>
+    </div>
+
+    <div class="panel-body" id="panel-body">
+      <div class="welcome-panel">
+        <div class="icon">&#9670;</div>
+        <h2 style="font-size:1rem; color:#6b7280; margin-bottom:6px;">ArchiMate 4 Referensguide</h2>
+        <p>Klicka på en domän eller ett element i sidopanelen för att se ett live-renderat exempeldiagram och syntaxförklaring.</p>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script src="../archicode.js"></script>
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const EXAMPLES = {
+
+  'motivation-overview': {
+    title: 'Motivation — Domänoverview',
+    badge: 'Motivation', badgeColor: '#D8C1E4', badgeBorder: '#B39BCF',
+    desc: 'Motivationsdomänen representerar varför arkitektur skapas. Den innehåller stakeholders, drivers, goals och requirements som styr alla arkitekturbeslutar.',
+    pills: ['stakeholder','driver','assessment','goal','outcome','principle','requirement','value','meaning'],
+    code: `[<motivation:goal> Öka kundnöjdhet]
+[<motivation:driver> Digitalisering]
+[<motivation:stakeholder> CTO]
+[<motivation:requirement> GDPR-efterlevnad]
+[CTO] --> [Öka kundnöjdhet]
+[Digitalisering] --> [Öka kundnöjdhet]
+[Öka kundnöjdhet] --> [GDPR-efterlevnad]`
+  },
+
+  'motivation-goal': {
+    title: 'motivation:goal',
+    badge: 'Motivation', badgeColor: '#D8C1E4', badgeBorder: '#B39BCF',
+    desc: 'En goal representerar ett önskat slutresultat eller ett tillstånd som en intressent vill uppnå. Det är det centrala motiverande elementet i arkitekturen.',
+    pills: ['motivation:goal'],
+    code: `[<motivation:goal> Minska ledtid]
+[<motivation:driver> Konkurrenstryck]
+[<motivation:outcome> Nöjdare kunder]
+[Konkurrenstryck] --> [Minska ledtid]
+[Minska ledtid] --> [Nöjdare kunder]`
+  },
+
+  'motivation-driver': {
+    title: 'motivation:driver',
+    badge: 'Motivation', badgeColor: '#D8C1E4', badgeBorder: '#B39BCF',
+    desc: 'En driver representerar en extern eller intern kraft som motiverar en organisation att förändras. Vanliga drivers är lagkrav, marknadstryck eller teknologiska skiften.',
+    pills: ['motivation:driver'],
+    code: `[<motivation:driver> Regulatoriska krav]
+[<motivation:driver> Digitalisering]
+[<motivation:assessment> Riskanalys 2026]
+[Regulatoriska krav] --> [Riskanalys 2026]
+[Digitalisering] --> [Riskanalys 2026]`
+  },
+
+  'motivation-stakeholder': {
+    title: 'motivation:stakeholder',
+    badge: 'Motivation', badgeColor: '#D8C1E4', badgeBorder: '#B39BCF',
+    desc: 'En stakeholder är en individ, grupp eller organisation med ett intresse i resultatet av arkitekturen. Stakeholders har roles och interests kopplat till sig.',
+    pills: ['motivation:stakeholder'],
+    code: `[<motivation:stakeholder> CTO]
+[<motivation:stakeholder> Dataskyddsombud]
+[<motivation:goal> GDPR-efterlevnad]
+[CTO] --> [GDPR-efterlevnad]
+[Dataskyddsombud] --> [GDPR-efterlevnad]`
+  },
+
+  'motivation-requirement': {
+    title: 'motivation:requirement',
+    badge: 'Motivation', badgeColor: '#D8C1E4', badgeBorder: '#B39BCF',
+    desc: 'Ett requirement specificerar en nödvändig egenskap, beteende eller begränsning som ett system eller tjänst måste uppfylla för att realisera ett mål.',
+    pills: ['motivation:requirement','motivation:principle'],
+    code: `[<motivation:goal> Säker inloggning]
+[<motivation:requirement> MFA obligatorisk]
+[<motivation:requirement> Sessionslogg 90 dagar]
+[<motivation:principle> Privacy by Design]
+[Säker inloggning] --> [MFA obligatorisk]
+[Säker inloggning] --> [Sessionslogg 90 dagar]
+[Privacy by Design] --> [Säker inloggning]`
+  },
+
+  // STRATEGY
+  'strategy-overview': {
+    title: 'Strategy — Domänoverview',
+    badge: 'Strategy', badgeColor: '#EFBD5D', badgeBorder: '#D4A43B',
+    desc: 'Strategidomänen länkar motivationen till den operativa verksamheten. Den definierar capabilities (förmågor), resurser och hur organisationen planerar att uppnå sina mål.',
+    pills: ['capability','resource','course-of-action','value-stream'],
+    code: `[<strategy:capability> E-handel]
+[<strategy:resource> Teknikteam]
+[<strategy:value-stream> Lead till order]
+[<strategy:course-of-action> Digital strategi]
+[Teknikteam] .-- [E-handel]
+[E-handel] -> [Lead till order]
+[Digital strategi] --> [E-handel]`
+  },
+
+  'strategy-capability': {
+    title: 'strategy:capability',
+    badge: 'Strategy', badgeColor: '#EFBD5D', badgeBorder: '#D4A43B',
+    desc: 'En capability är en organisations förmåga att utföra en viss aktivitet. Capabilities är stabila över tid och oberoende av hur de realiseras.',
+    pills: ['strategy:capability'],
+    code: `[<strategy:capability> Kundanalys]
+[<strategy:capability> Automatisering]
+[<strategy:capability> Datahantering]
+[Kundanalys] --> [Automatisering]
+[Datahantering] --> [Kundanalys]`
+  },
+
+  'strategy-resource': {
+    title: 'strategy:resource',
+    badge: 'Strategy', badgeColor: '#EFBD5D', badgeBorder: '#D4A43B',
+    desc: 'En resource är en tillgång som en organisation äger och använder för att uppnå sina mål. Resurser kan vara mänskliga, finansiella, fysiska eller informationsbaserade.',
+    pills: ['strategy:resource'],
+    code: `[<strategy:capability> Webbutveckling]
+[<strategy:resource> Frontend-team]
+[<strategy:resource> Cloud-budget]
+[Frontend-team] .-- [Webbutveckling]
+[Cloud-budget] .-- [Webbutveckling]`
+  },
+
+  'strategy-valuestream': {
+    title: 'strategy:value-stream',
+    badge: 'Strategy', badgeColor: '#EFBD5D', badgeBorder: '#D4A43B',
+    desc: 'En value-stream representerar en serie aktiviteter som skapar värde för en kund eller intressent. Den sträcker sig från triggerhändelse till leverans av värde.',
+    pills: ['strategy:value-stream'],
+    code: `[<strategy:value-stream> Lead till order]
+[<strategy:value-stream> Order till leverans]
+[<strategy:value-stream> Problem till lösning]
+[Lead till order] --> [Order till leverans]`
+  },
+
+  // COMMON
+  'common-overview': {
+    title: 'Common — Domänoverview',
+    badge: 'Common', badgeColor: '#E8E5D3', badgeBorder: '#C4BFA6',
+    desc: 'Common-domänen (ny i AM4) innehåller delade beteendeelement som kan användas tvärs alla domäner — process, function, service, event och collaboration är inte längre låsta till ett specifikt lager.',
+    pills: ['process','function','service','event','collaboration','role','interaction'],
+    code: `[<common:process> Orderprocess]
+[<common:service> Ordertjänst]
+[<common:event> Beställning mottagen]
+[<common:function> Prisberäkning]
+[Beställning mottagen] -|> [Orderprocess]
+[Orderprocess] -> [Ordertjänst]
+[Orderprocess] o- [Prisberäkning]`
+  },
+
+  'common-process': {
+    title: 'common:process',
+    badge: 'Common', badgeColor: '#E8E5D3', badgeBorder: '#C4BFA6',
+    desc: 'En process representerar en sekvens av aktiviteter som leder till ett definierat resultat. I AM4 kan process användas domänöverskridande via Common-domänen.',
+    pills: ['common:process'],
+    code: `[<common:event> Ansökan inkommen]
+[<common:process> Handläggning]
+[<common:process> Godkännande]
+[<common:service> Beslutssignal]
+[Ansökan inkommen] -|> [Handläggning]
+[Handläggning] --> [Godkännande]
+[Godkännande] -> [Beslutssignal]`
+  },
+
+  'common-service': {
+    title: 'common:service',
+    badge: 'Common', badgeColor: '#E8E5D3', badgeBorder: '#C4BFA6',
+    desc: 'En service representerar ett externt synligt beteende som ett system eller organisation exponerar. Services konsumeras av externa parter.',
+    pills: ['common:service'],
+    code: `[<common:process> Fakturahantering]
+[<common:service> Betalservice]
+[<common:service> Notifieringstjänst]
+[Fakturahantering] -> [Betalservice]
+[Betalservice] --> [Notifieringstjänst]`
+  },
+
+  'common-event': {
+    title: 'common:event',
+    badge: 'Common', badgeColor: '#E8E5D3', badgeBorder: '#C4BFA6',
+    desc: 'En event representerar en tillståndsförändring som triggar en process eller funktion. Events är passiva element i ArchiMate.',
+    pills: ['common:event'],
+    code: `[<common:event> Kund registrerad]
+[<common:event> Betalning bekräftad]
+[<common:process> Onboarding-flöde]
+[Kund registrerad] -|> [Onboarding-flöde]
+[Betalning bekräftad] -|> [Onboarding-flöde]`
+  },
+
+  // BUSINESS
+  'business-overview': {
+    title: 'Business — Domänoverview',
+    badge: 'Business', badgeColor: '#F4DE7F', badgeBorder: '#E8C555',
+    desc: 'Business-domänen representerar affärsverksamheten — aktörer, roller, processer, tjänster, objekt och produkter. Det är "vad" och "vem" i företagets leverans av värde.',
+    pills: ['actor','role','collaboration','interface','process','function','event','service','object','product'],
+    code: `[<business:actor> Kund]
+[<business:role> Säljare]
+[<business:object> Beställning]
+[<business:product> Licens]
+[Kund] .-- [Säljare]
+[Säljare] -> [Beställning]
+[Beställning] --> [Licens]`
+  },
+
+  'business-actor': {
+    title: 'business:actor',
+    badge: 'Business', badgeColor: '#F4DE7F', badgeBorder: '#E8C555',
+    desc: 'En business actor är en person, organisation eller system som utövar ett beteende och innehar en roll. Actors är de aktiva affärsenheterna i modellen.',
+    pills: ['business:actor'],
+    code: `[<business:actor> Kund]
+[<business:actor> Leverantör]
+[<business:role> Inköpare]
+[<common:process> Inköpsprocess]
+[Kund] .-- [Inköpare]
+[Inköpare] -> [Inköpsprocess]
+[Leverantör] -> [Inköpsprocess]`
+  },
+
+  'business-role': {
+    title: 'business:role',
+    badge: 'Business', badgeColor: '#F4DE7F', badgeBorder: '#E8C555',
+    desc: 'En business role representerar en specifik ansvarighet eller kompetens. En actor kan tilldelas (assignment) till en eller flera roles.',
+    pills: ['business:role'],
+    code: `[<business:actor> Anna Lindgren]
+[<business:role> Produktägare]
+[<business:role> Arkitekt]
+[<common:process> Systemutveckling]
+[Anna Lindgren] .-- [Produktägare]
+[Anna Lindgren] .-- [Arkitekt]
+[Produktägare] -> [Systemutveckling]`
+  },
+
+  'business-object': {
+    title: 'business:object',
+    badge: 'Business', badgeColor: '#F4DE7F', badgeBorder: '#E8C555',
+    desc: 'Ett business object är ett passivt element — information eller data som används, skapas eller transformeras av affärsprocesser. Exempel: kontrakt, order, faktura.',
+    pills: ['business:object'],
+    code: `[<common:process> Orderhantering]
+[<business:object> Kundorder]
+[<business:object> Faktura]
+[<business:object> Leveransbekräftelse]
+[Orderhantering] <-> [Kundorder]
+[Orderhantering] --> [Faktura]
+[Faktura] --> [Leveransbekräftelse]`
+  },
+
+  'business-product': {
+    title: 'business:product',
+    badge: 'Business', badgeColor: '#F4DE7F', badgeBorder: '#E8C555',
+    desc: 'En business product representerar ett värdeerbjudande som säljs av organisationen. En product samlar ihop services och objects till ett leveranspaket.',
+    pills: ['business:product'],
+    code: `[<business:product> Premiumlicens]
+[<business:service> Kundsupport 24/7]
+[<business:service> Systemuppdateringar]
+[<business:object> Licensavtal]
+[Premiumlicens] o- [Kundsupport 24/7]
+[Premiumlicens] o- [Systemuppdateringar]
+[Premiumlicens] o- [Licensavtal]`
+  },
+
+  // APPLICATION
+  'application-overview': {
+    title: 'Application — Domänoverview',
+    badge: 'Application', badgeColor: '#B6D7E1', badgeBorder: '#8CC5D4',
+    desc: 'Application-domänen representerar IT-system och mjukvarukomponenter som stödjer affärsverksamheten. Den innehåller components, services, interfaces och data.',
+    pills: ['component','collaboration','interface','function','event','service','data'],
+    code: `[<application:component> Webbapp]
+[<application:service> Auth API]
+[<application:data> Användardatabas]
+[<application:interface> REST-gränssnitt]
+[Webbapp] -> [Auth API]
+[Auth API] <-> [Användardatabas]
+[REST-gränssnitt] --:> [Auth API]`
+  },
+
+  'application-component': {
+    title: 'application:component',
+    badge: 'Application', badgeColor: '#B6D7E1', badgeBorder: '#8CC5D4',
+    desc: 'En application component är en modulär, deploybar och utbytbar del av ett system. Components kapslar in beteende och data och exponerar services via interfaces.',
+    pills: ['application:component'],
+    code: `[<application:component> Webbapp]
+[<application:component> API Gateway]
+[<application:component> Ordertjänst]
+[<application:component> Betaltjänst]
+[Webbapp] -> [API Gateway]
+[API Gateway] -> [Ordertjänst]
+[API Gateway] -> [Betaltjänst]`
+  },
+
+  'application-service': {
+    title: 'application:service',
+    badge: 'Application', badgeColor: '#B6D7E1', badgeBorder: '#8CC5D4',
+    desc: 'En application service är ett externt synligt beteende som en applikation exponerar. Services konsumeras av andra komponenter eller affärsprocesser.',
+    pills: ['application:service'],
+    code: `[<application:service> Auth API]
+[<application:service> Notifikations-API]
+[<application:service> Rapport-API]
+[<application:component> Affärslogik]
+[Affärslogik] -> [Auth API]
+[Affärslogik] -> [Notifikations-API]
+[Affärslogik] -> [Rapport-API]`
+  },
+
+  'application-data': {
+    title: 'application:data',
+    badge: 'Application', badgeColor: '#B6D7E1', badgeBorder: '#8CC5D4',
+    desc: 'En application data (data object) representerar data som används och produceras av applikationer. Det är det passiva elementet i applikationsdomänen.',
+    pills: ['application:data'],
+    code: `[<application:component> Ordertjänst]
+[<application:data> Orderdatabas]
+[<application:data> Produktkatalog]
+[<application:data> Kundregister]
+[Ordertjänst] <-> [Orderdatabas]
+[Ordertjänst] <-> [Produktkatalog]
+[Ordertjänst] <-> [Kundregister]`
+  },
+
+  // TECHNOLOGY
+  'technology-overview': {
+    title: 'Technology — Domänoverview',
+    badge: 'Technology', badgeColor: '#C3E1B4', badgeBorder: '#9BD083',
+    desc: 'Technology-domänen representerar den tekniska infrastrukturen — servrar, nätverk, enheter och systemprogramvara som applikationerna körs på.',
+    pills: ['node','device','system-software','path','network','service','artifact','equipment','facility','material'],
+    code: `[<technology:node> Kubernetes]
+[<technology:device> Brandvägg]
+[<technology:system-software> PostgreSQL]
+[<technology:equipment> Datacenterserver]
+[Brandvägg] -> [Kubernetes]
+[Kubernetes] -> [PostgreSQL]
+[PostgreSQL] --> [Datacenterserver]`
+  },
+
+  'technology-node': {
+    title: 'technology:node',
+    badge: 'Technology', badgeColor: '#C3E1B4', badgeBorder: '#9BD083',
+    desc: 'En technology node är en beräkningsenhet som kör systemprogramvara och applikationer. Kan representera fysiska servrar, virtuella maskiner eller containermiljöer.',
+    pills: ['technology:node'],
+    code: `[<technology:node> Appserver 1]
+[<technology:node> Appserver 2]
+[<technology:node> Databasserver]
+[<technology:network> Internt LAN]
+[Appserver 1] --> [Internt LAN]
+[Appserver 2] --> [Internt LAN]
+[Internt LAN] --> [Databasserver]`
+  },
+
+  'technology-device': {
+    title: 'technology:device',
+    badge: 'Technology', badgeColor: '#C3E1B4', badgeBorder: '#9BD083',
+    desc: 'En technology device är en fysisk hårdvaruenhet — router, brandvägg, switch, load balancer eller annan nätverkshårdvara.',
+    pills: ['technology:device'],
+    code: `[<technology:device> Brandvägg]
+[<technology:device> Load Balancer]
+[<technology:node> Appserver-kluster]
+[Brandvägg] -> [Load Balancer]
+[Load Balancer] -> [Appserver-kluster]`
+  },
+
+  'technology-system-software': {
+    title: 'technology:system-software',
+    badge: 'Technology', badgeColor: '#C3E1B4', badgeBorder: '#9BD083',
+    desc: 'System-software representerar mjukvara som körs på infrastrukturnivå — operativsystem, databaser, containerruntimes eller middleware.',
+    pills: ['technology:system-software'],
+    code: `[<technology:node> Produktionsserver]
+[<technology:system-software> Ubuntu 24.04]
+[<technology:system-software> PostgreSQL 16]
+[<technology:system-software> Docker]
+[Ubuntu 24.04] --> [Produktionsserver]
+[Docker] --> [Produktionsserver]
+[PostgreSQL 16] --> [Produktionsserver]`
+  },
+
+  'technology-equipment': {
+    title: 'technology:equipment',
+    badge: 'Technology', badgeColor: '#C3E1B4', badgeBorder: '#9BD083',
+    desc: 'Equipment representerar fysisk utrustning i datacentermiljön — serverracks, UPS, kylsystem. I AM4 absorberas det gamla Physical-lagret här.',
+    pills: ['technology:equipment','technology:facility'],
+    code: `[<technology:facility> Datacenter Stockholm]
+[<technology:equipment> Serverrack A1]
+[<technology:equipment> UPS-system]
+[<technology:node> Produktionsnoder]
+[Serverrack A1] --> [Datacenter Stockholm]
+[UPS-system] --> [Datacenter Stockholm]
+[Produktionsnoder] --> [Serverrack A1]`
+  },
+
+  // IMPLEMENTATION
+  'implementation-overview': {
+    title: 'Implementation — Domänoverview',
+    badge: 'Impl. & Migration', badgeColor: '#F8C2BE', badgeBorder: '#F09B95',
+    desc: 'Implementation & Migration-domänen modellerar transformation och förändring — arbetspaket, leveranser och platåer som representerar tillstånd i en migreringsresa.',
+    pills: ['workpackage','deliverable','plateau'],
+    code: `[<implementation:workpackage> Fas 1 – Migrering]
+[<implementation:deliverable> Testrapport]
+[<implementation:plateau> Hybridläge]
+[<implementation:plateau> Målarkitektur]
+[Fas 1 – Migrering] --> [Testrapport]
+[Fas 1 – Migrering] --> [Hybridläge]
+[Hybridläge] --> [Målarkitektur]`
+  },
+
+  'implementation-workpackage': {
+    title: 'implementation:workpackage',
+    badge: 'Impl. & Migration', badgeColor: '#F8C2BE', badgeBorder: '#F09B95',
+    desc: 'Ett workpackage representerar en sammanhängande enhet av arbete — ett projekt, sprint eller fas i en transformationsresa.',
+    pills: ['implementation:workpackage'],
+    code: `[<implementation:workpackage> Inventering]
+[<implementation:workpackage> Design]
+[<implementation:workpackage> Driftsättning]
+[<implementation:workpackage> Validering]
+[Inventering] --> [Design]
+[Design] --> [Driftsättning]
+[Driftsättning] --> [Validering]`
+  },
+
+  'implementation-deliverable': {
+    title: 'implementation:deliverable',
+    badge: 'Impl. & Migration', badgeColor: '#F8C2BE', badgeBorder: '#F09B95',
+    desc: 'En deliverable är ett konkret resultat av ett workpackage — en rapport, specifikation, prototyp eller driftsatt tjänst.',
+    pills: ['implementation:deliverable'],
+    code: `[<implementation:workpackage> Kravfas]
+[<implementation:deliverable> Kravspec]
+[<implementation:deliverable> Testplan]
+[<implementation:deliverable> Arkitekturbeslut]
+[Kravfas] --> [Kravspec]
+[Kravfas] --> [Testplan]
+[Kravfas] --> [Arkitekturbeslut]`
+  },
+
+  'implementation-plateau': {
+    title: 'implementation:plateau',
+    badge: 'Impl. & Migration', badgeColor: '#F8C2BE', badgeBorder: '#F09B95',
+    desc: 'En plateau representerar en relativt stabil tillstånd av arkitekturen vid en specifik tidpunkt — nuläge, hybridläge eller målläge.',
+    pills: ['implementation:plateau'],
+    code: `[<implementation:plateau> Nuläge 2025]
+[<implementation:plateau> Hybridläge Q2 2026]
+[<implementation:plateau> Målarkitektur 2027]
+[<implementation:workpackage> Migreringsprojekt]
+[Nuläge 2025] --> [Hybridläge Q2 2026]
+[Hybridläge Q2 2026] --> [Målarkitektur 2027]
+[Migreringsprojekt] --> [Hybridläge Q2 2026]`
+  },
+
+  // RELATIONS
+  'relations-all': {
+    title: 'Relationstyper — Alla',
+    badge: 'Relationer', badgeColor: '#e3e8ff', badgeBorder: '#6c8ebf',
+    desc: 'ArchiMate 4 definierar tio primära relationstyper. Varje relation har en specifik semantisk betydelse och visas med olika pilhuvuden och linjestilar.',
+    pills: ['->','-->','--:>','-|>','.--','o-','-:>','---','<->','o--o'],
+    code: `// Serving: A levererar tjänst till B
+[<common:service> API] -> [<application:component> Webbapp]`
+  }
+};
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function showExample(btn) {
+  const key = btn.dataset.key;
+  const ex = EXAMPLES[key];
+  if (!ex) return;
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Show header
+  const header = document.getElementById('panel-header');
+  header.style.display = 'block';
+  document.getElementById('ph-title').textContent = ex.title;
+  const badge = document.getElementById('ph-badge');
+  badge.textContent = ex.badge;
+  badge.style.background = ex.badgeColor;
+  badge.style.borderColor = ex.badgeBorder;
+  badge.style.color = '#1a1c2e';
+
+  const pills = document.getElementById('ph-pills');
+  pills.innerHTML = ex.pills.map(p => `<span class="epill">${p}</span>`).join('');
+
+  document.getElementById('ph-desc').textContent = ex.desc;
+
+  // Build body
+  const body = document.getElementById('panel-body');
+
+  if (key === 'relations-all') {
+    // Special: render relation table
+    body.innerHTML = buildRelationTable();
+    renderAllRelationMinis();
+  } else {
+    body.innerHTML = `
+      <div class="diagram-card">
+        <div class="diagram-card-header">
+          <span>Live-renderat diagram</span>
+          <span style="font-weight:400; text-transform:none; letter-spacing:0; color:#9ca3af; font-size:0.75rem;">ArchiCode.render()</span>
+        </div>
+        <div class="diagram-output" id="diagram-out"></div>
+      </div>
+      <div class="code-card">
+        <div class="code-card-header">ArchiCode-syntax</div>
+        <pre class="code-block">${escHtml(ex.code)}</pre>
+      </div>
+    `;
+    // Render
+    try {
+      ArchiCode.render(ex.code, '#diagram-out');
+    } catch(e) {
+      document.getElementById('diagram-out').innerHTML = `<span style="color:#e57373;font-size:0.85rem;">Renderingsfel: ${escHtml(e.message)}</span>`;
+    }
+  }
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── RELATION TABLE ────────────────────────────────────────────────────────────
+const RELATIONS = [
+  { syntax: '->', name: 'Serving', desc: 'Element A levererar tjänst till element B.', code: '[<common:service> Tjänst] -> [<application:component> Klient]' },
+  { syntax: '-->', name: 'Flow', desc: 'Information eller data flödar från A till B.', code: '[<common:process> Process A] --> [<common:process> Process B]' },
+  { syntax: '--:>', name: 'Realization', desc: 'A realiserar (implementerar) B.', code: '[<application:component> Webbapp] --:> [<business:service> Onlineköp]' },
+  { syntax: '-|>', name: 'Triggering', desc: 'A triggar (startar) B.', code: '[<common:event> Betalning] -|> [<common:process> Leverans]' },
+  { syntax: '.--', name: 'Assignment', desc: 'A är tilldelad till roll/element B.', code: '[<business:actor> Kund] .-- [<business:role> Köpare]' },
+  { syntax: 'o-', name: 'Aggregation', desc: 'B är en del av A (lös sammansättning).', code: '[<business:product> Paket] o- [<common:service> Support]' },
+  { syntax: '-:>', name: 'Specialization', desc: 'A är en specialisering av B.', code: '[<business:actor> VIP-kund] -:> [<business:actor> Kund]' },
+  { syntax: '---', name: 'Association', desc: 'Generell, odefinierbar relation.', code: '[<business:actor> Chef] --- [<common:process> Beslutsprocess]' },
+  { syntax: '<->', name: 'Access', desc: 'A använder/accessar (läser/skriver) B.', code: '[<application:component> Service] <-> [<application:data> Databas]' },
+];
+
+function buildRelationTable() {
+  return `
+    <div class="relation-section">
+      <table class="rel-table">
+        <thead>
+          <tr>
+            <th>Syntax</th>
+            <th>Relation</th>
+            <th>Beskrivning</th>
+            <th style="min-width:160px;">Exempel (live)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${RELATIONS.map((r,i) => `
+          <tr>
+            <td><code>${escHtml(r.syntax)}</code></td>
+            <td><strong>${r.name}</strong></td>
+            <td style="color:#6b7280;font-size:0.8rem;">${r.desc}</td>
+            <td><div class="rel-mini" id="rel-mini-${i}"></div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAllRelationMinis() {
+  RELATIONS.forEach((r,i) => {
+    const el = document.getElementById('rel-mini-' + i);
+    if (!el) return;
+    try {
+      ArchiCode.render(r.code, el);
+      // Scale down SVG
+      const svg = el.querySelector('svg');
+      if (svg) {
+        svg.style.maxWidth = '200px';
+        svg.style.fontSize = '11px';
+      }
+    } catch(e) { /* skip */ }
+  });
+}
+</script>
+</body>
+</html>

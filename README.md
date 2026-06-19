@@ -7,7 +7,7 @@
 
 **[English README](README_EN.md)** | **[Live Demo](https://yllemo.github.io/ArchiCode/)** | **[Examples](examples/)**
 
-En webbaserad applikation för att skapa ArchiMate 3.2-diagram från textbaserad syntax, kompatibel med [Architext.dev](https://architext.dev). Applikationen använder **ArchiCode.js** - ett autonomt rendering-bibliotek som följer ArchiMate 3.2-standarden.
+En webbaserad applikation för att skapa **ArchiMate 4 (C260)**-diagram från textbaserad syntax, kompatibel med [Architext.dev](https://architext.dev). Applikationen använder **ArchiCode.js** - ett autonomt rendering-bibliotek som följer ArchiMate 4-standarden (The Open Group, publicerad april 2026).
 
 ## 📋 Översikt
 
@@ -15,7 +15,7 @@ ArchiCode.js är ett autonomt JavaScript-bibliotek för rendering av ArchiMate-d
 
 ### ✨ Funktioner
 
-- 🎨 **ArchiMate 2025-färger** - Modern Color Set, former och symboler enligt ArchiMate 3.2-metamodell
+- 🎨 **ArchiMate 4-domänfärger** - Modern Color Set, former och symboler enligt ArchiMate 4 (C260)
 - 🔧 **Autonomt bibliotek** - ArchiCode.js kan användas fristående i egna projekt
 - 📝 **Architext.dev-kompatibel** - Använder samma syntax
 - 🌙 **Dark mode** - Modern och professionell design
@@ -238,11 +238,13 @@ Element kan ha långa namn - texten skalas automatiskt för att passa i boxen:
 **Ikoner:**
 Varje element får automatiskt en ArchiMate-ikon i övre högra hörnet enligt sin typ.
 
-### ArchiMate 3.2 Lager och färger (Modern Color Set 2025)
+### ArchiMate 4 Domäner och färger (Modern Color Set)
 
-ArchiCode.js följer ArchiMate 3.2-metamodellen; **färgerna** kommer från ArchiMate 2025 Modern Color Set:
+ArchiCode.js följer **ArchiMate 4 (C260)**-specifikationen. Begreppet *lager* ersätts av *domäner* som kan kombineras fritt utan strikt hierarki. **Färgerna** är ArchiMate 2025 Modern Color Set.
 
-#### Motivation Layer (Rosa/Magenta)
+> **Nytt i v2 (ArchiMate 4):** `physical`-domänen är borttagen och inbakad i `technology`. Den nya `common`-domänen innehåller delade beteendeelement (process, funktion, tjänst, händelse, kollaboration, roll) som kan användas i alla domäner. `<physical:...>` normaliseras automatiskt till `<technology:...>`.
+
+#### Motivation (Lavendel `#D8C1E4`)
 - `<motivation:stakeholder>` - Intressent
 - `<motivation:driver>` - Drivkraft
 - `<motivation:assessment>` - Bedömning
@@ -250,40 +252,49 @@ ArchiCode.js följer ArchiMate 3.2-metamodellen; **färgerna** kommer från Arch
 - `<motivation:outcome>` - Utfall
 - `<motivation:principle>` - Princip
 - `<motivation:requirement>` - Krav
-- `<motivation:constraint>` - Begränsning
 - `<motivation:value>` - Värde
 - `<motivation:meaning>` - Betydelse
 
-#### Strategy Layer (Orange)
+#### Strategy (Guld `#EFBD5D`)
 - `<strategy:capability>` - Kapabilitet
 - `<strategy:resource>` - Resurs
 - `<strategy:course-of-action>` - Handlingsplan
+- `<strategy:value-stream>` - Värdeström
 
-#### Business Layer (Gul)
+#### Common — delade element (Satin Linen `#E8E5D3`)
+Beteendeelement som delas av alla domäner. Visas i beige när domänen är `common`.
+- `<common:process>` - Process
+- `<common:function>` - Funktion
+- `<common:service>` - Tjänst
+- `<common:event>` - Händelse
+- `<common:collaboration>` - Kollaboration
+- `<common:role>` - Roll
+- `<common:interaction>` - Interaktion
+
+#### Business (Jasmine `#F4DE7F`)
+Domänspecifika element + beteendeelement ärvda från Common.
 - `<business:actor>` - Aktör
-- `<business:role>` - Roll
+- `<business:role>` - Roll (business-specifik)
 - `<business:collaboration>` - Samarbete
 - `<business:interface>` - Gränssnitt
-- `<business:process>` - Process
-- `<business:function>` - Funktion
-- `<business:interaction>` - Interaktion
-- `<business:event>` - Händelse
-- `<business:service>` - Tjänst
+- `<business:process>` - Process (business-kontext)
+- `<business:function>` - Funktion (business-kontext)
+- `<business:event>` - Händelse (business-kontext)
+- `<business:service>` - Tjänst (business-kontext)
 - `<business:object>` - Affärsobjekt
-- `<business:contract>` - Kontrakt
 - `<business:product>` - Produkt
 
-#### Application Layer (Ljusblå)
+#### Application (Ljus Aqua `#B6D7E1`)
 - `<application:component>` - Applikationskomponent
 - `<application:collaboration>` - Applikationssamarbete
 - `<application:interface>` - Applikationsgränssnitt
-- `<application:function>` - Applikationsfunktion
-- `<application:interaction>` - Applikationsinteraktion
+- `<application:function>` - Applikationsfunktion (application-kontext)
 - `<application:event>` - Applikationshändelse
 - `<application:service>` - Applikationstjänst
 - `<application:data>` - Dataobjekt
 
-#### Technology Layer (Grön)
+#### Technology (Ljusgrön `#C3E1B4`)
+Inkluderar nu även det som tidigare var Physical Layer (OT/fysisk teknik).
 - `<technology:node>` - Nod
 - `<technology:device>` - Enhet
 - `<technology:system-software>` - Systemmjukvara
@@ -291,19 +302,17 @@ ArchiCode.js följer ArchiMate 3.2-metamodellen; **färgerna** kommer från Arch
 - `<technology:network>` - Nätverk
 - `<technology:service>` - Tekniktjänst
 - `<technology:artifact>` - Artefakt
+- `<technology:equipment>` - Utrustning (tidigare `physical:equipment`)
+- `<technology:facility>` - Anläggning (tidigare `physical:facility`)
+- `<technology:material>` - Material (tidigare `physical:material`)
+- `<technology:distribution-network>` - Distributionsnät
 
-#### Physical Layer (Lila)
-- `<physical:equipment>` - Utrustning
-- `<physical:facility>` - Anläggning
-- `<physical:material>` - Material
-
-#### Implementation & Migration Layer (Rosa)
+#### Implementation & Migration (Korall `#F8C2BE`)
 - `<implementation:workpackage>` - Arbetspaket
 - `<implementation:deliverable>` - Leverans
 - `<implementation:plateau>` - Platå
-- `<implementation:gap>` - Gap
 
-### Element-former enligt ArchiMate 3.2
+### Element-former enligt ArchiMate 4
 
 ArchiCode.js använder de officiella formerna:
 
@@ -322,11 +331,12 @@ Stödda relationstyper enligt [Architext.dev syntax](https://architext.dev/guide
 | `--:>` / `<:--` | Realization | Realisering | Streckad | Tom triangel |
 | `-|>` / `<\|-` | Triggering | Triggande | Heldragen | Öppen pil |
 | `.--` / `--.` | Assignment | Tilldelning | Heldragen | Fylld cirkel |
-| `+-` / `-+` | Composition | Komposition | Heldragen | Fylld diamant |
 | `o-` / `-o` | Aggregation | Aggregering | Heldragen | Tom diamant |
 | `-:>` / `<:-` | Specialization | Specialisering | Heldragen | Tom triangel |
 | `---` | Association | Association | Heldragen | Ingen pil |
 | `<->` | Access | Åtkomst | Streckad | Öppen pil (båda håll) |
+
+> **ArchiMate 4:** Relationen `composition` (`+-`) är borttagen i AM4. Syntaxen `+-` / `-+` omdirigeras automatiskt till `aggregation` för bakåtkompatibilitet.
 
 **Exempel:**
 ```
@@ -381,7 +391,7 @@ Anpassa diagrammets utseende:
 #lineWidth: 2         # Tjocklek på linjer
 #arrowSize: 8         # Storlek på pilar
 #direction: down      # Riktning (down/right)
-#showBadges: true     # Visa lager-badges (M, S, B, A, T, P, C, I)
+#showBadges: true     # Visa domän-badges (M, S, Co, B, A, T, I)
 #stereotypeWordThreshold: 12  # Dölj «type» om titeln har fler än N ord (0 = ordregel av)
 #stereotypeHideLineCount: 3   # Dölj «type» vid så många rader eller fler (0 = aldrig p.g.a. radantal)
 ```
@@ -424,21 +434,19 @@ Anpassa diagrammets utseende:
 [Application Server] --> [Web Server]
 ```
 
-## 🎨 ArchiMate 2025 — Modern Color Set
+## 🎨 ArchiMate 4 — Domänfärger (Modern Color Set)
 
-ArchiCode.js använder **ArchiMate 2025 Modern Color Set** (samma hex som `archimate-2025.md` / [archimate.yllemo.com](https://archimate.yllemo.com)):
+ArchiCode.js använder **ArchiMate 2025 Modern Color Set** anpassat för ArchiMate 4-domänerna (samma hex som `archimate-2025.md` / [archimate.yllemo.com](https://archimate.yllemo.com)):
 
-| Lager | Fyllnadsfärg | Kantfärg | Beskrivning |
-|-------|-------------|----------|-------------|
-| **Motivation** | `#D8C1E4` | `#B39BCF` | Lavendel — intressenter, mål, krav |
-| **Strategy** | `#EFBD5D` | `#D4A43B` | Guld/gul — kapabiliteter, resurser, handlingsplaner |
-| **Business** | `#F4DE7F` | `#E8C555` | Jasmine — affärsaktörer, processer, tjänster |
-| **Application** | `#B6D7E1` | `#8CC5D4` | Ljus aqua — applikationer, tjänster, data |
-| **Technology** | `#C3E1B4` | `#9BD083` | Ljusgrön — infrastruktur, plattform |
-| **Physical / Composite** | `#E8E5D3` | `#D4CDB4` | Satin Linen — fysisk utrustning, plats, gruppering |
-| **Implementation** | `#F8C2BE` | `#F09B95` | Korall/te ros — arbetspaket, leveranser, migration |
-
-Varje element har också en lager-badge (M, S, B, A, T, P, C, I) i det övre vänstra hörnet (C = composite, t.ex. plats/gruppering).
+| Domän | Fyllnadsfärg | Kantfärg | Badge | Beskrivning |
+|-------|-------------|----------|-------|-------------|
+| **Motivation** | `#D8C1E4` | `#B39BCF` | `M` | Lavendel — intressenter, mål, krav, drivkrafter |
+| **Strategy** | `#EFBD5D` | `#D4A43B` | `S` | Guld — kapabiliteter, resurser, värdeströmmar |
+| **Common** | `#E8E5D3` | `#C4BFA6` | `Co` | Satin Linen — delade beteendeelement (process, funktion, tjänst…) |
+| **Business** | `#F4DE7F` | `#E8C555` | `B` | Jasmine — aktörer, affärsobjekt, produkter |
+| **Application** | `#B6D7E1` | `#8CC5D4` | `A` | Ljus aqua — applikationer, tjänster, dataobjekt |
+| **Technology** | `#C3E1B4` | `#9BD083` | `T` | Ljusgrön — infrastruktur, OT/fysisk teknik |
+| **Implementation** | `#F8C2BE` | `#F09B95` | `I` | Korall — arbetspaket, leveranser, platåer |
 
 ## 💾 Export
 
@@ -510,7 +518,7 @@ Skapa ett ArchiCode.js-diagram för en e-handelsplattform med:
 - Application layer (webbapp, databas)
 - Technology layer (server, nätverk)
 
-Använd ArchiMate 3.2-syntax med format [<layer:type> Name].
+Använd ArchiMate 4-syntax med format [<domän:typ> Name].
 ```
 
 ### Kompletta guider
@@ -558,7 +566,7 @@ Application Layer:
 Technology Layer:
 - Node: "Application Server"
 
-Använd ArchiMate 3.2-syntax, lägg till relationer.
+Använd ArchiMate 4-syntax (C260), lägg till relationer.
 ```
 
 **Output från AI → Klistra in i demo-editorn och testa!**
@@ -668,21 +676,20 @@ try {
 
 ## 📚 Resurser
 
-- [ArchiMate 3.2 Specifikation](https://pubs.opengroup.org/architecture/archimate32-doc/) - Officiell standard
+- [ArchiMate 4 Specification (C260)](https://pubs.opengroup.org/architecture/archimate4-doc/) - Officiell standard (The Open Group, april 2026)
+- [ArchiMate 3.2 Specification](https://pubs.opengroup.org/architecture/archimate32-doc/) - Föregående version
 - [Architext.dev](https://architext.dev) - Original inspiration för syntaxen
-- [ArchiMate Guide](https://www.visual-paradigm.com/guide/archimate/) - Nybörjarguide
+- [archimate.yllemo.com](https://archimate.yllemo.com) - ArchiMate 4 domänmodell och färger
 
 ## 📄 Licens
 
 ArchiCode.js är licensierad under MIT License.
 
-Copyright (c) 2026 Henrik Yllemo
-
 ArchiMate® är ett registrerat varumärke som tillhör The Open Group.
 
 ## 🙏 Erkännanden
 
-- **The Open Group** för ArchiMate 3.2-standarden
+- **The Open Group** för ArchiMate 4-standarden (C260)
 - **[Architext.dev](https://architext.dev)** av Arie Timmerman för syntaxinspiration
 - Inspirerad av **mermaid.js** för biblioteksdesign
 
@@ -701,31 +708,28 @@ Förbättringsförslag välkomnas! Idéer för framtida utveckling:
 
 ## 📝 Versionshistorik
 
-### v1.0.0 (Aktuell)
-- ✅ Första versionen av ArchiCode.js
-- ✅ Stöd för alla ArchiMate 3.2 lager
-- ✅ Officiella färger och former
-- ✅ Architext.dev-kompatibel syntax
-- ✅ Autonomt bibliotek utan externa beroenden
-- ✅ Automatisk layout-algoritm
-- ✅ Komplett stöd för alla relationstyper (specialization, composition, aggregation, assignment, realization, triggering, serving, flow, access, association)
-- ✅ Stöd för omvända riktningar och labels på relationer
-- ✅ Inline element-definitioner i relationer
-- ✅ Automatiska ArchiMate-ikoner för varje element
-- ✅ SVG-export
-- ✅ Draw.io export
-- ✅ Zoom och pan-funktionalitet
-- ✅ Fullskärmsläge
-- ✅ Auto-sparande i webbläsaren
-- ✅ SVG-rendering
+### v2.0.0 (Aktuell) — ArchiMate 4 (C260)
+- ✅ Uppgraderad till **ArchiMate 4** (The Open Group C260, april 2026)
+- ✅ Ny **Common**-domän med delade beteendeelement (process, funktion, tjänst, händelse, kollaboration, roll)
+- ✅ `physical`-domänen borttagen — sammanslaget med `technology` (bakåtkompatibelt)
+- ✅ `composite`-domänen ersatt av `common` (bakåtkompatibelt)
+- ✅ Relation `composition` (`+-`) borttagen i AM4 — omdirigeras automatiskt till `aggregation`
+- ✅ Domänmedveten ikonfärgning (`<common:process>` visas i beige, `<business:process>` i gult)
+- ✅ Badges uppdaterade: M, S, **Co**, B, A, T, I
+- ✅ Automatisk lagnormalisering: `physical → technology`, `composite → common`
+
+### v1.0.0
+- ✅ Första versionen av ArchiCode.js (ArchiMate 3.2)
+- ✅ Officiella färger och former, Architext.dev-kompatibel syntax
+- ✅ Autonomt bibliotek utan externa beroenden, automatisk layout-algoritm
+- ✅ Komplett stöd för relationstyper, inline element-definitioner
+- ✅ SVG-export, Draw.io export, zoom/pan, fullskärmsläge
 
 ---
 
 **Skapad för enterprise architects och systemdesigners** 🎨📊
 
-**Powered by ArchiCode.js** - Ett autonomt ArchiMate 3.2 rendering-bibliotek
+**Powered by ArchiCode.js** - Ett autonomt ArchiMate 4 rendering-bibliotek
 
-**Author:** Henrik Yllemo
-**Version:** 1.0.0
-**Year:** 2025
+**Version:** 2.0.0
 **License:** MIT

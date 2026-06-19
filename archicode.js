@@ -1,12 +1,10 @@
 /**
  * ArchiCode.js - Autonomous ArchiMate Diagram Renderer
- * Version 1.0.0
+ * Version 2.0.0
  *
- * A standalone library for rendering ArchiMate 3.2 diagrams from text
+ * A standalone library for rendering ArchiMate 4 (C260) diagrams from text
  * Compatible with Architext.dev syntax
  *
- * @author Henrik Yllemo
- * @copyright 2025 Henrik Yllemo
  * @license MIT
  *
  * Usage:
@@ -16,15 +14,14 @@
 (function(global) {
     'use strict';
 
-    // ArchiMate 2025 — Modern Color Set (fill/stroke per layer; see archimate-2025.md)
+    // ArchiMate 4 (C260) — Color Set (fill/stroke per domain; see archimate-2025.md)
     const ARCHIMATE_COLORS = {
-        'motivation': { fill: '#D8C1E4', stroke: '#B39BCF', badge: 'M' },
-        'strategy': { fill: '#EFBD5D', stroke: '#D4A43B', badge: 'S' },
-        'business': { fill: '#F4DE7F', stroke: '#E8C555', badge: 'B' },
-        'application': { fill: '#B6D7E1', stroke: '#8CC5D4', badge: 'A' },
-        'technology': { fill: '#C3E1B4', stroke: '#9BD083', badge: 'T' },
-        'physical': { fill: '#E8E5D3', stroke: '#D4CDB4', badge: 'P' },
-        'composite': { fill: '#E8E5D3', stroke: '#D4CDB4', badge: 'C' },
+        'motivation':     { fill: '#D8C1E4', stroke: '#B39BCF', badge: 'M' },
+        'strategy':       { fill: '#EFBD5D', stroke: '#D4A43B', badge: 'S' },
+        'common':         { fill: '#E8E5D3', stroke: '#C4BFA6', badge: 'Co' },
+        'business':       { fill: '#F4DE7F', stroke: '#E8C555', badge: 'B' },
+        'application':    { fill: '#B6D7E1', stroke: '#8CC5D4', badge: 'A' },
+        'technology':     { fill: '#C3E1B4', stroke: '#9BD083', badge: 'T' },
         'implementation': { fill: '#F8C2BE', stroke: '#F09B95', badge: 'I' }
     };
 
@@ -50,11 +47,11 @@
         'facility': 'square',
         'material': 'square',
         'object': 'square',
-        'contract': 'square',
+        'contract': 'square',        // Removed in ArchiMate 4 – kept for backwards compatibility
         'product': 'square',
         'artifact': 'square',
         'data': 'square',
-        'representation': 'square',
+        'representation': 'square',  // Removed in ArchiMate 4 – kept for backwards compatibility
         'resource': 'square',
         'capability': 'square',
         
@@ -66,10 +63,10 @@
         'service': 'rounded',
         'workpackage': 'rounded',
         'deliverable': 'rounded',
-        'gap': 'rounded',
+        'gap': 'rounded',            // Removed in ArchiMate 4 – kept for backwards compatibility
         'plateau': 'rounded',
         'course-of-action': 'rounded',
-        'implementation-event': 'rounded',
+        'implementation-event': 'rounded', // Removed in ArchiMate 4 – kept for backwards compatibility
         'application-process': 'rounded',
         'technology-process': 'rounded',
         'technology-function': 'rounded',
@@ -85,7 +82,7 @@
         'outcome': 'diagonal',
         'principle': 'diagonal',
         'requirement': 'diagonal',
-        'constraint': 'diagonal',
+        'constraint': 'diagonal',    // Removed in ArchiMate 4 – kept for backwards compatibility
         'meaning': 'diagonal',
         'value': 'diagonal',
 
@@ -120,12 +117,12 @@
         // Data object (ArchiMate) — application layer; samma ikon som data-object (blå)
         'data': 'data-object',
         'business-data': 'data-object',
-        'contract': 'contract',
-        'business-contract': 'contract',
+        'contract': 'contract',             // Removed in ArchiMate 4 – kept for backwards compatibility
+        'business-contract': 'contract',    // Removed in ArchiMate 4 – kept for backwards compatibility
         'product': 'product',
         'business-product': 'product',
-        'representation': 'representation',
-        'business-representation': 'representation',
+        'representation': 'representation',          // Removed in ArchiMate 4 – kept for backwards compatibility
+        'business-representation': 'representation', // Removed in ArchiMate 4 – kept for backwards compatibility
         
         // Application Layer
         'component': 'application-component',
@@ -169,7 +166,7 @@
         'outcome': 'outcome',
         'principle': 'principle',
         'requirement': 'requirement',
-        'constraint': 'constraint',
+        'constraint': 'constraint',   // Removed in ArchiMate 4 – kept for backwards compatibility
         'value': 'value',
         'meaning': 'meaning',
         
@@ -184,8 +181,8 @@
         'work-package': 'workpackage',
         'deliverable': 'deliverable',
         'plateau': 'plateau',
-        'gap': 'gap',
-        'implementation-event': 'implementation-event',
+        'gap': 'gap',                               // Removed in ArchiMate 4 – kept for backwards compatibility
+        'implementation-event': 'implementation-event', // Removed in ArchiMate 4 – kept for backwards compatibility
         
         // Physical Layer
         'physical-equipment': 'physical-equipment',
@@ -195,12 +192,21 @@
         'physical-distribution-network': 'distribution-network',
 
         'location': 'location',
-        'grouping': 'grouping'
+        'grouping': 'grouping',
+
+        // Common Domain (delade beteendeelement – beige) — ArchiMate 4
+        'common-process': 'common-process',
+        'common-function': 'common-function',
+        'common-service': 'common-service',
+        'common-event': 'common-event',
+        'common-collaboration': 'common-collaboration',
+        'common-role': 'common-role',
+        'common-interaction': 'common-interaction',
     };
 
-    // Relationship types and their visual representations (ArchiMate 3.2 standard)
+    // Relationship types and their visual representations (ArchiMate 4 / C260)
     const RELATIONSHIPS = {
-        'composition': { line: 'solid', arrow: 'filled-diamond', label: '' },
+        // 'composition' removed in ArchiMate 4 – kept for backwards compatibility (maps to aggregation via syntax)
         'aggregation': { line: 'solid', arrow: 'empty-diamond', label: '' },
         'assignment': { line: 'solid', arrow: 'filled-circle', label: '' },
         'realization': { line: 'dashed', arrow: 'empty-triangle', label: '' },
@@ -219,9 +225,9 @@
         // Specialization: -:> or <:-
         '-:>': 'specialization',
         '<:-': 'specialization',
-        // Composition: +- or -+
-        '+-': 'composition',
-        '-+': 'composition',
+        // Composition (+- / -+) removed in ArchiMate 4 — remapped to aggregation for backwards compatibility
+        '+-': 'aggregation',
+        '-+': 'aggregation',
         // Aggregation: o- or -o
         'o-': 'aggregation',
         '-o': 'aggregation',
@@ -393,9 +399,9 @@
          * Returns {valid: boolean, warning: string}
          */
         validateRelationship(sourceType, targetType, relationType) {
-            // ArchiMate 3.2 allowed relationships (simplified subset)
+            // ArchiMate 4 (C260) allowed relationships (simplified subset)
+            // Note: 'composition' was removed in AM4; +- / -+ now map to aggregation
             const allowedRelations = {
-                'composition': ['element', 'component', 'node', 'process', 'function'],
                 'aggregation': ['element', 'component', 'node', 'process', 'function'],
                 'assignment': ['actor', 'role', 'component', 'node'],
                 'realization': ['component', 'service', 'process', 'function'],
@@ -508,12 +514,16 @@
                 if (elementMatchWithType) {
                     const [, layer, type, name] = elementMatchWithType;
                     const elementName = name.trim();
+                    // ArchiMate 4: normalisera äldre lagernamn för bakåtkompatibilitet
+                    const normalizedLayer = layer.trim().toLowerCase()
+                        .replace('physical', 'technology')
+                        .replace('composite', 'common');
                     // Use full name as ID, but also store first word for matching
                     const elementId = elementName;
                     // Check if element already exists (avoid duplicates)
                     if (!elements.find(el => el.id === elementId)) {
                         elements.push({
-                            layer: layer.trim().toLowerCase(),
+                            layer: normalizedLayer,
                             type: type.trim().toLowerCase(),
                             name: elementName,
                             id: elementId
@@ -562,11 +572,15 @@
                     if (inlineElementMatch) {
                         const [, layer, type, name] = inlineElementMatch;
                         const elementName = name.trim();
+                        // ArchiMate 4: normalisera äldre lagernamn för bakåtkompatibilitet
+                        const normalizedLayer = layer.trim().toLowerCase()
+                            .replace('physical', 'technology')
+                            .replace('composite', 'common');
                         const elementId = elementName;
                         // Add element if it doesn't exist
                         if (!elements.find(el => el.id === elementId)) {
                             elements.push({
-                                layer: layer.trim().toLowerCase(),
+                                layer: normalizedLayer,
                                 type: type.trim().toLowerCase(),
                                 name: elementName,
                                 id: elementId
@@ -591,10 +605,14 @@
                     if (inlineSourceMatch) {
                         const [, layer, type, name] = inlineSourceMatch;
                         const elementName = name.trim();
+                        // ArchiMate 4: normalisera äldre lagernamn för bakåtkompatibilitet
+                        const normalizedLayer = layer.trim().toLowerCase()
+                            .replace('physical', 'technology')
+                            .replace('composite', 'common');
                         const elementId = elementName;
                         if (!elements.find(el => el.id === elementId)) {
                             elements.push({
-                                layer: layer.trim().toLowerCase(),
+                                layer: normalizedLayer,
                                 type: type.trim().toLowerCase(),
                                 name: elementName,
                                 id: elementId
@@ -906,7 +924,7 @@
 
             // Icon in top-right corner (HTML via foreignObject, styled by archicode.css)
             if (config.showIcons) {
-                const iconClass = ICON_CLASS_MAP[element.type];
+                const iconClass = ICON_CLASS_MAP[`${element.layer}-${element.type}`] || ICON_CLASS_MAP[element.type];
                 if (iconClass) {
                     const iconSize = Math.min(20, element.height * 0.4);
                     const fo = this.createSvgElement('foreignObject', {

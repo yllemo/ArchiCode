@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArchiMate 4 — C260 Domänöversikt</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --motivation: #D8C1E4;
+      --motivation-b: #B39BCF;
+      --strategy: #EFBD5D;
+      --strategy-b: #D4A43B;
+      --common: #E8E5D3;
+      --common-b: #C4BFA6;
+      --business: #F4DE7F;
+      --business-b: #E8C555;
+      --application: #B6D7E1;
+      --application-b: #8CC5D4;
+      --technology: #C3E1B4;
+      --technology-b: #9BD083;
+      --implementation: #F8C2BE;
+      --implementation-b: #F09B95;
+
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --text: #1a1c2e;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --shadow: 0 2px 10px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: Arial, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1a1c2e 0%, #2d3250 60%, #3d4570 100%);
+      color: white;
+      padding: 56px 24px 48px;
+      text-align: center;
+    }
+    header .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #EFBD5D;
+      border: 1px solid #EFBD5D;
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    header h1 span { color: #EFBD5D; }
+    header p.subtitle {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.7);
+      max-width: 540px;
+      margin: 0 auto 28px;
+    }
+
+    /* ── QUICK LINKS ── */
+    .quick-links {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .quick-links a {
+      display: inline-block;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .quick-links a.primary {
+      background: #EFBD5D;
+      color: #1a1c2e;
+    }
+    .quick-links a.primary:hover { background: #f5ca70; transform: translateY(-1px); }
+    .quick-links a.secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .quick-links a.secondary:hover {
+      background: rgba(255,255,255,0.18);
+      transform: translateY(-1px);
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    section { margin-bottom: 48px; }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    /* ── HEXAGON SVG WRAPPER ── */
+    .hex-section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .hex-section p.caption {
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .hex-svg {
+      max-width: 520px;
+      width: 100%;
+      height: auto;
+    }
+
+    /* ── DOMAIN LEGEND ── */
+    .domain-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .domain-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.85rem;
+    }
+    .domain-item .swatch {
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      border: 2px solid rgba(0,0,0,0.15);
+    }
+    .domain-item strong { font-weight: 700; display: block; line-height: 1.2; }
+    .domain-item span { color: var(--text-muted); font-size: 0.78rem; }
+
+    /* ── NEWS CARDS ── */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .news-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid;
+    }
+    .news-card.motivation  { border-color: var(--motivation-b); }
+    .news-card.strategy    { border-color: var(--strategy-b); }
+    .news-card.common      { border-color: var(--common-b); }
+    .news-card.removed     { border-color: #e57373; }
+
+    .news-card h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .news-card p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .news-card .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 100px;
+      margin-bottom: 8px;
+    }
+    .tag.new       { background: #d4edda; color: #155724; }
+    .tag.changed   { background: #fff3cd; color: #856404; }
+    .tag.removed   { background: #f8d7da; color: #721c24; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      border-left: 4px solid #6c8ebf;
+    }
+    .info-box strong { color: var(--text); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #1a1c2e;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+    }
+    footer a { color: #EFBD5D; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .quick-links { flex-direction: column; align-items: center; }
+      .quick-links a { width: 200px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">ArchiMate 4 · C260 · April 2026</div>
+  <h1>Archi<span>Mate</span> 4</h1>
+  <p class="subtitle">Den senaste standarden från The Open Group — domänbaserad modellering med sju distinkta arkitekturdomäner.</p>
+  <nav class="quick-links">
+    <a href="archimate-guide.html" class="primary">Referensguide</a>
+    <a href="../demo/index.html" class="secondary">Editor / Playground</a>
+    <a href="archimate-mermaid.html" class="secondary">ArchiCode vs Mermaid</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- HEXAGONAL DOMAIN MODEL -->
+  <section class="hex-section">
+    <h2 style="border:none; text-align:left; margin-bottom:20px;">Domänmodell</h2>
+
+    <svg class="hex-svg" viewBox="0 0 750 681" xmlns="http://www.w3.org/2000/svg" aria-label="ArchiMate 4 domänmodell">
+      <defs>
+        <style>
+          .hex-label { font-family: Arial, system-ui, sans-serif; font-size: 13px; font-weight: 700; fill: #1a1c2e; text-anchor: middle; pointer-events: none; }
+          .hex-sub   { font-family: Arial, system-ui, sans-serif; font-size: 10px; fill: #555; text-anchor: middle; pointer-events: none; }
+          polygon, path { transition: opacity 0.2s; }
+          polygon:hover, path:hover { opacity: 0.85; cursor: default; }
+        </style>
+      </defs>
+
+      <!-- Implementation (outermost ring, evenodd) -->
+      <path fill="#F8C2BE" stroke="#F09B95" stroke-width="1.5"
+        fill-rule="evenodd"
+        d="M670,340 L525,591 L235,591 L90,340 L235,89 L525,89 Z
+           M498,136 L263,136 L145,340 L263,544 L498,544 L615,340 Z"/>
+
+      <!-- Business (yellow, left+top) -->
+      <polygon fill="#F4DE7F" stroke="#E8C555" stroke-width="1.5"
+        points="145,340 263,136 498,136 469,186 291,186 202,340"/>
+
+      <!-- Application (blue, right) -->
+      <polygon fill="#B6D7E1" stroke="#8CC5D4" stroke-width="1.5"
+        points="498,136 615,340 498,544 469,494 558,340 469,186"/>
+
+      <!-- Technology (green, bottom) -->
+      <polygon fill="#C3E1B4" stroke="#9BD083" stroke-width="1.5"
+        points="498,544 263,544 145,340 202,340 291,494 469,494"/>
+
+      <!-- Common (beige, middle ring) -->
+      <polygon fill="#E8E5D3" stroke="#C4BFA6" stroke-width="1.5"
+        points="558,340 469,494 291,494 202,340 291,186 469,186"/>
+
+      <!-- Strategy (gold, inner ring) -->
+      <polygon fill="#EFBD5D" stroke="#D4A43B" stroke-width="1.5"
+        points="502,340 441,446 319,446 258,340 319,234 441,234"/>
+
+      <!-- Motivation (purple, innermost) -->
+      <polygon fill="#D8C1E4" stroke="#B39BCF" stroke-width="1.5"
+        points="446,340 413,397 347,397 314,340 347,283 413,283"/>
+
+      <!-- LABELS -->
+      <!-- Implementation -->
+      <text class="hex-label" x="380" y="108">Implementation &amp; Migration</text>
+      <text class="hex-sub"   x="380" y="122">workpackage · deliverable · plateau</text>
+
+      <!-- Business -->
+      <text class="hex-label" x="195" y="235">Business</text>
+      <text class="hex-sub"   x="195" y="249">actor · role · process · product</text>
+
+      <!-- Application -->
+      <text class="hex-label" x="580" y="310">Application</text>
+      <text class="hex-sub"   x="580" y="324">component · service · data</text>
+
+      <!-- Technology -->
+      <text class="hex-label" x="195" y="470">Technology</text>
+      <text class="hex-sub"   x="195" y="484">node · device · artifact</text>
+
+      <!-- Common -->
+      <text class="hex-label" x="380" y="278">Common</text>
+      <text class="hex-sub"   x="380" y="291">process · service · event</text>
+
+      <!-- Strategy -->
+      <text class="hex-label" x="380" y="366">Strategy</text>
+      <text class="hex-sub"   x="380" y="378">capability · resource</text>
+
+      <!-- Motivation -->
+      <text class="hex-label" x="380" y="346">Motivation</text>
+      <text class="hex-sub"   x="380" y="357">goal · driver</text>
+    </svg>
+
+    <p class="caption">ArchiMate 4 (C260) — sju domäner. Motivation i centrum, Implementation som yttre ring. Klicka på referensguiden för elementdetaljer.</p>
+  </section>
+
+  <!-- DOMAIN LEGEND -->
+  <section>
+    <h2>Domäner och färger</h2>
+    <div class="domain-legend">
+      <div class="domain-item">
+        <div class="swatch" style="background:#D8C1E4;"></div>
+        <div><strong>Motivation</strong><span>#D8C1E4 / #B39BCF</span></div>
+      </div>
+      <div class="domain-item">
+        <div class="swatch" style="background:#EFBD5D;"></div>
+        <div><strong>Strategy</strong><span>#EFBD5D / #D4A43B</span></div>
+      </div>
+      <div class="domain-item">
+        <div class="swatch" style="background:#E8E5D3;"></div>
+        <div><strong>Common</strong><span>#E8E5D3 / #C4BFA6</span></div>
+      </div>
+      <div class="domain-item">
+        <div class="swatch" style="background:#F4DE7F;"></div>
+        <div><strong>Business</strong><span>#F4DE7F / #E8C555</span></div>
+      </div>
+      <div class="domain-item">
+        <div class="swatch" style="background:#B6D7E1;"></div>
+        <div><strong>Application</strong><span>#B6D7E1 / #8CC5D4</span></div>
+      </div>
+      <div class="domain-item">
+        <div class="swatch" style="background:#C3E1B4;"></div>
+        <div><strong>Technology</strong><span>#C3E1B4 / #9BD083</span></div>
+      </div>
+      <div class="domain-item">
+        <div class="swatch" style="background:#F8C2BE;"></div>
+        <div><strong>Implementation</strong><span>#F8C2BE / #F09B95</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEW IN AM4 -->
+  <section>
+    <h2>Nytt i ArchiMate 4 (C260)</h2>
+    <div class="news-grid">
+      <div class="news-card motivation">
+        <span class="tag changed">Omstrukturerat</span>
+        <h3>Domäner ersätter lager</h3>
+        <p>AM4 introducerar "domäner" istället för det strikta lagerbegreppet, vilket ger mer flexibel modellering.</p>
+      </div>
+      <div class="news-card common">
+        <span class="tag new">Ny domän</span>
+        <h3>Common-domänen</h3>
+        <p>Delade beteendeelement (process, function, service, event) som inte är bundna till ett specifikt lager.</p>
+      </div>
+      <div class="news-card strategy">
+        <span class="tag new">Utökad</span>
+        <h3>Strategy-domänen</h3>
+        <p>Capability, resource, course-of-action och value-stream — strategisk länk mellan motivation och leverans.</p>
+      </div>
+      <div class="news-card motivation">
+        <span class="tag changed">Centralt</span>
+        <h3>Motivation i centrum</h3>
+        <p>Motivationselement (goal, driver, requirement) är nu domänens centrum och driver hela arkitekturen.</p>
+      </div>
+      <div class="news-card removed">
+        <span class="tag removed">Borttagen</span>
+        <h3>Physical borttagen</h3>
+        <p>Det fysiska lagret är borttaget från AM4. Fysiska element absorberas i Technology-domänen.</p>
+      </div>
+      <div class="news-card common">
+        <span class="tag changed">Uppdaterat</span>
+        <h3>Relationer förenklat</h3>
+        <p>Relationshierarkin har förtydligats. Serving, flow, triggering och assignment är de primära relationstyperna.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFO BOX -->
+  <div class="info-box">
+    <strong>Om ArchiCode:</strong> ArchiCode är en textbaserad SVG-renderare för ArchiMate 4. Skriv <code>[&lt;business:actor&gt; Kund]</code> och få ett färdigt ArchiMate-element renderat direkt i webbläsaren. Perfekt för AI-genererade arkitekturdiagram, dokumentation och snabba skisser.
+    <br><br>
+    Öppna <a href="../demo/index.html">editorn</a> och börja skriva, eller läs <a href="archimate-guide.html">referensguiden</a> för fullständig syntaxdokumentation.
+  </div>
+
+</main>
+
+<footer>
+  <p>ArchiMate 4 (C260) &mdash; The Open Group, april 2026 &mdash;
+  <a href="https://www.opengroup.org/archimate-forum" target="_blank" rel="noopener">opengroup.org</a></p>
+  <p style="margin-top:6px;">ArchiCode renderingsbibliotek &mdash; <a href="../demo/index.html">Editor</a> &middot; <a href="archimate-guide.html">Guide</a> &middot; <a href="SKILL.md">SKILL.md</a></p>
+</footer>
+
+</body>
+</html>

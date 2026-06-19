@@ -64,8 +64,9 @@ Jag behöver ett ArchiMate-diagram för en e-handelsplattform med:
 
 **Lägg till format-instruktion:**
 ```
-Skapa detta som ArchiCode.js-kod med ArchiMate 3.2-syntax.
-Använd rätt lager (business, application, technology).
+Skapa detta som ArchiCode.js-kod med ArchiMate 4-syntax (C260).
+Använd rätt domäner (motivation, strategy, common, business, application, technology, implementation).
+Använd <common:process> för processer som spänner över domäner, och <business:process> för business-specifika.
 ```
 
 ### Steg 3: Kopiera och testa
@@ -98,7 +99,7 @@ Lägg till:
 2. **Nämn ArchiCode.js explicit**
    ```
    ✅ "Generera ArchiCode.js-syntax"
-   ✅ "Använd ArchiMate 3.2 med layer:type format"
+   ✅ "Använd ArchiMate 4 med layer:type format"
    ```
 
 3. **Be om kommentarer**
@@ -131,17 +132,21 @@ Lägg till:
 ```
 Skapa ett ArchiCode.js-diagram för [SYSTEM_NAMN] med följande:
 
-Business Layer:
-- [LISTA AKTÖRER]
-- [LISTA PROCESSER]
+Business-domän:
+- [LISTA AKTÖRER med <business:actor>]
+- [LISTA AFFÄRSOBJEKT med <business:object>]
 
-Application Layer:
-- [LISTA KOMPONENTER]
+Common-domän (delade processer/tjänster):
+- [LISTA PROCESSER med <common:process>]
+- [LISTA TJÄNSTER med <common:service>]
 
-Technology Layer:
-- [LISTA INFRASTRUKTUR]
+Application-domän:
+- [LISTA KOMPONENTER med <application:component>]
 
-Använd ArchiMate 3.2-syntax med layer:type format.
+Technology-domän:
+- [LISTA INFRASTRUKTUR med <technology:node>]
+
+Använd ArchiMate 4-syntax (C260) med <domän:typ> format.
 Lägg till relevanta relationer.
 Inkludera #spacing: 80 och #fontSize: 14.
 ```
@@ -158,7 +163,7 @@ MÅLBILD (TO-BE):
 - [NYA SYSTEM]
 
 Visa migration path med implementation:workpackage element.
-Använd ArchiMate 3.2-syntax.
+Använd ArchiMate 4-syntax.
 ```
 
 ### Mall 3: Capability Map
@@ -174,7 +179,7 @@ Business Layer:
 - Processer som realiserar capabilities: [LISTA]
 
 Använd realization relationer (.-|>) mellan capabilities och processer.
-ArchiMate 3.2-syntax, #spacing: 100.
+ArchiMate 4-syntax, #spacing: 100.
 ```
 
 ## 🔄 Iterativa AI-konversationer
@@ -188,7 +193,7 @@ Skapa ett enkelt ArchiCode.js-diagram för ett CRM-system med:
 - Application component (CRM-applikation)
 - Technology node (server)
 
-Använd ArchiMate 3.2-syntax.
+Använd ArchiMate 4-syntax.
 ```
 
 ### Uppföljningsprompt 1
@@ -223,7 +228,7 @@ Optimera diagrammet:
 ### Prompt
 
 ```
-Skapa ett ArchiCode.js-diagram för en modern e-handelsplattform enligt ArchiMate 3.2.
+Skapa ett ArchiCode.js-diagram för en modern e-handelsplattform enligt ArchiMate 4.
 
 Inkludera:
 
@@ -343,7 +348,7 @@ Migration Path:
 
 Använd implementation:workpackage, implementation:plateau.
 Visa gap mellan nuläge och målbild.
-ArchiMate 3.2-syntax.
+ArchiMate 4-syntax.
 ```
 
 ### Use Case 2: Business Capability Model
@@ -395,7 +400,7 @@ Requirements:
 
 Koppla stakeholders till drivers och goals.
 Koppla goals till requirements.
-ArchiMate 3.2-syntax.
+ArchiMate 4-syntax.
 ```
 
 ## 🔧 Felsökning med AI
@@ -433,7 +438,7 @@ Använd ArchiMate relationstyper korrekt.
 
 **Lösning:**
 ```
-Elementen är på fel lager enligt ArchiMate 3.2.
+Elementen är på fel lager enligt ArchiMate 4.
 
 Korrigera:
 - "Databas" ska vara technology:node (INTE application:component)
@@ -456,22 +461,24 @@ Generera om med korrekta lager.
 - `ArchiCode.exportDrawIO(code)` - Exportera till draw.io format
 - `ArchiCode.parse(code)` - Parsa kod till intern struktur
 
-### ArchiMate 2025 — Modern Color Set
+### ArchiMate 4 — Domänfärger (Modern Color Set)
 
-ArchiCode.js använder samma fyllnad/kant per lager som i `archimate-2025.md` (The Open Group, Modern Color Set):
+ArchiCode.js v2 använder ArchiMate 4 (C260) med sju domäner:
 
-| Lager | Fyllnadsfärg | Kantfärg | Beskrivning |
-|-------|-------------|----------|-------------|
-| **Motivation** | `#D8C1E4` | `#B39BCF` | Lavendel — intressenter, mål, krav |
-| **Strategy** | `#EFBD5D` | `#D4A43B` | Guld/gul — kapabiliteter, resurser, handlingsplaner |
-| **Business** | `#F4DE7F` | `#E8C555` | Jasmine — affärsaktörer, processer, tjänster |
-| **Application** | `#B6D7E1` | `#8CC5D4` | Ljus aqua — applikationer, tjänster, data |
-| **Technology** | `#C3E1B4` | `#9BD083` | Ljusgrön — infrastruktur, plattform |
-| **Physical / Composite** | `#E8E5D3` | `#D4CDB4` | Satin Linen — fysisk utrustning, plats, gruppering |
-| **Implementation** | `#F8C2BE` | `#F09B95` | Korall/te ros — arbetspaket, leveranser, migration |
+| Domän | Fyllnadsfärg | Kantfärg | Badge | Beskrivning |
+|-------|-------------|----------|-------|-------------|
+| **Motivation** | `#D8C1E4` | `#B39BCF` | `M` | Lavendel — intressenter, mål, krav, drivkrafter |
+| **Strategy** | `#EFBD5D` | `#D4A43B` | `S` | Guld — kapabiliteter, resurser, värdeströmmar |
+| **Common** | `#E8E5D3` | `#C4BFA6` | `Co` | Satin Linen — delade process/funktion/tjänst/händelse |
+| **Business** | `#F4DE7F` | `#E8C555` | `B` | Jasmine — aktörer, affärsobjekt, produkter |
+| **Application** | `#B6D7E1` | `#8CC5D4` | `A` | Ljus aqua — komponenter, tjänster, dataobjekt |
+| **Technology** | `#C3E1B4` | `#9BD083` | `T` | Ljusgrön — infrastruktur + fysisk OT-teknik |
+| **Implementation** | `#F8C2BE` | `#F09B95` | `I` | Korall — arbetspaket, leveranser, platåer |
+
+> `physical`-domänen är borttagen i AM4 (ingår nu i `technology`). `<physical:equipment>` normaliseras automatiskt.
 
 ### ArchiMate Standarder
-- [ArchiMate 3.2 Specification](https://pubs.opengroup.org/architecture/archimate32-doc/)
+- [ArchiMate 4 Specification (C260)](https://pubs.opengroup.org/architecture/archimate4-doc/) — The Open Group, april 2026
 - [ArchiMate Reference Cards](https://www.opengroup.org/archimate-forum/archimate-overview)
 
 ### AI-verktyg länkar
@@ -539,7 +546,5 @@ Dokumentera prompts som ger bra resultat för återanvändning
 
 ---
 
-**Version:** 1.0.0
-**Author:** Henrik Yllemo
-**Year:** 2025
+**Version:** 2.0.0
 **License:** MIT
