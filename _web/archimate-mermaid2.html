@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArchiCode vs Mermaid — ArchiMate 4</title>
+  <link rel="stylesheet" href="../archicode.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --text: #1a1c2e;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 10px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --accent: #4f7cff;
+      --archicode-bg: #1e2130;
+      --mermaid-bg: #1a3a2a;
+    }
+
+    body {
+      font-family: Arial, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1a1c2e 0%, #2a2d47 100%);
+      color: white;
+      padding: 44px 24px 36px;
+      text-align: center;
+    }
+    header .breadcrumb {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 12px;
+    }
+    header .breadcrumb a { color: #EFBD5D; text-decoration: none; }
+    header .breadcrumb a:hover { text-decoration: underline; }
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    header h1 .ac { color: #4f9eff; }
+    header h1 .vs { color: rgba(255,255,255,0.35); margin: 0 8px; font-weight: 300; }
+    header h1 .mm { color: #6eda8e; }
+    header p.subtitle {
+      color: rgba(255,255,255,0.65);
+      max-width: 560px;
+      margin: 0 auto 24px;
+      font-size: 0.95rem;
+    }
+    .header-nav {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .header-nav a {
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.75);
+      transition: all 0.2s;
+    }
+    .header-nav a:hover {
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    section { margin-bottom: 52px; }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 18px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    /* ── INTRO ── */
+    .intro-text {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      box-shadow: var(--shadow);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .intro-text p + p { margin-top: 10px; }
+    .intro-text strong { color: var(--text); }
+
+    /* ── COMPARISON TABLE ── */
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+    }
+    .comp-table thead th {
+      padding: 12px 18px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+    .comp-table thead th:nth-child(1) { background: #1e2130; color: #e2e8f0; }
+    .comp-table thead th:nth-child(2) { background: #1e2130; color: #4f9eff; }
+    .comp-table thead th:nth-child(3) { background: #1e2130; color: #6eda8e; }
+    .comp-table tbody td {
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .comp-table tbody tr:last-child td { border-bottom: none; }
+    .comp-table tbody tr:hover { background: #f9fafb; }
+    .comp-table .cat { font-weight: 600; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .yes  { color: #16a34a; font-weight: 700; }
+    .no   { color: #dc2626; font-weight: 700; }
+    .part { color: #d97706; font-weight: 700; }
+
+    /* ── EXAMPLE PAIR ── */
+    .example-pair {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .example-pair-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .example-num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #1e2130;
+      color: #EFBD5D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .example-pair-header h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .example-pair-header span {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+
+    .split-col {
+      border-right: 1px solid var(--border);
+    }
+    .split-col:last-child { border-right: none; }
+
+    .col-header {
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .col-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .col-badge.archicode { background: #1e2130; color: #4f9eff; }
+    .col-badge.mermaid   { background: #1a3a2a; color: #6eda8e; }
+    .col-header span.note { font-size: 0.75rem; color: var(--text-muted); }
+
+    .col-diagram {
+      padding: 20px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      border-bottom: 1px solid var(--border);
+    }
+    .col-diagram svg { max-width: 100%; }
+
+    .mermaid-placeholder {
+      background: linear-gradient(135deg, #1a3a2a, #0f2218);
+      border-radius: 8px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.78rem;
+      line-height: 1.65;
+      color: #a7f3b8;
+      white-space: pre;
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .mermaid-note {
+      padding: 8px 18px 14px;
+      font-size: 0.75rem;
+      color: #6eda8e;
+      background: #0f1f14;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .mermaid-note::before {
+      content: 'i';
+      background: #6eda8e;
+      color: #0f1f14;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .col-code {
+      padding: 14px 18px;
+      background: var(--archicode-bg);
+    }
+    .col-code pre {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: #a9b4cc;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    /* ── WHEN TO USE ── */
+    .when-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .when-grid { grid-template-columns: 1fr; } }
+
+    .when-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border-top: 4px solid;
+    }
+    .when-card.ac { border-color: #4f9eff; }
+    .when-card.mm { border-color: #6eda8e; }
+    .when-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .when-card h3 span { font-size: 0.75rem; font-weight: 400; color: var(--text-muted); }
+    .when-card ul {
+      padding-left: 18px;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ── SUMMARY TABLE ── */
+    .sum-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      font-size: 0.85rem;
+    }
+    .sum-table thead th {
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    .sum-table thead th:nth-child(1) { background: #1e2130; color: #e2e8f0; }
+    .sum-table thead th:nth-child(2) { background: #162038; color: #4f9eff; }
+    .sum-table thead th:nth-child(3) { background: #0f2218; color: #6eda8e; }
+    .sum-table tbody td {
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sum-table tbody tr:last-child td { border-bottom: none; }
+    .sum-table tbody tr:nth-child(even) { background: #f9fafb; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #1a1c2e;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+    }
+    footer a { color: #EFBD5D; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="breadcrumb">
+    <a href="index.html">ArchiMate 4</a> / ArchiCode vs Mermaid
+  </div>
+  <h1><span class="ac">ArchiCode</span><span class="vs">vs</span><span class="mm">Mermaid</span></h1>
+  <p class="subtitle">Samma arkitektur — tva olika verktyg. Forstaa skillnaderna och valj ratt verktyg for ratt uppgift.</p>
+  <nav class="header-nav">
+    <a href="archimate-guide.html">Referensguide</a>
+    <a href="../demo/index.html">Editor / Playground</a>
+    <a href="index.html">Startsida</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- INTRO -->
+  <section>
+    <h2>Introduktion</h2>
+    <div class="intro-text">
+      <p><strong>ArchiCode</strong> ar ett textbaserat renderingsbibliotek for ArchiMate 4 (C260). Det producerar SVG-diagram med korrekt ArchiMate-notation — domarnfarger, elementikoner, stereotyper och standardiserade relationspilar. ArchiCode kraver ingen installation och kan baddas in i alla webbsidor.</p>
+      <p><strong>Mermaid</strong> ar ett populart diagramverktyg som stoeder flowcharts, sekvensdiagram, Gantt-scheman och mer. Det ar valkant, brett integrerat (GitHub, Notion, Confluence) men saknar inbyggt stoed for ArchiMate-domarnfarger och elementikoner.</p>
+      <p>Valj <strong>ArchiCode</strong> nar du behoever formell, standardenlig ArchiMate 4-notation. Valj <strong>Mermaid</strong> nar du behoever snabb kommunikation i verktyg som redan stoeder Mermaid, och ArchiMate-standardisering inte ar ett krav.</p>
+    </div>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Egenskap</th>
+          <th>ArchiCode</th>
+          <th>Mermaid</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cat">AM4-standard</td>
+          <td><span class="yes">Ja</span> — fullstandig C260-implementation</td>
+          <td><span class="no">Nej</span> — generell diagramstandard</td>
+        </tr>
+        <tr>
+          <td class="cat">Domarnfarger</td>
+          <td><span class="yes">Automatiska</span> — ratt farg per doman</td>
+          <td><span class="part">Manuell</span> — kraver classDef-block</td>
+        </tr>
+        <tr>
+          <td class="cat">Elementikoner</td>
+          <td><span class="yes">Inbyggda</span> — SVG-ikoner per elementtyp</td>
+          <td><span class="part">Delvis</span> — emoji eller text</td>
+        </tr>
+        <tr>
+          <td class="cat">Relationssemantik</td>
+          <td><span class="yes">AM4-standard</span> — serving, flow, triggering m.fl.</td>
+          <td><span class="no">Generell</span> — linjer och pilar utan AM-semantik</td>
+        </tr>
+        <tr>
+          <td class="cat">Exportformat</td>
+          <td>SVG, draw.io / diagrams.net</td>
+          <td>PNG, SVG</td>
+        </tr>
+        <tr>
+          <td class="cat">AI-genererat</td>
+          <td><span class="yes">Ja</span> — strukturerad syntax, latt att generera</td>
+          <td><span class="yes">Ja</span> — brett traningsdata i LLMs</td>
+        </tr>
+        <tr>
+          <td class="cat">Inlardningskurva</td>
+          <td>Medel — kraver kunskap om AM-domaner</td>
+          <td>Lag — intuitiv flowchart-syntax</td>
+        </tr>
+        <tr>
+          <td class="cat">Verktygsintegration</td>
+          <td>Web, CDN, NPM</td>
+          <td>GitHub, Notion, Confluence, GitLab m.fl.</td>
+        </tr>
+        <tr>
+          <td class="cat">Malgrupp</td>
+          <td>Enterprise-arkitekter, EA-team</td>
+          <td>Alla — fran utvecklare till projektledare</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- EXAMPLES -->
+  <section>
+    <h2>Tre parallella exempel</h2>
+
+    <!-- EXAMPLE 1 -->
+    <div class="example-pair">
+      <div class="example-pair-header">
+        <div class="example-num">1</div>
+        <h3>E-handelsflode</h3>
+        <span>Business · Common · Application</span>
+      </div>
+      <div class="split">
+        <div class="split-col">
+          <div class="col-header">
+            <span class="col-badge archicode">ArchiCode</span>
+            <span class="note">Live-renderat SVG</span>
+          </div>
+          <div class="col-diagram" id="ex1-ac"></div>
+          <div class="col-code"><pre>// ArchiMate 4 — E-handelsflode
+[&lt;business:actor&gt; Kund]
+[&lt;common:process&gt; Kopprocess]
+[&lt;application:component&gt; Webbshop]
+[Kund] -&gt; [Kopprocess]
+[Kopprocess] --:&gt; [Webbshop]</pre></div>
+        </div>
+        <div class="split-col">
+          <div class="col-header">
+            <span class="col-badge mermaid">Mermaid</span>
+            <span class="note">Syntaxexempel (ej renderat)</span>
+          </div>
+          <div class="col-diagram">
+            <div class="mermaid-placeholder">graph TD
+  Kund[&#x1F464; Kund] --&gt; Kopprocess[&#x2699;&#xFE0F; Kopprocess]
+  Kopprocess --&gt;|realiseras av| Webbshop[&#x1F5A5;&#xFE0F; Webbshop]
+
+  %% classDef maste definieras manuellt
+  classDef business fill:#F4DE7F,stroke:#E8C555
+  classDef common   fill:#E8E5D3,stroke:#C4BFA6
+  classDef app      fill:#B6D7E1,stroke:#8CC5D4
+  class Kund business
+  class Kopprocess common
+  class Webbshop app</div>
+          </div>
+          <div class="mermaid-note">ArchiMate-ikoner saknas — ersatts av emoji. Relationstyp (realization vs serving) maste anges som etikett manuellt.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXAMPLE 2 -->
+    <div class="example-pair">
+      <div class="example-pair-header">
+        <div class="example-num">2</div>
+        <h3>Capability Map</h3>
+        <span>Strategy</span>
+      </div>
+      <div class="split">
+        <div class="split-col">
+          <div class="col-header">
+            <span class="col-badge archicode">ArchiCode</span>
+            <span class="note">Live-renderat SVG</span>
+          </div>
+          <div class="col-diagram" id="ex2-ac"></div>
+          <div class="col-code"><pre>// ArchiMate 4 — Capability Map
+[&lt;strategy:capability&gt; Kundservice]
+[&lt;strategy:resource&gt; CRM-system]
+[&lt;strategy:value-stream&gt; Kundresa]
+[CRM-system] .-- [Kundservice]
+[Kundservice] -&gt; [Kundresa]</pre></div>
+        </div>
+        <div class="split-col">
+          <div class="col-header">
+            <span class="col-badge mermaid">Mermaid</span>
+            <span class="note">Syntaxexempel (ej renderat)</span>
+          </div>
+          <div class="col-diagram">
+            <div class="mermaid-placeholder">graph LR
+  Kundservice[&#x1F3AF; Kundservice] -.->|stods av| CRM[&#x1F4BB; CRM-system]
+  Kundservice --&gt; Kundresa[&#x1F504; Kundresa]
+
+  classDef strategy fill:#EFBD5D,stroke:#D4A43B,color:#000
+  class Kundservice,CRM,Kundresa strategy</div>
+          </div>
+          <div class="mermaid-note">Alla tre elementtyper (capability, resource, value-stream) ritas med samma nod-form. Ingen semantisk skillnad i Mermaid-notation.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXAMPLE 3 -->
+    <div class="example-pair">
+      <div class="example-pair-header">
+        <div class="example-num">3</div>
+        <h3>Infrastrukturoverview</h3>
+        <span>Technology</span>
+      </div>
+      <div class="split">
+        <div class="split-col">
+          <div class="col-header">
+            <span class="col-badge archicode">ArchiCode</span>
+            <span class="note">Live-renderat SVG</span>
+          </div>
+          <div class="col-diagram" id="ex3-ac"></div>
+          <div class="col-code"><pre>// ArchiMate 4 — Infrastruktur
+[&lt;technology:node&gt; App Server]
+[&lt;technology:device&gt; Brandvagg]
+[&lt;technology:system-software&gt; PostgreSQL]
+[Brandvagg] -&gt; [App Server]
+[App Server] -&gt; [PostgreSQL]</pre></div>
+        </div>
+        <div class="split-col">
+          <div class="col-header">
+            <span class="col-badge mermaid">Mermaid</span>
+            <span class="note">Syntaxexempel (ej renderat)</span>
+          </div>
+          <div class="col-diagram">
+            <div class="mermaid-placeholder">graph TD
+  BV[&#x1F512; Brandvagg] --&gt; AS[&#x1F5A5;&#xFE0F; App Server]
+  AS --&gt; PG[&#x1F4BE; PostgreSQL]
+
+  classDef tech fill:#C3E1B4,stroke:#9BD083,color:#000
+  class BV,AS,PG tech</div>
+          </div>
+          <div class="mermaid-note">Node, device och system-software ritas likadant. Den distinkta AM-ikonen per elementtyp saknas helt i Mermaid.</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WHEN TO USE -->
+  <section>
+    <h2>Nar ska du anvanda vad?</h2>
+    <div class="when-grid">
+      <div class="when-card ac">
+        <h3>Anvand ArchiCode <span>nar du behoever...</span></h3>
+        <ul>
+          <li>Formell ArchiMate 4-notation for leverans</li>
+          <li>Korrekt domarnfarg och elementikoner automatiskt</li>
+          <li>SVG- eller draw.io-export for presentationer</li>
+          <li>AI-genererade arkitekturdiagram</li>
+          <li>Skillnad pa actor, role, process, service i notation</li>
+          <li>Relationstyper med korrekt AM4-semantik</li>
+        </ul>
+      </div>
+      <div class="when-card mm">
+        <h3>Anvand Mermaid <span>nar du behoever...</span></h3>
+        <ul>
+          <li>Snabb kommunikation i GitHub/Notion/Confluence</li>
+          <li>Sekvensdiagram, Gantt eller mindmaps</li>
+          <li>Bred tillganglighet utan installationskrav</li>
+          <li>Enkel representation utan AM-standard</li>
+          <li>Flodensdiagram for icke-arkitekter</li>
+          <li>Dokumentation dar AM-precision inte ar ett krav</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY TABLE -->
+  <section>
+    <h2>Sammanfattning</h2>
+    <table class="sum-table">
+      <thead>
+        <tr>
+          <th>Egenskap</th>
+          <th>ArchiCode</th>
+          <th>Mermaid</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AM4-standard (C260)</td>
+          <td><span class="yes">Ja</span></td>
+          <td><span class="no">Nej</span></td>
+        </tr>
+        <tr>
+          <td>Automatiska ikoner</td>
+          <td><span class="yes">Ja</span></td>
+          <td><span class="part">Delvis (emoji)</span></td>
+        </tr>
+        <tr>
+          <td>Exportformat</td>
+          <td>SVG, draw.io</td>
+          <td>PNG, SVG</td>
+        </tr>
+        <tr>
+          <td>AI-genererat</td>
+          <td><span class="yes">Ja</span></td>
+          <td><span class="yes">Ja</span></td>
+        </tr>
+        <tr>
+          <td>Enkelt att lara sig</td>
+          <td><span class="part">Medel</span></td>
+          <td><span class="yes">Enkelt</span></td>
+        </tr>
+        <tr>
+          <td>Verktygsintegration</td>
+          <td>Web / CDN / NPM</td>
+          <td>GitHub, Notion, Confluence m.fl.</td>
+        </tr>
+        <tr>
+          <td>Semantiskt korrekt</td>
+          <td><span class="yes">Ja — AM4-relationer</span></td>
+          <td><span class="no">Nej — generella pilar</span></td>
+        </tr>
+        <tr>
+          <td>Externt beroende</td>
+          <td><span class="yes">Minimalt (en JS-fil)</span></td>
+          <td><span class="part">CDN-beroende normalt</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <p>ArchiMate 4 (C260) &mdash; The Open Group, april 2026</p>
+  <p style="margin-top:6px;">
+    <a href="index.html">Startsida</a> &middot;
+    <a href="archimate-guide.html">Guide</a> &middot;
+    <a href="../demo/index.html">Editor</a> &middot;
+    <a href="SKILL.md">SKILL.md</a>
+  </p>
+</footer>
+
+<script src="../archicode.js"></script>
+<script>
+  var examples = [
+    {
+      id: 'ex1-ac',
+      code: '[<business:actor> Kund]\n[<common:process> Kopprocess]\n[<application:component> Webbshop]\n[Kund] -> [Kopprocess]\n[Kopprocess] --:> [Webbshop]'
+    },
+    {
+      id: 'ex2-ac',
+      code: '[<strategy:capability> Kundservice]\n[<strategy:resource> CRM-system]\n[<strategy:value-stream> Kundresa]\n[CRM-system] .-- [Kundservice]\n[Kundservice] -> [Kundresa]'
+    },
+    {
+      id: 'ex3-ac',
+      code: '[<technology:node> App Server]\n[<technology:device> Brandvagg]\n[<technology:system-software> PostgreSQL]\n[Brandvagg] -> [App Server]\n[App Server] -> [PostgreSQL]'
+    }
+  ];
+
+  examples.forEach(function(ex) {
+    var el = document.getElementById(ex.id);
+    if (!el) return;
+    try {
+      ArchiCode.render(ex.code, el);
+    } catch(e) {
+      el.innerHTML = '<span style="color:#e57373;font-size:0.8rem;">Renderingsfel: ' + e.message + '</span>';
+    }
+  });
+</script>
+</body>
+</html>

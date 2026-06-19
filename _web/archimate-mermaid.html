@@ -3,677 +3,844 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ArchiCode vs Mermaid — ArchiMate 4</title>
-  <link rel="stylesheet" href="../archicode.css">
+  <title>ArchiMate 4 — Mermaid-exempel med domäner</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f5f6f8;
+      --motivation-bg: #D8C1E4;
+      --motivation-border: #B39BCF;
+      --strategy-bg: #EFBD5D;
+      --strategy-border: #D4A43B;
+      --common-bg: #E8E5D3;
+      --common-border: #C4BFA6;
+      --business-bg: #F4DE7F;
+      --business-border: #E8C555;
+      --application-bg: #B6D7E1;
+      --application-border: #8CC5D4;
+      --technology-bg: #C3E1B4;
+      --technology-border: #9BD083;
+      --implementation-bg: #F8C2BE;
+      --implementation-border: #F09B95;
+
+      --bg: #f4f5f7;
       --surface: #ffffff;
-      --text: #1a1c2e;
+      --text: #1a1a2e;
       --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --radius: 10px;
       --shadow: 0 2px 8px rgba(0,0,0,0.08);
-      --accent: #4f7cff;
-      --archicode-bg: #1e2130;
-      --mermaid-bg: #1a3a2a;
+      --radius: 10px;
+      --accent: #0277BD;
     }
 
     body {
-      font-family: Arial, system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    /* ── HEADER ── */
-    header {
-      background: linear-gradient(135deg, #1a1c2e 0%, #2a2d47 100%);
-      color: white;
-      padding: 44px 24px 36px;
-      text-align: center;
+    .site-nav {
+      background: #151724;
+      border-bottom: 1px solid #2a2d3e;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      height: 50px;
+      gap: 16px;
     }
-    header .breadcrumb {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 12px;
-    }
-    header .breadcrumb a { color: #EFBD5D; text-decoration: none; }
-    header .breadcrumb a:hover { text-decoration: underline; }
-    header h1 {
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-    header h1 .ac { color: #4f9eff; }
-    header h1 .vs { color: rgba(255,255,255,0.35); margin: 0 8px; font-weight: 300; }
-    header h1 .mm { color: #6eda8e; }
-    header p.subtitle {
-      color: rgba(255,255,255,0.65);
-      max-width: 560px;
-      margin: 0 auto 24px;
+    .site-nav .nav-logo {
       font-size: 0.95rem;
+      font-weight: 800;
+      color: #EFBD5D;
+      text-decoration: none;
+      white-space: nowrap;
     }
-    .header-nav {
+    .site-nav .nav-logo span { color: #6b7280; font-weight: 400; font-size: 0.82rem; }
+    .site-nav .nav-links { display: flex; gap: 4px; margin-left: auto; }
+    .site-nav .nav-links a {
+      color: #9ca3af;
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .site-nav .nav-links a:hover { background: #1e2135; color: #e2e8f0; }
+
+    .page {
+      padding: 28px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .page-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      margin-top: 12px;
       display: flex;
       gap: 8px;
-      justify-content: center;
       flex-wrap: wrap;
     }
-    .header-nav a {
-      padding: 7px 16px;
-      border-radius: 7px;
-      font-size: 0.82rem;
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: #eff6ff;
+      border: 1px solid #3b82f6;
+      border-radius: 6px;
+      color: var(--accent);
       text-decoration: none;
-      border: 1px solid rgba(255,255,255,0.15);
-      color: rgba(255,255,255,0.75);
-      transition: all 0.2s;
-    }
-    .header-nav a:hover {
-      background: rgba(255,255,255,0.08);
-      color: white;
-    }
-
-    /* ── MAIN ── */
-    main {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 40px 20px 64px;
-    }
-
-    section { margin-bottom: 52px; }
-
-    h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 18px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
-    }
-
-    /* ── INTRO ── */
-    .intro-text {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 22px 26px;
-      box-shadow: var(--shadow);
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-    .intro-text p + p { margin-top: 10px; }
-    .intro-text strong { color: var(--text); }
-
-    /* ── COMPARISON TABLE ── */
-    .comp-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--surface);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
+      font-weight: 500;
       font-size: 0.85rem;
-      margin-bottom: 24px;
+      transition: all 0.15s;
+      width: fit-content;
     }
-    .comp-table thead th {
-      padding: 12px 18px;
-      text-align: left;
-      font-weight: 700;
-      font-size: 0.82rem;
-      letter-spacing: 0.3px;
-    }
-    .comp-table thead th:nth-child(1) { background: #1e2130; color: #e2e8f0; }
-    .comp-table thead th:nth-child(2) { background: #1e2130; color: #4f9eff; }
-    .comp-table thead th:nth-child(3) { background: #1e2130; color: #6eda8e; }
-    .comp-table tbody td {
-      padding: 11px 18px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-    .comp-table tbody tr:last-child td { border-bottom: none; }
-    .comp-table tbody tr:hover { background: #f9fafb; }
-    .comp-table .cat { font-weight: 600; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .yes  { color: #16a34a; font-weight: 700; }
-    .no   { color: #dc2626; font-weight: 700; }
-    .part { color: #d97706; font-weight: 700; }
 
-    /* ── EXAMPLE PAIR ── */
-    .example-pair {
-      background: var(--surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .download-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .layers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
       margin-bottom: 28px;
     }
-    .example-pair-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
+
+    .example-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 28px;
+    }
+
+    .example-panel h2 {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .example-panel p {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .mermaid {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .toggle-btn {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #1f2937;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .toggle-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .mermaid-code {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #1e293b;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid #e5e7eb;
+      margin-bottom: 18px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    .tab-content.active {
+      display: block;
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .layer-card {
+      border-radius: var(--radius);
+      border: 2px solid transparent;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .layer-card.motivation    { background: var(--motivation-bg);    border-color: var(--motivation-border); }
+    .layer-card.strategy      { background: var(--strategy-bg);      border-color: var(--strategy-border); }
+    .layer-card.common        { background: var(--common-bg);        border-color: var(--common-border); }
+    .layer-card.business      { background: var(--business-bg);      border-color: var(--business-border); }
+    .layer-card.application   { background: var(--application-bg);   border-color: var(--application-border); }
+    .layer-card.technology    { background: var(--technology-bg);    border-color: var(--technology-border); }
+    .layer-card.implementation{ background: var(--implementation-bg);border-color: var(--implementation-border); }
+
+    .layer-card-header {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .example-num {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      background: #1e2130;
-      color: #EFBD5D;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.78rem;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-    .example-pair-header h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .example-pair-header span {
-      margin-left: auto;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
-
-    .split-col {
-      border-right: 1px solid var(--border);
-    }
-    .split-col:last-child { border-right: none; }
-
-    .col-header {
-      padding: 10px 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .col-badge {
-      font-size: 0.7rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-    .col-badge.archicode { background: #1e2130; color: #4f9eff; }
-    .col-badge.mermaid   { background: #1a3a2a; color: #6eda8e; }
-    .col-header span.note { font-size: 0.75rem; color: var(--text-muted); }
-
-    .col-diagram {
-      padding: 20px;
-      min-height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fafafa;
-      border-bottom: 1px solid var(--border);
-    }
-    .col-diagram svg { max-width: 100%; }
-
-    .mermaid-placeholder {
-      background: linear-gradient(135deg, #1a3a2a, #0f2218);
+    .layer-icon {
+      width: 38px;
+      height: 38px;
       border-radius: 8px;
-      padding: 18px 20px;
-      font-family: 'Cascadia Code', 'Consolas', monospace;
-      font-size: 0.78rem;
-      line-height: 1.65;
-      color: #a7f3b8;
-      white-space: pre;
-      overflow-x: auto;
-      width: 100%;
-    }
-
-    .mermaid-note {
-      padding: 8px 18px 14px;
-      font-size: 0.75rem;
-      color: #6eda8e;
-      background: #0f1f14;
       display: flex;
-      align-items: flex-start;
-      gap: 6px;
-    }
-    .mermaid-note::before {
-      content: 'i';
-      background: #6eda8e;
-      color: #0f1f14;
-      border-radius: 50%;
-      width: 14px;
-      height: 14px;
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.65rem;
-      font-weight: 800;
+      font-size: 18px;
       flex-shrink: 0;
-      margin-top: 1px;
+      color: #ffffff;
     }
 
-    .col-code {
-      padding: 14px 18px;
-      background: var(--archicode-bg);
-    }
-    .col-code pre {
-      font-family: 'Cascadia Code', 'Consolas', monospace;
-      font-size: 0.78rem;
-      line-height: 1.6;
-      color: #a9b4cc;
-      white-space: pre;
-      overflow-x: auto;
-    }
+    .motivation   .layer-icon { background: var(--motivation-border); }
+    .strategy     .layer-icon { background: var(--strategy-border); }
+    .common       .layer-icon { background: var(--common-border); }
+    .business     .layer-icon { background: var(--business-border); }
+    .application  .layer-icon { background: var(--application-border); }
+    .technology   .layer-icon { background: var(--technology-border); }
+    .implementation .layer-icon { background: var(--implementation-border); }
 
-    /* ── WHEN TO USE ── */
-    .when-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 600px) { .when-grid { grid-template-columns: 1fr; } }
-
-    .when-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      border-top: 4px solid;
-    }
-    .when-card.ac { border-color: #4f9eff; }
-    .when-card.mm { border-color: #6eda8e; }
-    .when-card h3 {
-      font-size: 0.95rem;
+    .layer-card-header h3 {
+      font-size: 1rem;
       font-weight: 700;
-      margin-bottom: 10px;
+      line-height: 1.2;
     }
-    .when-card h3 span { font-size: 0.75rem; font-weight: 400; color: var(--text-muted); }
-    .when-card ul {
-      padding-left: 18px;
-      font-size: 0.83rem;
-      color: var(--text-muted);
-      line-height: 1.7;
+    .layer-card-header .hex {
+      font-size: 0.75rem;
+      font-family: monospace;
+      opacity: 0.7;
     }
 
-    /* ── SUMMARY TABLE ── */
-    .sum-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--surface);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
+    .layer-card p {
       font-size: 0.85rem;
+      line-height: 1.5;
+      opacity: 0.85;
     }
-    .sum-table thead th {
-      padding: 12px 18px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      text-align: left;
-    }
-    .sum-table thead th:nth-child(1) { background: #1e2130; color: #e2e8f0; }
-    .sum-table thead th:nth-child(2) { background: #162038; color: #4f9eff; }
-    .sum-table thead th:nth-child(3) { background: #0f2218; color: #6eda8e; }
-    .sum-table tbody td {
-      padding: 11px 18px;
-      border-bottom: 1px solid var(--border);
-    }
-    .sum-table tbody tr:last-child td { border-bottom: none; }
-    .sum-table tbody tr:nth-child(even) { background: #f9fafb; }
 
-    /* ── FOOTER ── */
-    footer {
-      background: #1a1c2e;
-      color: rgba(255,255,255,0.45);
-      text-align: center;
-      padding: 24px;
-      font-size: 0.8rem;
+    .element-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
     }
-    footer a { color: #EFBD5D; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+
+    .etag {
+      font-size: 0.72rem;
+      font-family: monospace;
+      padding: 2px 8px;
+      border-radius: 100px;
+      background: rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    footer {
+      text-align: center;
+      margin: 24px auto 28px;
+      padding: 18px 20px;
+      max-width: 1100px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    footer p + p {
+      margin-top: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .layers-grid { grid-template-columns: 1fr; }
+      .page { padding: 20px 16px; }
+      .mermaid { padding: 8px; }
+      .tabs { gap: 2px; }
+      .tab-btn {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+      }
+      footer {
+        margin: 16px 16px 24px;
+      }
+    }
   </style>
 </head>
 <body>
-
-<header>
-  <div class="breadcrumb">
-    <a href="index.html">ArchiMate 4</a> / ArchiCode vs Mermaid
-  </div>
-  <h1><span class="ac">ArchiCode</span><span class="vs">vs</span><span class="mm">Mermaid</span></h1>
-  <p class="subtitle">Samma arkitektur — tva olika verktyg. Forstaa skillnaderna och valj ratt verktyg for ratt uppgift.</p>
-  <nav class="header-nav">
-    <a href="archimate-guide.html">Referensguide</a>
-    <a href="../demo/index.html">Editor / Playground</a>
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">ArchiCode <span>/ Mermaid &amp; ArchiMate 4</span></a>
+  <div class="nav-links">
     <a href="index.html">Startsida</a>
-  </nav>
-</header>
-
-<main>
-
-  <!-- INTRO -->
-  <section>
-    <h2>Introduktion</h2>
-    <div class="intro-text">
-      <p><strong>ArchiCode</strong> ar ett textbaserat renderingsbibliotek for ArchiMate 4 (C260). Det producerar SVG-diagram med korrekt ArchiMate-notation — domarnfarger, elementikoner, stereotyper och standardiserade relationspilar. ArchiCode kraver ingen installation och kan baddas in i alla webbsidor.</p>
-      <p><strong>Mermaid</strong> ar ett populart diagramverktyg som stoeder flowcharts, sekvensdiagram, Gantt-scheman och mer. Det ar valkant, brett integrerat (GitHub, Notion, Confluence) men saknar inbyggt stoed for ArchiMate-domarnfarger och elementikoner.</p>
-      <p>Valj <strong>ArchiCode</strong> nar du behoever formell, standardenlig ArchiMate 4-notation. Valj <strong>Mermaid</strong> nar du behoever snabb kommunikation i verktyg som redan stoeder Mermaid, och ArchiMate-standardisering inte ar ett krav.</p>
-    </div>
-
-    <table class="comp-table">
-      <thead>
-        <tr>
-          <th>Egenskap</th>
-          <th>ArchiCode</th>
-          <th>Mermaid</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="cat">AM4-standard</td>
-          <td><span class="yes">Ja</span> — fullstandig C260-implementation</td>
-          <td><span class="no">Nej</span> — generell diagramstandard</td>
-        </tr>
-        <tr>
-          <td class="cat">Domarnfarger</td>
-          <td><span class="yes">Automatiska</span> — ratt farg per doman</td>
-          <td><span class="part">Manuell</span> — kraver classDef-block</td>
-        </tr>
-        <tr>
-          <td class="cat">Elementikoner</td>
-          <td><span class="yes">Inbyggda</span> — SVG-ikoner per elementtyp</td>
-          <td><span class="part">Delvis</span> — emoji eller text</td>
-        </tr>
-        <tr>
-          <td class="cat">Relationssemantik</td>
-          <td><span class="yes">AM4-standard</span> — serving, flow, triggering m.fl.</td>
-          <td><span class="no">Generell</span> — linjer och pilar utan AM-semantik</td>
-        </tr>
-        <tr>
-          <td class="cat">Exportformat</td>
-          <td>SVG, draw.io / diagrams.net</td>
-          <td>PNG, SVG</td>
-        </tr>
-        <tr>
-          <td class="cat">AI-genererat</td>
-          <td><span class="yes">Ja</span> — strukturerad syntax, latt att generera</td>
-          <td><span class="yes">Ja</span> — brett traningsdata i LLMs</td>
-        </tr>
-        <tr>
-          <td class="cat">Inlardningskurva</td>
-          <td>Medel — kraver kunskap om AM-domaner</td>
-          <td>Lag — intuitiv flowchart-syntax</td>
-        </tr>
-        <tr>
-          <td class="cat">Verktygsintegration</td>
-          <td>Web, CDN, NPM</td>
-          <td>GitHub, Notion, Confluence, GitLab m.fl.</td>
-        </tr>
-        <tr>
-          <td class="cat">Malgrupp</td>
-          <td>Enterprise-arkitekter, EA-team</td>
-          <td>Alla — fran utvecklare till projektledare</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- EXAMPLES -->
-  <section>
-    <h2>Tre parallella exempel</h2>
-
-    <!-- EXAMPLE 1 -->
-    <div class="example-pair">
-      <div class="example-pair-header">
-        <div class="example-num">1</div>
-        <h3>E-handelsflode</h3>
-        <span>Business · Common · Application</span>
-      </div>
-      <div class="split">
-        <div class="split-col">
-          <div class="col-header">
-            <span class="col-badge archicode">ArchiCode</span>
-            <span class="note">Live-renderat SVG</span>
-          </div>
-          <div class="col-diagram" id="ex1-ac"></div>
-          <div class="col-code"><pre>// ArchiMate 4 — E-handelsflode
-[&lt;business:actor&gt; Kund]
-[&lt;common:process&gt; Kopprocess]
-[&lt;application:component&gt; Webbshop]
-[Kund] -&gt; [Kopprocess]
-[Kopprocess] --:&gt; [Webbshop]</pre></div>
-        </div>
-        <div class="split-col">
-          <div class="col-header">
-            <span class="col-badge mermaid">Mermaid</span>
-            <span class="note">Syntaxexempel (ej renderat)</span>
-          </div>
-          <div class="col-diagram">
-            <div class="mermaid-placeholder">graph TD
-  Kund[&#x1F464; Kund] --&gt; Kopprocess[&#x2699;&#xFE0F; Kopprocess]
-  Kopprocess --&gt;|realiseras av| Webbshop[&#x1F5A5;&#xFE0F; Webbshop]
-
-  %% classDef maste definieras manuellt
-  classDef business fill:#F4DE7F,stroke:#E8C555
-  classDef common   fill:#E8E5D3,stroke:#C4BFA6
-  classDef app      fill:#B6D7E1,stroke:#8CC5D4
-  class Kund business
-  class Kopprocess common
-  class Webbshop app</div>
-          </div>
-          <div class="mermaid-note">ArchiMate-ikoner saknas — ersatts av emoji. Relationstyp (realization vs serving) maste anges som etikett manuellt.</div>
-        </div>
+    <a href="https://archicode.yllemo.com/">Editor</a>
+    <a href="archimate-guide.html">Guide</a>
+    <a href="skill-am4-mermaid.md" download>↓ Skill</a>
+  </div>
+</nav>
+  <main class="page">
+    <div class="page-header">
+      <h1>ArchiMate 4 — Mermaid-exempel</h1>
+      <p>Exempel på hur du modellerar ArchiMate 4 (C260)-domäner i Mermaid med officiella färger och svenska etiketter. Physical-lagret är borttaget — fysiska element ingår nu i Teknologidomänen. Common-domänen samlar alla delade beteendeelement.</p>
+      <div class="header-actions">
+        <a href="skill-am4-mermaid.md" class="download-btn" download>↓ Ladda ner Mermaid Skill</a>
       </div>
     </div>
 
-    <!-- EXAMPLE 2 -->
-    <div class="example-pair">
-      <div class="example-pair-header">
-        <div class="example-num">2</div>
-        <h3>Capability Map</h3>
-        <span>Strategy</span>
-      </div>
-      <div class="split">
-        <div class="split-col">
-          <div class="col-header">
-            <span class="col-badge archicode">ArchiCode</span>
-            <span class="note">Live-renderat SVG</span>
-          </div>
-          <div class="col-diagram" id="ex2-ac"></div>
-          <div class="col-code"><pre>// ArchiMate 4 — Capability Map
-[&lt;strategy:capability&gt; Kundservice]
-[&lt;strategy:resource&gt; CRM-system]
-[&lt;strategy:value-stream&gt; Kundresa]
-[CRM-system] .-- [Kundservice]
-[Kundservice] -&gt; [Kundresa]</pre></div>
-        </div>
-        <div class="split-col">
-          <div class="col-header">
-            <span class="col-badge mermaid">Mermaid</span>
-            <span class="note">Syntaxexempel (ej renderat)</span>
-          </div>
-          <div class="col-diagram">
-            <div class="mermaid-placeholder">graph LR
-  Kundservice[&#x1F3AF; Kundservice] -.->|stods av| CRM[&#x1F4BB; CRM-system]
-  Kundservice --&gt; Kundresa[&#x1F504; Kundresa]
+    <section class="example-panel">
+      <h2>Mermaid-exempel: vanliga mönster per domän</h2>
+      <p>Välj en domän för att se ett representativt Mermaid-diagram med ArchiMate 4-färgpalett.</p>
 
-  classDef strategy fill:#EFBD5D,stroke:#D4A43B,color:#000
-  class Kundservice,CRM,Kundresa strategy</div>
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="overview"        role="tab" aria-selected="true">Domänöversikt</button>
+        <button class="tab-btn"        data-tab="motivation"      role="tab" aria-selected="false">Motivationsdomän</button>
+        <button class="tab-btn"        data-tab="strategy"        role="tab" aria-selected="false">Strategidomän</button>
+        <button class="tab-btn"        data-tab="common"          role="tab" aria-selected="false">Common-domän</button>
+        <button class="tab-btn"        data-tab="business"        role="tab" aria-selected="false">Verksamhetsdomän</button>
+        <button class="tab-btn"        data-tab="application"     role="tab" aria-selected="false">Applikationsdomän</button>
+        <button class="tab-btn"        data-tab="technology"      role="tab" aria-selected="false">Teknologidomän</button>
+        <button class="tab-btn"        data-tab="implementation"  role="tab" aria-selected="false">Implementering</button>
+      </div>
+
+      <!-- DOMÄNÖVERSIKT -->
+      <div class="tab-content active" data-tab="overview">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="overview-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="overview-code" type="button">Kodvy</button>
+        </div>
+        <div id="overview-rendered" class="mermaid"></div>
+        <pre id="overview-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- MOTIVATIONSDOMÄN -->
+      <div class="tab-content" data-tab="motivation">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="motivation-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="motivation-code" type="button">Kodvy</button>
+        </div>
+        <div id="motivation-rendered" class="mermaid"></div>
+        <pre id="motivation-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- STRATEGIDOMÄN -->
+      <div class="tab-content" data-tab="strategy">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="strategy-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="strategy-code" type="button">Kodvy</button>
+        </div>
+        <div id="strategy-rendered" class="mermaid"></div>
+        <pre id="strategy-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- COMMON-DOMÄN -->
+      <div class="tab-content" data-tab="common">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="common-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="common-code" type="button">Kodvy</button>
+        </div>
+        <div id="common-rendered" class="mermaid"></div>
+        <pre id="common-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- VERKSAMHETSDOMÄN -->
+      <div class="tab-content" data-tab="business">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="business-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="business-code" type="button">Kodvy</button>
+        </div>
+        <div id="business-rendered" class="mermaid"></div>
+        <pre id="business-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- APPLIKATIONSDOMÄN -->
+      <div class="tab-content" data-tab="application">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="application-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="application-code" type="button">Kodvy</button>
+        </div>
+        <div id="application-rendered" class="mermaid"></div>
+        <pre id="application-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- TEKNOLOGIDOMÄN -->
+      <div class="tab-content" data-tab="technology">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="technology-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="technology-code" type="button">Kodvy</button>
+        </div>
+        <div id="technology-rendered" class="mermaid"></div>
+        <pre id="technology-code" class="mermaid-code hidden"></pre>
+      </div>
+
+      <!-- IMPLEMENTERING -->
+      <div class="tab-content" data-tab="implementation">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-toggle="implementation-rendered" type="button">Renderad vy</button>
+          <button class="toggle-btn" data-toggle="implementation-code" type="button">Kodvy</button>
+        </div>
+        <div id="implementation-rendered" class="mermaid"></div>
+        <pre id="implementation-code" class="mermaid-code hidden"></pre>
+      </div>
+    </section>
+
+    <div class="layers-grid">
+      <div class="layer-card motivation">
+        <div class="layer-card-header">
+          <div class="layer-icon">💡</div>
+          <div>
+            <h3>Motivationsdomän</h3>
+            <div class="hex">#D8C1E4 / #B39BCF</div>
           </div>
-          <div class="mermaid-note">Alla tre elementtyper (capability, resource, value-stream) ritas med samma nod-form. Ingen semantisk skillnad i Mermaid-notation.</div>
+        </div>
+        <p><strong>Varför:</strong> Representerar mål, drivkrafter, krav och principer som motiverar arkitekturbeslut. Placerad i centrum — all arkitektur börjar här.</p>
+        <div class="element-tags">
+          <span class="etag">intressent</span>
+          <span class="etag">drivkraft</span>
+          <span class="etag">bedömning</span>
+          <span class="etag">mål</span>
+          <span class="etag">utfall</span>
+          <span class="etag">princip</span>
+          <span class="etag">krav</span>
+          <span class="etag">begränsning</span>
+          <span class="etag">betydelse</span>
+          <span class="etag">värde</span>
+        </div>
+      </div>
+
+      <div class="layer-card strategy">
+        <div class="layer-card-header">
+          <div class="layer-icon">🎯</div>
+          <div>
+            <h3>Strategidomän</h3>
+            <div class="hex">#EFBD5D / #D4A43B</div>
+          </div>
+        </div>
+        <p><strong>Hur:</strong> Representerar förmågor, resurser, värdeströmmar och handlingsplaner. Bryggan mellan motivationen och den operativa verksamheten.</p>
+        <div class="element-tags">
+          <span class="etag">resurs</span>
+          <span class="etag">förmåga</span>
+          <span class="etag">värdeström</span>
+          <span class="etag">handlingsplan</span>
+        </div>
+      </div>
+
+      <div class="layer-card common">
+        <div class="layer-card-header">
+          <div class="layer-icon">🔗</div>
+          <div>
+            <h3>Common-domän <span style="font-size:0.7rem;font-weight:400;">(ny i AM4)</span></h3>
+            <div class="hex">#E8E5D3 / #C4BFA6</div>
+          </div>
+        </div>
+        <p><strong>Delade element:</strong> Generiska beteendeelement som används i alla domäner. I AM3.2 duplicerades dessa per lager — nu finns de bara en gång här.</p>
+        <div class="element-tags">
+          <span class="etag">process</span>
+          <span class="etag">funktion</span>
+          <span class="etag">tjänst</span>
+          <span class="etag">händelse</span>
+          <span class="etag">kollaboration</span>
+          <span class="etag">roll</span>
+          <span class="etag">interaktion</span>
+          <span class="etag">stig</span>
+        </div>
+      </div>
+
+      <div class="layer-card business">
+        <div class="layer-card-header">
+          <div class="layer-icon">💼</div>
+          <div>
+            <h3>Verksamhetsdomän</h3>
+            <div class="hex">#F4DE7F / #E8C555</div>
+          </div>
+        </div>
+        <p><strong>Affär:</strong> Representerar aktörer, roller och värdeskapande mot kunder. Beteenden (process, tjänst) ärvs från Common-domänen.</p>
+        <div class="element-tags">
+          <span class="etag">aktör</span>
+          <span class="etag">roll</span>
+          <span class="etag">samarbete</span>
+          <span class="etag">gränssnitt</span>
+          <span class="etag">affärsobjekt</span>
+          <span class="etag">produkt</span>
+        </div>
+      </div>
+
+      <div class="layer-card application">
+        <div class="layer-card-header">
+          <div class="layer-icon">💻</div>
+          <div>
+            <h3>Applikationsdomän</h3>
+            <div class="hex">#B6D7E1 / #8CC5D4</div>
+          </div>
+        </div>
+        <p><strong>IT-stöd:</strong> Representerar applikationskomponenter, gränssnitt och dataobjekt. Beteenden (process, tjänst) ärvs från Common-domänen.</p>
+        <div class="element-tags">
+          <span class="etag">applikationskomponent</span>
+          <span class="etag">samarbete</span>
+          <span class="etag">gränssnitt</span>
+          <span class="etag">dataobjekt</span>
+        </div>
+      </div>
+
+      <div class="layer-card technology">
+        <div class="layer-card-header">
+          <div class="layer-icon">🖥️</div>
+          <div>
+            <h3>Teknologidomän</h3>
+            <div class="hex">#C3E1B4 / #9BD083</div>
+          </div>
+        </div>
+        <p><strong>Infrastruktur &amp; OT:</strong> Representerar IT-infrastruktur och fysisk operativ teknik. Physical Layer från AM3.2 är nu inbakat här.</p>
+        <div class="element-tags">
+          <span class="etag">nod</span>
+          <span class="etag">enhet</span>
+          <span class="etag">systemprogramvara</span>
+          <span class="etag">nätverk</span>
+          <span class="etag">kommunikationsväg</span>
+          <span class="etag">artefakt</span>
+          <span class="etag">utrustning</span>
+          <span class="etag">anläggning</span>
+          <span class="etag">distributionsnät</span>
+          <span class="etag">material</span>
+        </div>
+      </div>
+
+      <div class="layer-card implementation">
+        <div class="layer-card-header">
+          <div class="layer-icon">📋</div>
+          <div>
+            <h3>Implementering &amp; Migration</h3>
+            <div class="hex">#F8C2BE / #F09B95</div>
+          </div>
+        </div>
+        <p><strong>Förändring:</strong> Representerar program, projekt, arbetspaket, leveranser och platåer i en transformationsresa.</p>
+        <div class="element-tags">
+          <span class="etag">arbetspaket</span>
+          <span class="etag">leverans</span>
+          <span class="etag">platå</span>
+          <span class="etag">program</span>
+          <span class="etag">projekt</span>
         </div>
       </div>
     </div>
+  </main>
 
-    <!-- EXAMPLE 3 -->
-    <div class="example-pair">
-      <div class="example-pair-header">
-        <div class="example-num">3</div>
-        <h3>Infrastrukturoverview</h3>
-        <span>Technology</span>
-      </div>
-      <div class="split">
-        <div class="split-col">
-          <div class="col-header">
-            <span class="col-badge archicode">ArchiCode</span>
-            <span class="note">Live-renderat SVG</span>
-          </div>
-          <div class="col-diagram" id="ex3-ac"></div>
-          <div class="col-code"><pre>// ArchiMate 4 — Infrastruktur
-[&lt;technology:node&gt; App Server]
-[&lt;technology:device&gt; Brandvagg]
-[&lt;technology:system-software&gt; PostgreSQL]
-[Brandvagg] -&gt; [App Server]
-[App Server] -&gt; [PostgreSQL]</pre></div>
-        </div>
-        <div class="split-col">
-          <div class="col-header">
-            <span class="col-badge mermaid">Mermaid</span>
-            <span class="note">Syntaxexempel (ej renderat)</span>
-          </div>
-          <div class="col-diagram">
-            <div class="mermaid-placeholder">graph TD
-  BV[&#x1F512; Brandvagg] --&gt; AS[&#x1F5A5;&#xFE0F; App Server]
-  AS --&gt; PG[&#x1F4BE; PostgreSQL]
+  <footer>
+    <p>Baserat på ArchiMate 4 (C260) från The Open Group, publicerad april 2026.</p>
+    <p><a href="https://www.opengroup.org/archimate-forum" target="_blank" rel="noopener">opengroup.org/archimate-forum</a></p>
+    <p style="font-size: 0.8rem; color: #666; margin-top: 20px;">ArchiMate® är ett registrerat varumärke som tillhör The Open Group.</p>
+  </footer>
 
-  classDef tech fill:#C3E1B4,stroke:#9BD083,color:#000
-  class BV,AS,PG tech</div>
-          </div>
-          <div class="mermaid-note">Node, device och system-software ritas likadant. Den distinkta AM-ikonen per elementtyp saknas helt i Mermaid.</div>
-        </div>
-      </div>
-    </div>
+  <script>
+    const diagrams = {
+      overview: `flowchart TD
+    M["«motivation»<br/>Motivationsdomän<br/>(Varför)"]:::motivation
+    S["«strategi»<br/>Strategidomän<br/>(Hur vi skapar värde)"]:::strategy
+    Co["«common»<br/>Common-domän<br/>(Delade beteendeelement)"]:::common
+    V["«verksamhet»<br/>Verksamhetsdomän<br/>(Affär & organisation)"]:::business
+    A["«applikation»<br/>Applikationsdomän<br/>(IT-stöd)"]:::application
+    T["«teknologi»<br/>Teknologidomän<br/>(Infrastruktur & OT)"]:::technology
+    I["«implementering»<br/>Implementering & Migration<br/>(Förändring)"]:::implementation
 
-  </section>
+    M --> S
+    S --> Co
+    Co --> V
+    Co --> A
+    Co --> T
+    V & A & T --> I
 
-  <!-- WHEN TO USE -->
-  <section>
-    <h2>Nar ska du anvanda vad?</h2>
-    <div class="when-grid">
-      <div class="when-card ac">
-        <h3>Anvand ArchiCode <span>nar du behoever...</span></h3>
-        <ul>
-          <li>Formell ArchiMate 4-notation for leverans</li>
-          <li>Korrekt domarnfarg och elementikoner automatiskt</li>
-          <li>SVG- eller draw.io-export for presentationer</li>
-          <li>AI-genererade arkitekturdiagram</li>
-          <li>Skillnad pa actor, role, process, service i notation</li>
-          <li>Relationstyper med korrekt AM4-semantik</li>
-        </ul>
-      </div>
-      <div class="when-card mm">
-        <h3>Anvand Mermaid <span>nar du behoever...</span></h3>
-        <ul>
-          <li>Snabb kommunikation i GitHub/Notion/Confluence</li>
-          <li>Sekvensdiagram, Gantt eller mindmaps</li>
-          <li>Bred tillganglighet utan installationskrav</li>
-          <li>Enkel representation utan AM-standard</li>
-          <li>Flodensdiagram for icke-arkitekter</li>
-          <li>Dokumentation dar AM-precision inte ar ett krav</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+    V --> BO["«affärsobjekt»<br/>Kundärende"]:::business
+    A --> DO["«dataobjekt»<br/>Ärendedata"]:::application
+    BO -. realiseras av .-> DO
 
-  <!-- SUMMARY TABLE -->
-  <section>
-    <h2>Sammanfattning</h2>
-    <table class="sum-table">
-      <thead>
-        <tr>
-          <th>Egenskap</th>
-          <th>ArchiCode</th>
-          <th>Mermaid</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>AM4-standard (C260)</td>
-          <td><span class="yes">Ja</span></td>
-          <td><span class="no">Nej</span></td>
-        </tr>
-        <tr>
-          <td>Automatiska ikoner</td>
-          <td><span class="yes">Ja</span></td>
-          <td><span class="part">Delvis (emoji)</span></td>
-        </tr>
-        <tr>
-          <td>Exportformat</td>
-          <td>SVG, draw.io</td>
-          <td>PNG, SVG</td>
-        </tr>
-        <tr>
-          <td>AI-genererat</td>
-          <td><span class="yes">Ja</span></td>
-          <td><span class="yes">Ja</span></td>
-        </tr>
-        <tr>
-          <td>Enkelt att lara sig</td>
-          <td><span class="part">Medel</span></td>
-          <td><span class="yes">Enkelt</span></td>
-        </tr>
-        <tr>
-          <td>Verktygsintegration</td>
-          <td>Web / CDN / NPM</td>
-          <td>GitHub, Notion, Confluence m.fl.</td>
-        </tr>
-        <tr>
-          <td>Semantiskt korrekt</td>
-          <td><span class="yes">Ja — AM4-relationer</span></td>
-          <td><span class="no">Nej — generella pilar</span></td>
-        </tr>
-        <tr>
-          <td>Externt beroende</td>
-          <td><span class="yes">Minimalt (en JS-fil)</span></td>
-          <td><span class="part">CDN-beroende normalt</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+    classDef motivation     fill:#D8C1E4,stroke:#B39BCF,stroke-width:1px,color:#000;
+    classDef strategy       fill:#EFBD5D,stroke:#D4A43B,stroke-width:1px,color:#000;
+    classDef common         fill:#E8E5D3,stroke:#C4BFA6,stroke-width:1px,color:#000;
+    classDef business       fill:#F4DE7F,stroke:#E8C555,stroke-width:1px,color:#000;
+    classDef application    fill:#B6D7E1,stroke:#8CC5D4,stroke-width:1px,color:#000;
+    classDef technology     fill:#C3E1B4,stroke:#9BD083,stroke-width:1px,color:#000;
+    classDef implementation fill:#F8C2BE,stroke:#F09B95,stroke-width:1px,color:#000;`,
 
-</main>
+      motivation: `flowchart TD
+    Sh["«intressent»<br/>Ledning"]:::motivation
+    Dr1["«drivkraft»<br/>Ökat marknadsvärde"]:::motivation
+    Dr2["«drivkraft»<br/>Kostnadskontroll"]:::motivation
+    Go1["«mål»<br/>Effektivare processer"]:::motivation
+    Go2["«mål»<br/>Bättre datakvalitet"]:::motivation
+    Req["«krav»<br/>GDPR-efterlevnad"]:::motivation
+    Pri["«princip»<br/>Data som tillgång"]:::motivation
 
-<footer>
-  <p>ArchiMate 4 (C260) &mdash; The Open Group, april 2026</p>
-  <p style="margin-top:6px;">
-    <a href="index.html">Startsida</a> &middot;
-    <a href="archimate-guide.html">Guide</a> &middot;
-    <a href="../demo/index.html">Editor</a> &middot;
-    <a href="SKILL.md">SKILL.md</a>
-  </p>
-</footer>
+    Sh --> Dr1
+    Sh --> Dr2
+    Dr1 --> Go1
+    Dr2 --> Go2
+    Go1 --> Req
+    Go2 --> Pri
 
-<script src="../archicode.js"></script>
-<script>
-  var examples = [
-    {
-      id: 'ex1-ac',
-      code: '[<business:actor> Kund]\n[<common:process> Kopprocess]\n[<application:component> Webbshop]\n[Kund] -> [Kopprocess]\n[Kopprocess] --:> [Webbshop]'
-    },
-    {
-      id: 'ex2-ac',
-      code: '[<strategy:capability> Kundservice]\n[<strategy:resource> CRM-system]\n[<strategy:value-stream> Kundresa]\n[CRM-system] .-- [Kundservice]\n[Kundservice] -> [Kundresa]'
-    },
-    {
-      id: 'ex3-ac',
-      code: '[<technology:node> App Server]\n[<technology:device> Brandvagg]\n[<technology:system-software> PostgreSQL]\n[Brandvagg] -> [App Server]\n[App Server] -> [PostgreSQL]'
+    classDef motivation fill:#D8C1E4,stroke:#B39BCF,stroke-width:1px,color:#000;`,
+
+      strategy: `flowchart TD
+    Cap1["«förmåga»<br/>IT-hantering"]:::strategy
+    Cap2["«förmåga»<br/>Processoptimering"]:::strategy
+    Res1["«resurs»<br/>IT-team"]:::strategy
+    Res2["«resurs»<br/>Konsulter"]:::strategy
+    CoA["«handlingsplan»<br/>Digital transformation"]:::strategy
+    VS["«värdeström»<br/>Kundresan"]:::strategy
+
+    Res1 --> Cap1
+    Res2 --> Cap2
+    Cap1 --> CoA
+    Cap2 --> CoA
+    CoA --> VS
+
+    classDef strategy fill:#EFBD5D,stroke:#D4A43B,stroke-width:1px,color:#000;`,
+
+      common: `flowchart TD
+    Proc["«process»<br/>Försäljningsprocess"]:::common
+    Func["«funktion»<br/>Kalkylatorfunktion"]:::common
+    Svc["«tjänst»<br/>Offerthantering"]:::common
+    Evt["«händelse»<br/>Affär avslutad"]:::common
+    Rol["«roll»<br/>Processutförare"]:::common
+    Col["«kollaboration»<br/>Säljteam"]:::common
+
+    Evt -->|utlöser| Proc
+    Func -->|producerar| Svc
+    Proc -->|producerar| Svc
+    Rol -->|utför| Proc
+    Col -->|utför| Proc
+
+    classDef common fill:#E8E5D3,stroke:#C4BFA6,stroke-width:1px,color:#000;`,
+
+      business: `flowchart TD
+    Act["«aktör»<br/>Säljorganisation"]:::business
+    Ro["«roll»<br/>Säljare"]:::business
+    Prod["«produkt»<br/>Försäljningspaket"]:::business
+    BO["«affärsobjekt»<br/>Kundavtal"]:::business
+    Iface["«gränssnitt»<br/>Kundportal"]:::business
+
+    Act -->|tilldelar| Ro
+    Ro -->|säljer| Prod
+    Prod -->|innefattar| BO
+    Iface -->|tillgängliggör| Prod
+
+    classDef business fill:#F4DE7F,stroke:#E8C555,stroke-width:1px,color:#000;`,
+
+      application: `flowchart TD
+    Comp1["«applikationskomponent»<br/>CRM-system"]:::application
+    Comp2["«applikationskomponent»<br/>Ordermodul"]:::application
+    Iface["«gränssnitt»<br/>Kunddata API"]:::application
+    DO["«dataobjekt»<br/>Kundregister"]:::application
+
+    Comp1 -->|exponerar| Iface
+    Comp2 -->|använder| Iface
+    Iface -->|tillgängliggör| DO
+
+    classDef application fill:#B6D7E1,stroke:#8CC5D4,stroke-width:1px,color:#000;`,
+
+      technology: `flowchart TD
+    Fac["«anläggning»<br/>Datacenter Stockholm"]:::technology
+    Eq["«utrustning»<br/>Serverracks"]:::technology
+    Node["«nod»<br/>Produktionsserver"]:::technology
+    Sys["«systemprogramvara»<br/>Docker/Kubernetes"]:::technology
+    Net["«nätverk»<br/>Datacenter LAN"]:::technology
+    Artif["«artefakt»<br/>kunddata.db"]:::technology
+
+    Fac -->|innehåller| Eq
+    Eq -->|utför| Node
+    Node -->|kör| Sys
+    Sys -->|kommunicerar via| Net
+    Node -->|lagrar| Artif
+
+    classDef technology fill:#C3E1B4,stroke:#9BD083,stroke-width:1px,color:#000;`,
+
+      implementation: `flowchart TD
+    Prog["«program»<br/>Digitalisering 2025–2027"]:::implementation
+    WP1["«arbetspaket»<br/>Infrastrukturuppgradering"]:::implementation
+    WP2["«arbetspaket»<br/>Datamigrering"]:::implementation
+    Del1["«leverans»<br/>Ny databaskonfiguration"]:::implementation
+    Del2["«leverans»<br/>Migrerad kunddata"]:::implementation
+    Plat["«platå»<br/>Målarkitektur v1"]:::implementation
+
+    Prog --> WP1
+    Prog --> WP2
+    WP1 --> Del1
+    WP2 --> Del2
+    Del1 & Del2 --> Plat
+
+    classDef implementation fill:#F8C2BE,stroke:#F09B95,stroke-width:1px,color:#000;`
+    };
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "base",
+      securityLevel: "loose",
+      flowchart: { htmlLabels: true },
+      themeVariables: {
+        primaryTextColor: "#1a1a1a",
+        lineColor: "#666666",
+        fontSize: "13px"
+      }
+    });
+
+    const renderCache = new Map();
+
+    function autoFitDiagram(layer) {
+      const renderedEl = document.getElementById(`${layer}-rendered`);
+      if (!renderedEl) return;
+      const svg = renderedEl.querySelector("svg");
+      if (!svg) return;
+      const viewBoxWidth = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal.width : 0;
+      const naturalWidth = viewBoxWidth > 0 ? viewBoxWidth : svg.getBoundingClientRect().width;
+      const containerWidth = renderedEl.clientWidth;
+      const targetWidth = Math.min(naturalWidth || containerWidth, containerWidth);
+      svg.style.width = `${targetWidth}px`;
+      svg.style.height = "auto";
+      svg.style.maxWidth = "100%";
+      svg.style.display = "block";
+      svg.style.margin = "0 auto";
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     }
-  ];
 
-  examples.forEach(function(ex) {
-    var el = document.getElementById(ex.id);
-    if (!el) return;
-    try {
-      ArchiCode.render(ex.code, el);
-    } catch(e) {
-      el.innerHTML = '<span style="color:#e57373;font-size:0.8rem;">Renderingsfel: ' + e.message + '</span>';
+    async function renderDiagram(layer) {
+      const renderedEl = document.getElementById(`${layer}-rendered`);
+      const codeEl = document.getElementById(`${layer}-code`);
+      const source = diagrams[layer];
+      if (!renderedEl || !codeEl || !source) return;
+      codeEl.textContent = source;
+      const cacheKey = `mmd-${layer}`;
+      if (renderCache.has(cacheKey)) {
+        renderedEl.innerHTML = renderCache.get(cacheKey);
+        autoFitDiagram(layer);
+        return;
+      }
+      const renderId = `mmd-${layer}-${Date.now()}`;
+      const result = await mermaid.render(renderId, source);
+      renderedEl.innerHTML = result.svg;
+      renderCache.set(cacheKey, result.svg);
+      if (typeof result.bindFunctions === "function") result.bindFunctions(renderedEl);
+      autoFitDiagram(layer);
     }
-  });
-</script>
+
+    function getActiveLayer() {
+      const activeTab = document.querySelector(".tab-content.active");
+      return activeTab ? activeTab.dataset.tab : "overview";
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => renderDiagram('overview'));
+    } else {
+      renderDiagram('overview');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tabName = e.currentTarget.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        const selectedTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
+        if (selectedTab) selectedTab.classList.add('active');
+        e.currentTarget.classList.add('active');
+        e.currentTarget.setAttribute('aria-selected', 'true');
+        renderDiagram(tabName);
+      });
+    });
+
+    window.addEventListener("resize", () => autoFitDiagram(getActiveLayer()));
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const toggleId = e.target.dataset.toggle;
+        const parent = e.target.closest('.tab-content');
+        parent.querySelectorAll('.mermaid, .mermaid-code').forEach(el => el.classList.add('hidden'));
+        parent.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(toggleId).classList.remove('hidden');
+        e.target.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>

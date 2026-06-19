@@ -236,6 +236,50 @@
       .quick-links { flex-direction: column; align-items: center; }
       .quick-links a { width: 200px; text-align: center; }
     }
+
+    /* ── Hex layer shapes ── */
+    .layer-shape {
+      cursor: pointer;
+      transition: filter 0.15s ease;
+    }
+    .layer-shape:hover { filter: brightness(0.84) saturate(1.3); }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      display: none;
+      width: 300px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      z-index: 999;
+      pointer-events: none;
+      overflow: hidden;
+      animation: pop .14s ease;
+    }
+    @keyframes pop {
+      from { opacity:0; transform:scale(.95) translateY(5px); }
+      to   { opacity:1; transform:scale(1)   translateY(0);   }
+    }
+    .tt-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px 10px;
+      border-bottom: 2px solid;
+    }
+    .tt-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; flex-shrink: 0;
+    }
+    .tt-name { font-size: 14px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+    .tt-hex  { font-size: 10.5px; color: #aaa; margin-top: 2px; font-family: monospace; }
+    .tt-body { padding: 10px 14px 12px; }
+    .tt-kw   { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase;
+               letter-spacing: .07em; margin-bottom: 5px; }
+    .tt-desc { font-size: 12px; color: #444; line-height: 1.6; margin-bottom: 9px; }
+    .tt-tags { display:flex; flex-wrap:wrap; gap:4px; }
+    .tt-tag  { font-size: 11px; border-radius: 20px; padding: 2px 8px;
+               background: rgba(0,0,0,0.07); color: #444; }
   </style>
 </head>
 <body>
@@ -246,8 +290,10 @@
   <p class="subtitle">Den senaste standarden från The Open Group — domänbaserad modellering med sju distinkta arkitekturdomäner.</p>
   <nav class="quick-links">
     <a href="archimate-guide.html" class="primary">Referensguide</a>
-    <a href="../demo/index.html" class="secondary">Editor / Playground</a>
-    <a href="archimate-mermaid.html" class="secondary">ArchiCode vs Mermaid</a>
+    <a href="https://archicode.yllemo.com/" class="secondary">ArchiCode Editor</a>
+    <a href="archimate-mermaid.html" class="secondary">Mermaid &amp; ArchiMate 4</a>
+    <a href="skill-am4-archicode.md" download class="secondary">↓ ArchiCode Skill</a>
+    <a href="skill-am4-mermaid.md" download class="secondary">↓ Mermaid Skill</a>
   </nav>
 </header>
 
@@ -258,76 +304,75 @@
     <h2 style="border:none; text-align:left; margin-bottom:20px;">Domänmodell</h2>
 
     <svg class="hex-svg" viewBox="0 0 750 681" xmlns="http://www.w3.org/2000/svg" aria-label="ArchiMate 4 domänmodell">
-      <defs>
-        <style>
-          .hex-label { font-family: Arial, system-ui, sans-serif; font-size: 13px; font-weight: 700; fill: #1a1c2e; text-anchor: middle; pointer-events: none; }
-          .hex-sub   { font-family: Arial, system-ui, sans-serif; font-size: 10px; fill: #555; text-anchor: middle; pointer-events: none; }
-          polygon, path { transition: opacity 0.2s; }
-          polygon:hover, path:hover { opacity: 0.85; cursor: default; }
-        </style>
-      </defs>
+      <title>ArchiMate 4 domänmodell</title>
 
-      <!-- Implementation (outermost ring, evenodd) -->
-      <path fill="#F8C2BE" stroke="#F09B95" stroke-width="1.5"
-        fill-rule="evenodd"
-        d="M670,340 L525,591 L235,591 L90,340 L235,89 L525,89 Z
-           M498,136 L263,136 L145,340 L263,544 L498,544 L615,340 Z"/>
+      <!-- Implementation & Migration – rosa ring (evenodd) -->
+      <path class="layer-shape" data-layer="impl"
+        d="M670,340 L525,591.147 L235,591.147 L90,340 L235,88.853 L525,88.853 Z
+           M497.5,136.484 L262.5,136.484 L145,340 L262.5,543.516 L497.5,543.516 L615,340 Z"
+        fill="#F8C2BE" fill-rule="evenodd" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- Business (yellow, left+top) -->
-      <polygon fill="#F4DE7F" stroke="#E8C555" stroke-width="1.5"
-        points="145,340 263,136 498,136 469,186 291,186 202,340"/>
+      <!-- Verksamhetsdomän – gul -->
+      <polygon class="layer-shape" data-layer="bus"
+        points="145,340 262.5,136.484 497.5,136.484 469,185.847 291,185.847 202,340"
+        fill="#F4DE7F" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- Application (blue, right) -->
-      <polygon fill="#B6D7E1" stroke="#8CC5D4" stroke-width="1.5"
-        points="498,136 615,340 498,544 469,494 558,340 469,186"/>
+      <!-- Applikationsdomän – blå -->
+      <polygon class="layer-shape" data-layer="app"
+        points="497.5,136.484 615,340 497.5,543.516 469,494.153 558,340 469,185.847"
+        fill="#B6D7E1" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- Technology (green, bottom) -->
-      <polygon fill="#C3E1B4" stroke="#9BD083" stroke-width="1.5"
-        points="498,544 263,544 145,340 202,340 291,494 469,494"/>
+      <!-- Teknologidomän – grön -->
+      <polygon class="layer-shape" data-layer="tech"
+        points="497.5,543.516 262.5,543.516 145,340 202,340 291,494.153 469,494.153"
+        fill="#C3E1B4" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- Common (beige, middle ring) -->
-      <polygon fill="#E8E5D3" stroke="#C4BFA6" stroke-width="1.5"
-        points="558,340 469,494 291,494 202,340 291,186 469,186"/>
+      <!-- Common-domän – beige -->
+      <polygon class="layer-shape" data-layer="common"
+        points="558,340 469,494.153 291,494.153 202,340 291,185.847 469,185.847"
+        fill="#E8E5D3" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- Strategy (gold, inner ring) -->
-      <polygon fill="#EFBD5D" stroke="#D4A43B" stroke-width="1.5"
-        points="502,340 441,446 319,446 258,340 319,234 441,234"/>
+      <!-- Strategidomän – guld -->
+      <polygon class="layer-shape" data-layer="strat"
+        points="502,340 441,445.655 319,445.655 258,340 319,234.345 441,234.345"
+        fill="#EFBD5D" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- Motivation (purple, innermost) -->
-      <polygon fill="#D8C1E4" stroke="#B39BCF" stroke-width="1.5"
-        points="446,340 413,397 347,397 314,340 347,283 413,283"/>
+      <!-- Motivationsdomän – lila (innerst) -->
+      <polygon class="layer-shape" data-layer="motiv"
+        points="446,340 413,397.158 347,397.158 314,340 347,282.842 413,282.842"
+        fill="#D8C1E4" stroke="#fff" stroke-width="2.5" stroke-linejoin="miter"/>
 
-      <!-- LABELS -->
-      <!-- Implementation -->
-      <text class="hex-label" x="380" y="108">Implementation &amp; Migration</text>
-      <text class="hex-sub"   x="380" y="122">workpackage · deliverable · plateau</text>
+      <!-- Etiketter -->
+      <text font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700"
+        fill="#3A3630" text-anchor="middle" dominant-baseline="middle"
+        x="380" y="215" style="pointer-events:none">Common</text>
 
-      <!-- Business -->
-      <text class="hex-label" x="195" y="235">Business</text>
-      <text class="hex-sub"   x="195" y="249">actor · role · process · product</text>
+      <text font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"
+        fill="#5A3A08" text-anchor="middle" dominant-baseline="middle"
+        x="380" y="264" style="pointer-events:none">Strategi</text>
 
-      <!-- Application -->
-      <text class="hex-label" x="580" y="310">Application</text>
-      <text class="hex-sub"   x="580" y="324">component · service · data</text>
+      <text font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"
+        fill="#4A2A68" text-anchor="middle" dominant-baseline="middle"
+        x="380" y="340" style="pointer-events:none">Motivation</text>
 
-      <!-- Technology -->
-      <text class="hex-label" x="195" y="470">Technology</text>
-      <text class="hex-sub"   x="195" y="484">node · device · artifact</text>
+      <text font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700"
+        fill="#5A4A08" text-anchor="middle" dominant-baseline="middle"
+        transform="translate(222,251) rotate(-60)" style="pointer-events:none">Verksamhet</text>
 
-      <!-- Common -->
-      <text class="hex-label" x="380" y="278">Common</text>
-      <text class="hex-sub"   x="380" y="291">process · service · event</text>
+      <text font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700"
+        fill="#1E4E62" text-anchor="middle" dominant-baseline="middle"
+        transform="translate(538,251) rotate(60)" style="pointer-events:none">Applikation</text>
 
-      <!-- Strategy -->
-      <text class="hex-label" x="380" y="366">Strategy</text>
-      <text class="hex-sub"   x="380" y="378">capability · resource</text>
+      <text font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"
+        fill="#2D5C22" text-anchor="middle" dominant-baseline="middle"
+        x="380" y="519" style="pointer-events:none">Teknologi</text>
 
-      <!-- Motivation -->
-      <text class="hex-label" x="380" y="346">Motivation</text>
-      <text class="hex-sub"   x="380" y="357">goal · driver</text>
+      <text font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="700"
+        fill="#5A2A26" text-anchor="middle" dominant-baseline="middle"
+        x="380" y="567" style="pointer-events:none">Implementering &amp; Migration</text>
     </svg>
 
-    <p class="caption">ArchiMate 4 (C260) — sju domäner. Motivation i centrum, Implementation som yttre ring. Klicka på referensguiden för elementdetaljer.</p>
+    <p class="caption">Hover över ett domänlager för att se vad det innehåller. ArchiMate 4 (C260) — sju domäner, Motivation i centrum.</p>
   </section>
 
   <!-- DOMAIN LEGEND -->
@@ -406,7 +451,7 @@
   <div class="info-box">
     <strong>Om ArchiCode:</strong> ArchiCode är en textbaserad SVG-renderare för ArchiMate 4. Skriv <code>[&lt;business:actor&gt; Kund]</code> och få ett färdigt ArchiMate-element renderat direkt i webbläsaren. Perfekt för AI-genererade arkitekturdiagram, dokumentation och snabba skisser.
     <br><br>
-    Öppna <a href="../demo/index.html">editorn</a> och börja skriva, eller läs <a href="archimate-guide.html">referensguiden</a> för fullständig syntaxdokumentation.
+    Öppna <a href="/demo/">editorn</a> och börja skriva, eller läs <a href="archimate-guide.html">referensguiden</a> för fullständig syntaxdokumentation.
   </div>
 
 </main>
@@ -414,8 +459,103 @@
 <footer>
   <p>ArchiMate 4 (C260) &mdash; The Open Group, april 2026 &mdash;
   <a href="https://www.opengroup.org/archimate-forum" target="_blank" rel="noopener">opengroup.org</a></p>
-  <p style="margin-top:6px;">ArchiCode renderingsbibliotek &mdash; <a href="../demo/index.html">Editor</a> &middot; <a href="archimate-guide.html">Guide</a> &middot; <a href="SKILL.md">SKILL.md</a></p>
+  <p style="margin-top:6px;">ArchiCode renderingsbibliotek &mdash; <a href="https://archicode.yllemo.com/">Editor</a> &middot; <a href="archimate-guide.html">Guide</a> &middot; <a href="skill-am4-archicode.md" download>↓ ArchiCode Skill</a> &middot; <a href="skill-am4-mermaid.md" download>↓ Mermaid Skill</a></p>
+  <p style="margin-top:8px;font-size:0.78rem;opacity:0.55;">ArchiMate® är ett registrerat varumärke som tillhör The Open Group.</p>
 </footer>
 
+<div id="tooltip"></div>
+
+<script>
+const DOMANER = {
+  motiv: {
+    namn: "Motivationsdomän", hex: "#D8C1E4 / #B39BCF", ikon: "💡", bg: "#D8C1E4",
+    nyckel: "Varför – drivkrafter och mål",
+    beskr: "Modellerar de mål, krav och drivkrafter som motiverar och rättfärdigar arkitekturbeslut. Placerad i mitten av hexagonen – all arkitektur ska starta i motivationen.",
+    taggar: ["intressent","drivkraft","bedömning","mål","utfall","princip","krav","begränsning","värde","betydelse"]
+  },
+  strat: {
+    namn: "Strategidomän", hex: "#EFBD5D / #D4A43B", ikon: "🎯", bg: "#EFBD5D",
+    nyckel: "Hur vi skapar värde",
+    beskr: "Modellerar organisationens strategiska riktning: vilka förmågor och resurser som behövs, och hur de omsätts i konkreta handlingsplaner. Bryggan mellan varför och vad.",
+    taggar: ["resurs","förmåga","värdeström","handlingsplan"]
+  },
+  common: {
+    namn: "Common-domän", hex: "#E8E5D3 / #C4BFA6", ikon: "🔗", bg: "#C4BFA6",
+    nyckel: "Generiska, delade element",
+    beskr: "Innehåller de universella beteendeelementen som delas av alla domäner. Nytt i ArchiMate 4: Process, Funktion, Tjänst och Händelse finns nu bara en gång här – inte duplicerade per lager som i v3.2.",
+    taggar: ["process","funktion","tjänst","händelse","kollaboration","roll","interaktion","stig"]
+  },
+  bus: {
+    namn: "Verksamhetsdomän", hex: "#F4DE7F / #E8C555", ikon: "💼", bg: "#F4DE7F",
+    nyckel: "Organisation och affär",
+    beskr: "Modellerar organisationsstrukturer, aktörer och värdeskapande mot kunder och intressenter. Verksamhetsspecifika element är Aktör, Roll, Affärsobjekt och Produkt. Beteenden (process, tjänst) ärvs från Common.",
+    taggar: ["aktör","roll","samarbete","affärsobjekt","produkt","gränssnitt"]
+  },
+  app: {
+    namn: "Applikationsdomän", hex: "#B6D7E1 / #8CC5D4", ikon: "🖥️", bg: "#B6D7E1",
+    nyckel: "IT-stöd och mjukvara",
+    beskr: "Modellerar applikationer, gränssnitt och dataobjekt som stödjer verksamheten. Applikationsspecifika element är Applikationskomponent, Gränssnitt och Dataobjekt. Beteenden ärvs från Common.",
+    taggar: ["applikationskomponent","gränssnitt","dataobjekt","samarbete"]
+  },
+  tech: {
+    namn: "Teknologidomän", hex: "#C3E1B4 / #9BD083", ikon: "⚙️", bg: "#C3E1B4",
+    nyckel: "Infrastruktur och fysisk teknik",
+    beskr: "Modellerar IT-infrastruktur och fysisk operativ teknik (OT). I ArchiMate 4 är det tidigare Physical Layer inbakat här. Täcker allt från servrar och nätverk till fysisk utrustning och anläggningar.",
+    taggar: ["nod","enhet","systemprogramvara","nätverk","kommunikationsväg","artefakt","utrustning","anläggning","distributionsnät","material"]
+  },
+  impl: {
+    namn: "Implementering & Migration", hex: "#F8C2BE / #F09B95", ikon: "🔄", bg: "#F8C2BE",
+    nyckel: "Förändring och transformation",
+    beskr: "Modellerar program, projekt och leveranser som driver övergången från nuläge till målbild. Beskriver platåer i transformationsresan. Händelse-elementet från Common används nu i stället för det borttagna ImplementationEvent.",
+    taggar: ["arbetspaket","leverans","platå","program","projekt","fas"]
+  }
+};
+
+const tooltip = document.getElementById('tooltip');
+let active = null;
+
+function renderTooltip(id) {
+  const d = DOMANER[id];
+  tooltip.innerHTML = `
+    <div class="tt-head" style="background:${d.bg}33;border-color:${d.bg}">
+      <div class="tt-icon" style="background:${d.bg}">${d.ikon}</div>
+      <div>
+        <div class="tt-name">${d.namn}</div>
+        <div class="tt-hex">${d.hex}</div>
+      </div>
+    </div>
+    <div class="tt-body">
+      <div class="tt-kw">${d.nyckel}</div>
+      <div class="tt-desc">${d.beskr}</div>
+      <div class="tt-tags">${d.taggar.map(t=>`<span class="tt-tag">${t}</span>`).join('')}</div>
+    </div>`;
+}
+
+function placeTooltip(e) {
+  if (!active) return;
+  const pad=16, tw=300, th=tooltip.offsetHeight||210;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  let x=e.clientX+pad, y=e.clientY+pad;
+  if (x+tw>vw-pad) x=e.clientX-tw-pad;
+  if (y+th>vh-pad) y=e.clientY-th-pad;
+  if (y<pad) y=pad;
+  tooltip.style.left=x+'px';
+  tooltip.style.top=y+'px';
+}
+
+document.querySelectorAll('.layer-shape').forEach(el => {
+  el.addEventListener('mouseenter', e => {
+    active = el.dataset.layer;
+    renderTooltip(active);
+    tooltip.style.display = 'block';
+    placeTooltip(e);
+  });
+  el.addEventListener('mousemove', placeTooltip);
+  el.addEventListener('mouseleave', () => {
+    active = null;
+    tooltip.style.display = 'none';
+  });
+});
+</script>
 </body>
 </html>

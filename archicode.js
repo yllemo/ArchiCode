@@ -18,7 +18,7 @@
     const ARCHIMATE_COLORS = {
         'motivation':     { fill: '#D8C1E4', stroke: '#B39BCF', badge: 'M' },
         'strategy':       { fill: '#EFBD5D', stroke: '#D4A43B', badge: 'S' },
-        'common':         { fill: '#E8E5D3', stroke: '#C4BFA6', badge: 'Co' },
+        'common':         { fill: '#E8E5D3', stroke: '#C4BFA6', badge: 'C' },
         'business':       { fill: '#F4DE7F', stroke: '#E8C555', badge: 'B' },
         'application':    { fill: '#B6D7E1', stroke: '#8CC5D4', badge: 'A' },
         'technology':     { fill: '#C3E1B4', stroke: '#9BD083', badge: 'T' },
@@ -190,6 +190,7 @@
         'physical-material': 'physical-material',
         'distribution-network': 'distribution-network',
         'physical-distribution-network': 'distribution-network',
+        'technology-distribution-network': 'distribution-network',
 
         'location': 'location',
         'grouping': 'grouping',
@@ -537,7 +538,7 @@
                     // Only add if not already defined and not part of a relation
                     if (!elements.find(el => el.id === elementId)) {
                         // Check if this line is actually a relation (has relation syntax)
-                        const hasRelationSyntax = /\[([^\]]+)\]\s*(-:>|<-:|<:--|\+\-|\-\+|o-|-o|\.--\.|\.->|\.-\|>|\.--\|>|<-\||<-\|\.|--:>|-\|>|<\|-|->|<-|-->|<--|<->|---)\s*\[([^\]]+)\]/.test(line);
+                        const hasRelationSyntax = /\[([^\]]+)\]\s*(-:>|<-:|<:--|\+\-|\-\+|o-|-o|\.--\.|\.->|\.-\|>|\.--\|>|<-\||<-\|\.|--:>|-\|>|<\|-|<->|-->|<--|->|<-|---)\s*\[([^\]]+)\]/.test(line);
                         if (!hasRelationSyntax) {
                             elements.push({
                                 layer: 'business', // Default layer
@@ -557,7 +558,7 @@
                 // Support labels: [Source]label-->[Target] or [Source]-->label[Target]
                 // Match pattern: [source] (optional startLabel) (syntax) (optional endLabel) [target]
                 // Note: We need to match labels that can appear between syntax and target
-                const relationPattern = /\[([^\]]+)\]\s*([^\[]*?)(-:>|<-:|<:--|\+\-|\-\+|o-|-o|\.--\.|\.->|\.-\|>|\.--\|>|<-\||<-\|\.|--:>|-\|>|<\|-|->|<-|-->|<--|<->|---)\s*([^\[]*?)\s*\[([^\]]+)\]/g;
+                const relationPattern = /\[([^\]]+)\]\s*([^\[]*?)(-:>|<-:|<:--|\+\-|\-\+|o-|-o|\.--\.|\.->|\.-\|>|\.--\|>|<-\||<-\|\.|--:>|-\|>|<\|-|<->|-->|<--|->|<-|---)\s*([^\[]*?)\s*\[([^\]]+)\]/g;
                 let relationMatch;
                 while ((relationMatch = relationPattern.exec(line)) !== null) {
                     let [, source, startLabel, syntax, endLabel, target] = relationMatch;

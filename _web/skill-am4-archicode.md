@@ -410,6 +410,6 @@ console.log('Relationer:', relations.length);
 - **Standard**: The Open Group ArchiMate 4, specifikation C260, april 2026
 - **Farger**: ArchiMate 2025 Modern Color Set
 - **Dokumentation**: [opengroup.org/archimate-forum](https://www.opengroup.org/archimate-forum)
-- **Renderare**: ArchiCode.js — MIT-licens
-- **Demo**: [../demo/index.html](../demo/index.html)
+- **Renderare**: ArchiCode.js — public domain (The Unlicense)
+- **Demo**: [/demo/](/demo/)
 - **Guide**: [archimate-guide.html](archimate-guide.html)
